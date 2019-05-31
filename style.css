@@ -1,0 +1,19 @@
+﻿/*Page Styles*/
+
+#battle-screen {
+    border: 2px solid pink;
+}
+
+.battle-screen-background {
+    background-image: url('battle-screen-1.jpg');
+    background-repeat: no-repeat;
+}
+
+.hide-screen {
+    display: none;
+}
+
+.button-confirm {
+    font-weight: bold;
+    color: green;
+}
