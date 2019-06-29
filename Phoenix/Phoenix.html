@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <title>World Domination</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body id="entire-background">
+    <h1 id="game-header">World Domination</h1>
+
+    <div id="global-game-options">
+        <h2>Global Game Options</h2>
+        <h3>Number of Players</h3>
+        <input type="number" id="update-player-count" min=2 value=2></br>        
+        <input type="checkbox" id="shared-deck-pool">Shared Deck Pool</br>
+        <input type="checkbox" id="random-map-setup" checked>Random Map Setup</br>
+        <button id="button-begin-player-setup">Begin Player Setup</button>
+    </div>
+
+    <div id="player-info">
+        <div id="player-chosen-options">
+            <h2>Player Information</h2>
+            <button id="button-setup-complete">Begin World Domination</button></br></br>
+            <form id="dropdown-player-select">Player:
+                <div id="player-dropdown-select-container"></div>
+            </form>
+            <h2 id="name-to-show">Player Name</h2>
+            <button id="button-change-name">Change Name</button>
+            <h2 id="color-to-show">Player Color</h2>
+            <input id="red-value" type="range" min=0 max=255 value=255>Red</input></br>
+            <input id="green-value" type="range" min=0 max=255 value=255>Green</input></br>
+            <input id="blue-value" type="range" min=0 max=255 value=255>Blue</input>
+        </div>
+        
+        <div id="player-earned-info">
+            <h2>Game Info</h2>
+            <h3>Air Drop Cards</h3>
+            <h3>Decks In Game</h3>
+
+            <h2>Game Statistics</h2>
+            <div>Living Deck Color Graph</div>
+            <div>Decks on Color Bar Graph</div>
+            <div>Continent Color Pie Graph</div>
+            <div>Continent Victory Pie Graph</div>
+        </div>
+        
+        <div id="player-decklist">
+            <h2 id="player-library">Potential Library</h2>
+            <p id="player-decklist-count">Library Count</p>
+
+            <div id="library-table-container"></div>
+        </div>  
+    </div>    
+
+    <div id="battle-screen">
+        <h2 id="battle-message">Battle</h2>
+        <div id="display-defender"></div>
+        <div id="display-attackers"></div>
+    </div>
+
+
+<script src="deckLists.js"></script>
+<script src="gameVariables.js"></script>
+<script src="setupScript.js"></script>
+<script src="gameFlow.js"></script>
+</body>
+</html>

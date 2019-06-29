@@ -1,0 +1,32 @@
+﻿/*Page Styles*/
+
+#global-game-options {
+    border: 2px solid green;
+}
+
+#player-info {
+    border: 2px solid blue;
+}
+
+#battle-screen {
+    border: 2px solid pink;
+}
+
+.battle-screen-background-class {
+    background-image: url('battle-screen-1.jpg');
+    background-repeat: no-repeat;
+}
+
+.hide-item-class {
+    display: none;
+}
+
+.button-confirm-class {
+    font-weight: bold;
+    color: orange;
+}
+
+.deck-library-table-class {
+    color: red;
+    text-align: left;
+}
