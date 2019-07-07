@@ -15,22 +15,20 @@
         <input type="number" id="update-player-count" min=2 value=2></br>        
         <input type="checkbox" id="shared-deck-pool">Shared Deck Pool</br>
         <input type="checkbox" id="random-map-setup" checked>Random Map Setup</br>
-        <button id="button-begin-player-setup">Begin Player Setup</button>
+        <button id="button-begin-player-setup" onclick="beginPlayerSetup()">Begin Player Setup</button>
     </div>
 
-    <div id="player-info">
+    <div id="player-info" class="player-color-preview">
         <div id="player-chosen-options">
             <h2>Player Information</h2>
-            <button id="button-setup-complete">Begin World Domination</button></br></br>
-            <form id="dropdown-player-select">Player:
-                <div id="player-dropdown-select-container"></div>
-            </form>
+            <button id="button-setup-complete" onclick="startIniGame()">Begin World Domination</button></br></br>
+            <form id="player-dropdown-select-container" onchange="setupPlayerChange()">Player:</form>
             <h2 id="name-to-show">Player Name</h2>
-            <button id="button-change-name">Change Name</button>
+            <button id="button-change-name" onclick="setupPlayerName()">Change Name</button>
             <h2 id="color-to-show">Player Color</h2>
-            <input id="red-value" type="range" min=0 max=255 value=255>Red</input></br>
-            <input id="green-value" type="range" min=0 max=255 value=255>Green</input></br>
-            <input id="blue-value" type="range" min=0 max=255 value=255>Blue</input>
+            <input id="red-value" type="range" min=0 max=255 value=255 onchange="setupPlayerColor(0, value)">Red</input></br>
+            <input id="green-value" type="range" min=0 max=255 value=255 onchange="setupPlayerColor(1, value)">Green</input></br>
+            <input id="blue-value" type="range" min=0 max=255 value=255 onchange="setupPlayerColor(2, value)">Blue</input>
         </div>
         
         <div id="player-earned-info">
@@ -54,11 +52,11 @@
     </div>    
 
     <div id="battle-screen">
-        <h2 id="battle-message">Battle</h2>
-        <div id="display-defender"></div>
-        <div id="display-attackers"></div>
+        <h2 id="battle-title">Battle</h2>
+        <h3 id="battle-message">Initiation Game</h3>
+        <div id="battle-information"></div>
+        <div id="battle-win-buttons"></div>
     </div>
-
 
 <script src="deckLists.js"></script>
 <script src="gameVariables.js"></script>
