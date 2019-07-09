@@ -3,7 +3,7 @@
 //Battle
 
 function createBattleScreenInfo(plNum) {
-    battleScreenInfo["Player" + plNum] = {
+    gameVars.battleScreenInfo.battleDeck["Player" + plNum] = {
         playerNumber: plNum,
         deck: "",
         gameStarts: {
@@ -26,12 +26,14 @@ function createBattleScreenInfo(plNum) {
 }
 
 function loadBattleScreenDecks(plNum) {
-   if (gameStatus.mode === "setup") {
-       var iniDeck = playerInfo["Player" + plNum].gameDeckRandomLibrary[0];
+   if (gameVars.gameStatus.mode === "setup") {
+       var iniDeck = gameVars.playerInfo["Player" + plNum].gameDeckRandomLibrary[0];
 
-        battleScreenInfo["Player" + plNum].deck = iniDeck;
+       gameVars.battleScreenInfo.battleDeck["Player" + plNum].deck = iniDeck;
+        updateBattleLog("Initiative Game Begins");
    }
    else {
+    displayBattleLocationInfo();
        //check if playing in this battle
        //add regular battle info
    }
@@ -41,20 +43,20 @@ function loadBattleScreenDecks(plNum) {
 
 
 function displayBattlePlayerInfo(plNum) {
-    var displayName = playerInfo["Player" + plNum].name,
-    displayDeckName = battleScreenInfo["Player" + plNum].deck.deckName,
-    displayDeckColor = battleScreenInfo["Player" + plNum].deck.deckColor,
-    displayLife = battleScreenInfo["Player" + plNum].gameStarts.life,
-    displayHand = battleScreenInfo["Player" + plNum].gameStarts.hand,
-    displayAttacker = battleScreenInfo["Player" + plNum].attacker,
-    displayDefender = battleScreenInfo["Player" + plNum].defender,
-    displayContinentBonuses = battleScreenInfo["Player" + plNum].continentBonus,
-    displayVanguard = battleScreenInfo["Player" + plNum].vanguard,
-    displayBonuses = battleScreenInfo["Player" + plNum].bonuses,
-    displayPenalties = battleScreenInfo["Player" + plNum].penalties,
-    displayHero = battleScreenInfo["Player" + plNum].hero,
-    displayConspiracy = battleScreenInfo["Player" + plNum].conspiracy,
-    displayDefensePlane = battleScreenInfo["Player" + plNum].defensePlane;
+    var displayName = gameVars.playerInfo["Player" + plNum].name,
+    displayDeckName = gameVars.battleScreenInfo.battleDeck["Player" + plNum].deck.deckName,
+    displayDeckColor = gameVars.battleScreenInfo.battleDeck["Player" + plNum].deck.deckColor,
+    displayLife = gameVars.battleScreenInfo.battleDeck["Player" + plNum].gameStarts.life,
+    displayHand = gameVars.battleScreenInfo.battleDeck["Player" + plNum].gameStarts.hand,
+    displayAttacker = gameVars.battleScreenInfo.battleDeck["Player" + plNum].attacker,
+    displayDefender = gameVars.battleScreenInfo.battleDeck["Player" + plNum].defender,
+    displayContinentBonuses = gameVars.battleScreenInfo.battleDeck["Player" + plNum].continentBonus,
+    displayVanguard = gameVars.battleScreenInfo.battleDeck["Player" + plNum].vanguard,
+    displayBonuses = gameVars.battleScreenInfo.battleDeck["Player" + plNum].bonuses,
+    displayPenalties = gameVars.battleScreenInfo.battleDeck["Player" + plNum].penalties,
+    displayHero = gameVars.battleScreenInfo.battleDeck["Player" + plNum].hero,
+    displayConspiracy = gameVars.battleScreenInfo.battleDeck["Player" + plNum].conspiracy,
+    displayDefensePlane = gameVars.battleScreenInfo.battleDeck["Player" + plNum].defensePlane;
 
 
 
@@ -64,11 +66,6 @@ function displayBattlePlayerInfo(plNum) {
 
 
 
-function displayBattleLocationInfo() {
-    //set ground zero and display
-
-
-}
 
 
 
@@ -80,14 +77,19 @@ displayDeckColor + " \nLife " + displayLife + " Hand " + displayHand);
 
 
 
+function displayBattleLocationInfo() {
+    //set ground zero and display 
+
+
+}
 
 
 function openBattleScreen() {
-    var numberOfPlayers = battleScreenInfo.playersInBattle.length;
+    var numberOfPlayers = gameVars.battleScreenInfo.playersInBattleCount.length;
 
     displayBattleLocationInfo()
     for (var i = 0; i < numberOfPlayers; i++) {
-        var plNum = battleScreenInfo.playersInBattle[i];
+        var plNum = gameVars.battleScreenInfo.playersInBattleCount[i];
 
         createBattleScreenInfo(plNum);
         loadBattleScreenDecks(plNum);
@@ -97,7 +99,7 @@ function openBattleScreen() {
 
 
 
-    console.log(battleScreenInfo);
+    console.log(gameVars.battleScreenInfo);
 
     console.log("Display winner buttons");
 
@@ -114,4 +116,12 @@ function addClass(idToModify, classToAdd) {
 
 function removeClass(idToModify, classToRemove) {
     document.getElementById(idToModify).classList.remove(classToRemove);
+}
+
+function updateBattleLog (situationText) {
+    battleText = "Player and deck info from battleScreenInfo";
+
+
+
+    updateLog(battleText)
 }

@@ -5,17 +5,17 @@
 
 
 function prepDeckList() {
-    var tempDeckList = playerInfo.Player1.gameDeckLibrary,
-    totalPlayers = Object.keys(playerInfo).length,
+    var tempDeckList = gameVars.playerInfo.Player1.gameDeckLibrary,
+    totalPlayers = Object.keys(gameVars.playerInfo).length,
     decksPerPlayer = Math.floor(tempDeckList.length / totalPlayers),
     normalizedDeckCount = lowestDeckCount(totalPlayers);
 
-    if (globalGameOptions.sharedDeckPool === true) {
+    if (gameVars.globalGameOptions.sharedDeckPool === true) {
         prepDeckListSharedPool(tempDeckList, totalPlayers, decksPerPlayer);
     }
     else {
         for (var p = 1; p <= totalPlayers; p++) {
-            if (normalizeDeckList === true) {
+            if (gameVars.normalizeDeckList === true) {
                 prepDeckListNotSharedNormalizedPool(p, normalizedDeckCount);
             }
             else {
@@ -32,18 +32,18 @@ function startIniGame() {
 }
 
 function setupPlayerName() {
-    var currentPlayerName = playerInfo["Player" + playerScreenOptions.activeSetupPlayer].name,
+    var currentPlayerName = gameVars.playerInfo["Player" + gameVars.playerScreenOptions.activeSetupPlayer].name,
     changePlayerNameTo = prompt("Change Name to:", currentPlayerName);
 
     if (changePlayerNameTo != null) {
-        playerInfo["Player" + playerScreenOptions.activeSetupPlayer].name = changePlayerNameTo;
+        gameVars.playerInfo["Player" + gameVars.playerScreenOptions.activeSetupPlayer].name = changePlayerNameTo;
     }
-    refreshNameShown(playerScreenOptions.activeSetupPlayer);
+    refreshNameShown(gameVars.playerScreenOptions.activeSetupPlayer);
 }
 
 function setupPlayerColor(color, value) {
-    var currentPlayer = playerScreenOptions.activeSetupPlayer
-    playerInfo["Player" + currentPlayer].playerColor[color] = value;
+    var currentPlayer = gameVars.playerScreenOptions.activeSetupPlayer
+    gameVars.playerInfo["Player" + currentPlayer].playerColor[color] = value;
 
     refreshColorShown(currentPlayer);
 }
@@ -58,13 +58,13 @@ function clearSetupDeckList() {
 function setupPlayerChange() {
     var playerNum = document.getElementById("player-drop-select").value;
 
-    playerScreenOptions.activeSetupPlayer = playerNum;
+    gameVars.playerScreenOptions.activeSetupPlayer = playerNum;
     clearSetupDeckList()
     refreshPlayerSetupInformation();
 }
 
 function refreshNameShown(selectedPlayer) {
-    var nameToShow = playerInfo["Player" + selectedPlayer].name,
+    var nameToShow = gameVars.playerInfo["Player" + selectedPlayer].name,
     placeToShow = document.getElementById("name-to-show");
 
     placeToShow.innerHTML = nameToShow;
@@ -81,24 +81,24 @@ function refreshColorSliders(r, g, b) {
 }
 
 function refreshPlayerTextColor(selectedPlayer) {
-    var playerTextColor = playerInfo["Player" + selectedPlayer].textColor;
+    var playerTextColor = gameVars.playerInfo["Player" + selectedPlayer].textColor;
 
-    document.getElementById("player-info").style.color = playerTextColor;
+    document.getElementById("player-info").style.color = gameVars.playerTextColor;
 }
 
 function refreshColorShown(selectedPlayer) {
-    var r = playerInfo["Player" + selectedPlayer].playerColor[0],
-    g = playerInfo["Player" + selectedPlayer].playerColor[1],
-    b = playerInfo["Player" + selectedPlayer].playerColor[2],
+    var r = gameVars.playerInfo["Player" + selectedPlayer].playerColor[0],
+    g = gameVars.playerInfo["Player" + selectedPlayer].playerColor[1],
+    b = gameVars.playerInfo["Player" + selectedPlayer].playerColor[2],
     colorToShow = 'rgb(' + [(r),(g),(b)].join(',') + ')';
 
     document.getElementById("player-info").style.backgroundColor = colorToShow;
 
-    if (Math.max (r,g) < lightTextSetting) {
-        playerInfo["Player" + selectedPlayer].textColor = "white";
+    if (Math.max (r,g) < adminSettings.lightTextSetting) {
+        gameVars.playerInfo["Player" + selectedPlayer].textColor = "white";
     }
     else {
-        playerInfo["Player" + selectedPlayer].textColor = "black";
+        gameVars.playerInfo["Player" + selectedPlayer].textColor = "black";
     }
 
     refreshPlayerTextColor(selectedPlayer);
@@ -106,13 +106,13 @@ function refreshColorShown(selectedPlayer) {
 }
 
 function showDeckCount(selectedPlayer) {
-    var deckCount = playerInfo["Player" + selectedPlayer].gameDeckLibrary.length;
+    var deckCount = gameVars.playerInfo["Player" + selectedPlayer].gameDeckLibrary.length;
 
     document.getElementById("player-decklist-count").innerHTML = "Library Count: " + deckCount;
 }
 
 function refreshDeckListShown(selectedPlayer) {
-    var totalDecks = playerInfo["Player" + selectedPlayer].gameDeckLibrary.length,
+    var totalDecks = gameVars.playerInfo["Player" + selectedPlayer].gameDeckLibrary.length,
     tableBody = document.getElementById("library-table-container"), //reference for body
     tbl = document.createElement("table"), //table element
     tblBody = document.createElement("tbody"), //tbody element)
@@ -135,7 +135,7 @@ function refreshDeckListShown(selectedPlayer) {
         var row = document.createElement("tr"); //creates a table row
 
         for (var j = 0; j < tblHeaderValues.length; j++) { //create a td element and text node, make the text node the contents of td and put td at the end of table row
-            var currentDeck = playerInfo["Player" + selectedPlayer].gameDeckLibrary[i],
+            var currentDeck = gameVars.playerInfo["Player" + selectedPlayer].gameDeckLibrary[i],
             values = Object.values(currentDeck),
             cell = document.createElement("td"),
             cellText = document.createTextNode(values[j]);
@@ -152,7 +152,7 @@ function refreshDeckListShown(selectedPlayer) {
 }
 
 function refreshPlayerSetupInformation() {
-    var selectedPlayer = playerScreenOptions.activeSetupPlayer;
+    var selectedPlayer = gameVars.playerScreenOptions.activeSetupPlayer;
 
     refreshNameShown(selectedPlayer);
     refreshColorShown(selectedPlayer);
@@ -161,28 +161,28 @@ function refreshPlayerSetupInformation() {
 }
 
 function loadDeckLists(playerNum) {
-    if (globalGameOptions.sharedDeckPool === true) {
+    if (gameVars.globalGameOptions.sharedDeckPool === true) {
         var decksToAdd = [];
         
-        for (var p = 1; p <= globalGameOptions.totalPlayers; p++) {
+        for (var p = 1; p <= gameVars.globalGameOptions.totalPlayers; p++) {
             decksToAdd = decksToAdd.concat(masterDeckList["deckListPlayer" + p]);
         }
-        playerInfo['Player' + playerNum].gameDeckLibrary = decksToAdd;
+        gameVars.playerInfo['Player' + playerNum].gameDeckLibrary = decksToAdd;
     }
     else {
         var listToUse = masterDeckList["deckListPlayer" + playerNum];
 
-        playerInfo['Player' + playerNum].gameDeckLibrary = listToUse;
+        gameVars.playerInfo['Player' + playerNum].gameDeckLibrary = listToUse;
     }
 
-    playerInfo["Player" + playerNum].gameDeckLibrary.sort(function(a, b) {
+    gameVars.playerInfo["Player" + playerNum].gameDeckLibrary.sort(function(a, b) {
         if (a.deckName.toUpperCase() < b.deckName.toUpperCase()) { return -1; }
         if (a.deckName.toUpperCase() > b.deckName.toUpperCase()) { return 1;}
     })
 }
 
 function createPlayerInfo (plNum) {
-    playerInfo["Player" + plNum] = {
+    gameVars.playerInfo["Player" + plNum] = {
         name: "Player" + plNum,
         player: plNum,
         playerColor: [255,255,255],
@@ -192,14 +192,14 @@ function createPlayerInfo (plNum) {
         continentsControlled: [],
         continentsOwned: []
     };
-    battleScreenInfo.playersInBattle.push(plNum);
+    gameVars.battleScreenInfo.playersInBattleCount.push(plNum);
 }
 
 function createPlayerOptions() {
     var playerSelect = document.createElement("select");
     var container = document.getElementById("player-dropdown-select-container")
 
-    for (var i = 1; i <= globalGameOptions.totalPlayers; i++) {
+    for (var i = 1; i <= gameVars.globalGameOptions.totalPlayers; i++) {
         var option = document.createElement("option");  //Uses the option as a container for created elements
 
         option.innerHTML = i; //makes an option for each player
@@ -214,25 +214,25 @@ function createPlayerOptions() {
 }
 
 function beginPlayerSetup() {
-    globalGameOptions.totalPlayers = document.getElementById("update-player-count").value
+    gameVars.globalGameOptions.totalPlayers = document.getElementById("update-player-count").value
     
     if (document.getElementById("shared-deck-pool").checked === true) {
-        globalGameOptions.sharedDeckPool = true
+        gameVars.globalGameOptions.sharedDeckPool = true
     } 
     else {
-        globalGameOptions.sharedDeckPool = false
+        gameVars.globalGameOptions.sharedDeckPool = false
     };
 
     if (document.getElementById("random-map-setup").checked === true) {
-        globalGameOptions.randomMapSetup = true
+        gameVars.globalGameOptions.randomMapSetup = true
     } 
     else {
-        globalGameOptions.randomMapSetup = false
+        gameVars.globalGameOptions.randomMapSetup = false
     };
 
-    if (confirm("Are you sure you want these options for this game?\n Total Players: " + globalGameOptions.totalPlayers + 
-    "\n Shared Deck Pool: " + tfyn(globalGameOptions.sharedDeckPool) + 
-    "\n Random Map Setup: " + tfyn(globalGameOptions.randomMapSetup))) {
+    if (confirm("Are you sure you want these options for this game?\n Total Players: " + gameVars.globalGameOptions.totalPlayers + 
+    "\n Shared Deck Pool: " + tfyn(gameVars.globalGameOptions.sharedDeckPool) + 
+    "\n Random Map Setup: " + tfyn(gameVars.globalGameOptions.randomMapSetup))) {
         hideId("global-game-options");
         hideId("player-earned-info");
         unhideId("player-info");
@@ -257,8 +257,7 @@ document.addEventListener("DOMContentLoaded", function() {
 //Game Engine
 
 function startIniGameConfirmed() {
-    prepDeckList()
-    updateLog("Initiative Game Begins");
+    prepDeckList();
     openBattleScreen();
     hideId("player-info");
     unhideId("battle-screen");
@@ -268,7 +267,7 @@ function lowestDeckCount(totalPlayers) {
     var updatedDeckCount = [];
 
     for (var p = 1; p <= totalPlayers; p++) {
-        updatedDeckCount.push(playerInfo["Player" + p].gameDeckLibrary.length);
+        updatedDeckCount.push(gameVars.playerInfo["Player" + p].gameDeckLibrary.length);
     }
     return findLowest(updatedDeckCount);
 }
@@ -277,10 +276,10 @@ function prepDeckListSharedPool(tempDeckList, totalPlayers, decksPerPlayer) {
     shuffleArray(tempDeckList);
 
     for (var p = 1; p <= totalPlayers; p++) {
-        playerInfo["Player" + p].gameDeckLibrary = [];
-        playerInfo["Player" + p].gameDeckLibrary = tempDeckList.splice(0, decksPerPlayer);
-        playerInfo["Player" + p].gameDeckRandomLibrary = playerInfo["Player" + p].gameDeckLibrary.slice();
-        alphaOrderDeckName(playerInfo["Player" + p].gameDeckLibrary);
+        gameVars.playerInfo["Player" + p].gameDeckLibrary = [];
+        gameVars.playerInfo["Player" + p].gameDeckLibrary = tempDeckList.splice(0, decksPerPlayer);
+        gameVars.playerInfo["Player" + p].gameDeckRandomLibrary = gameVars.playerInfo["Player" + p].gameDeckLibrary.slice();
+        alphaOrderDeckName(gameVars.playerInfo["Player" + p].gameDeckLibrary);
     }
 }
 
@@ -294,8 +293,8 @@ function prepDeckListNotSharedNormalizedPool(playerNumber, normalizedDeckCount) 
 }
 
 function prepDeckListNotSharedNotNormalizedPool(playerNumber) {
-    playerInfo["Player" + playerNumber].gameDeckRandomLibrary = playerInfo["Player" + playerNumber].gameDeckLibrary.slice();
-    shuffleArray(playerInfo["Player" + playerNumber].gameDeckRandomLibrary);
+    gameVars.playerInfo["Player" + playerNumber].gameDeckRandomLibrary = gameVars.playerInfo["Player" + playerNumber].gameDeckLibrary.slice();
+    shuffleArray(gameVars.playerInfo["Player" + playerNumber].gameDeckRandomLibrary);
 
 }
 
@@ -339,7 +338,7 @@ function tfyn(tf) {
 }
 
 function updateLog(action) {
-    gameLog.unshift(Date() + " " + action);
+    gameVars.gameLog.unshift(Date() + " " + action);
 }
 
 function unhideId(elem) {
