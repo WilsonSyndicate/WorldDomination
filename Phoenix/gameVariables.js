@@ -9,7 +9,7 @@ var gameVars = {
         groundZero: "",
         text: "Initiation Game to decide turn order",
         playersInBattleCount: [],
-        battleDeck: []
+        battleDecks: []
     },
     gameLog: [],
     globalGameOptions: {

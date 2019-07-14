@@ -25,11 +25,7 @@ function prepDeckList() {
     }
 }
 
-function startIniGame() {
-    if (confirm ("Save player infomration and start initiation game?")) {
-        startIniGameConfirmed();
-    }  
-}
+
 
 function setupPlayerName() {
     var currentPlayerName = gameVars.playerInfo["Player" + gameVars.playerScreenOptions.activeSetupPlayer].name,
@@ -83,7 +79,7 @@ function refreshColorSliders(r, g, b) {
 function refreshPlayerTextColor(selectedPlayer) {
     var playerTextColor = gameVars.playerInfo["Player" + selectedPlayer].textColor;
 
-    document.getElementById("player-info").style.color = gameVars.playerTextColor;
+    document.getElementById("player-info").style.color = playerTextColor;
 }
 
 function refreshColorShown(selectedPlayer) {
@@ -213,54 +209,16 @@ function createPlayerOptions() {
     container.appendChild(playerSelect); //appends the container list to the DOM
 }
 
-function beginPlayerSetup() {
-    gameVars.globalGameOptions.totalPlayers = document.getElementById("update-player-count").value
-    
-    if (document.getElementById("shared-deck-pool").checked === true) {
-        gameVars.globalGameOptions.sharedDeckPool = true
-    } 
-    else {
-        gameVars.globalGameOptions.sharedDeckPool = false
-    };
 
-    if (document.getElementById("random-map-setup").checked === true) {
-        gameVars.globalGameOptions.randomMapSetup = true
-    } 
-    else {
-        gameVars.globalGameOptions.randomMapSetup = false
-    };
 
-    if (confirm("Are you sure you want these options for this game?\n Total Players: " + gameVars.globalGameOptions.totalPlayers + 
-    "\n Shared Deck Pool: " + tfyn(gameVars.globalGameOptions.sharedDeckPool) + 
-    "\n Random Map Setup: " + tfyn(gameVars.globalGameOptions.randomMapSetup))) {
-        hideId("global-game-options");
-        hideId("player-earned-info");
-        unhideId("player-info");
-        createPlayerOptions();
-        refreshPlayerSetupInformation();
-    } 
-}
-
-function beginSetup() {
-    var maxPlayers = Object.keys(masterDeckList).length;
-
-    hideId("player-info");
-    hideId("battle-screen");
-    document.getElementById("update-player-count").max = maxPlayers;
-    updateLog("Begin Setup");
-}
-
-document.addEventListener("DOMContentLoaded", function() {
-    beginSetup();
-});
 
 //Game Engine
 
 function startIniGameConfirmed() {
     prepDeckList();
-    openBattleScreen();
     hideId("player-info");
     unhideId("battle-screen");
+    openBattleScreen();
 }
 
 function lowestDeckCount(totalPlayers) {
@@ -295,18 +253,17 @@ function prepDeckListNotSharedNormalizedPool(playerNumber, normalizedDeckCount) 
 function prepDeckListNotSharedNotNormalizedPool(playerNumber) {
     gameVars.playerInfo["Player" + playerNumber].gameDeckRandomLibrary = gameVars.playerInfo["Player" + playerNumber].gameDeckLibrary.slice();
     shuffleArray(gameVars.playerInfo["Player" + playerNumber].gameDeckRandomLibrary);
-
 }
 
 
 //Task Masters
 
-function findLowest(deckCount) {
-    var lowest = deckCount[0];
+function findLowest(arrayToCheck) {
+    var lowest = arrayToCheck[0];
 
-    for (var i = 0; i < deckCount.length; i++) {
-        if (deckCount[i] < lowest) {
-            lowest = deckCount[i];
+    for (var i = 0; i < arrayToCheck.length; i++) {
+        if (arrayToCheck[i] < lowest) {
+            lowest = arrayToCheck[i];
         }
     }
     return lowest;
@@ -337,8 +294,8 @@ function tfyn(tf) {
     }
 }
 
-function updateLog(action) {
-    gameVars.gameLog.unshift(Date() + " " + action);
+function updateLog(text) {
+    gameVars.gameLog.unshift(Date() + " " + text);
 }
 
 function unhideId(elem) {
