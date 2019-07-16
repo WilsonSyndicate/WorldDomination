@@ -42,6 +42,8 @@ function beginPlayerSetup() {
 document.addEventListener("DOMContentLoaded", function() { 
     var maxPlayers = Object.keys(masterDeckList).length;
 
+    addAuthorToDecklists(maxPlayers);
+
     hideId("player-info");
     hideId("battle-screen");
     document.getElementById("update-player-count").max = maxPlayers;

@@ -48,7 +48,9 @@ function clearSetupDeckList() {
     var parentToClear = document.getElementById("library-table-container"),
     childToClear = document.getElementById("setup-player-decklist-table");
 
-    parentToClear.removeChild(childToClear);
+    if (typeof(childToClear) != 'undefined' && childToClear != null) {
+        parentToClear.removeChild(childToClear);
+    }
 }
 
 function setupPlayerChange() {
@@ -64,6 +66,9 @@ function refreshNameShown(selectedPlayer) {
     placeToShow = document.getElementById("name-to-show");
 
     placeToShow.innerHTML = nameToShow;
+    refreshDeckAuthor();   
+    clearSetupDeckList();
+    refreshDeckListShown(selectedPlayer);
 }
 
 function refreshColorSliders(r, g, b) {
@@ -117,6 +122,10 @@ function refreshDeckListShown(selectedPlayer) {
     var tblHeaderValues = ["Name", "Color", "Format", "Cards", "Rank", "Notes"],
     tblHeaderRow = document.createElement("tr");
 
+    if (gameVars.globalGameOptions.sharedDeckPool === true) {
+        tblHeaderValues.push("Author");
+    }
+
     tblHeader.appendChild(tblHeaderRow);
     for (var h = 0; h < tblHeaderValues.length; h++) {
         var headerValue = tblHeaderValues[h],
@@ -153,7 +162,36 @@ function refreshPlayerSetupInformation() {
     refreshNameShown(selectedPlayer);
     refreshColorShown(selectedPlayer);
     showDeckCount(selectedPlayer);
-    refreshDeckListShown(selectedPlayer);
+}
+
+function refreshDeckAuthor() {
+    //for each player, each deck in library, change deckauthorname to name of deckauthor
+
+    for (var p = 1; p <= gameVars.globalGameOptions.totalPlayers; p++) {
+        var currentLibrary = gameVars.playerInfo["Player" + p].gameDeckLibrary
+
+        for (var d = 0; d < currentLibrary.length; d++) {
+            var currentDeckAuthorNumber = gameVars.playerInfo["Player" + p].gameDeckLibrary[d].deckAuthor,
+            currentDeckAuthorName = gameVars.playerInfo["Player" + currentDeckAuthorNumber].name;
+
+            currentLibrary[d].deckAuthorName = currentDeckAuthorName;
+        }
+    }
+
+
+    
+   
+
+}
+
+function addAuthorToDecklists(maxPlayers) {
+    for (var p = 1; p <= maxPlayers; p++) {
+
+        for (var d = 0; d < masterDeckList["deckListPlayer" + p].length; d++) {
+           masterDeckList["deckListPlayer" + p][d].deckAuthorName = "Player" + p;
+           masterDeckList["deckListPlayer" + p][d].deckAuthor = p;
+        }
+    }
 }
 
 function loadDeckLists(playerNum) {
