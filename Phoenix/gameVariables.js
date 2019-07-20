@@ -7,9 +7,10 @@ var gameVars = {
     mapInfo: {},
     battleScreenInfo: {
         groundZero: "",
-        text: "Initiation Game to decide turn order",
+        text: "",
         playersInBattleCount: [],
-        battleDecks: []
+        battleDecks: [],
+        battleWinners: []
     },
     gameLog: [],
     globalGameOptions: {
@@ -24,7 +25,8 @@ var gameVars = {
         mode: "setup", //topOfTurn, Attack, onGoingAttack, mapSetupComplete
         focus: "setup", //map, battle, log
         turn: "initiation",
-        nextTurn: "undecided"
+        nextTurn: "undecided",
+        turnOrder: []
 }};
 
 //Admin Settings

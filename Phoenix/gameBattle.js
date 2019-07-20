@@ -1,8 +1,6 @@
 
 
-function battleWinner() {
-    console.log("winner button clicked!");
-}
+
 
 
 function countBattleLife(battleDeckRef) {
@@ -81,12 +79,8 @@ function displayBattleInfo(battleDeckRef) {
     "battle-player" + battleDeckRef, "battle-player");
     
     //create buttons
-    addElement("battle-player" + battleDeckRef, "button", currentPlayerName + " Wins", 
-    "battle-winner-" + currentPlayer, "noClass");
-    //button needs to trigger battleWinner() function!!
-
-
-    
+    addElement("battle-player" + battleDeckRef, "button", currentPlayerName, 
+    "battle-winner-" + currentPlayer, "noClass", battleWinner);
 
     //for each battle player show player, deck, life, cards
     for (var d = 0; d < gameMods.length; d++) {
@@ -123,9 +117,8 @@ function setupBattleInfo() {
     }
 }
 
-function openBattleScreen() {
-    var battleParticipants = gameVars.battleScreenInfo.battleDecks;
-//from setup, screen cleared
+function openBattleScreen() { //from setup with screen cleared
+    var battleParticipants = gameVars.battleScreenInfo.battleDecks;  
     setupBattleInfo();
     updateBattleLog("Initiation Battle Begins");
     for (var i = battleParticipants.length - 1; i >= 0; i--) {
@@ -158,29 +151,31 @@ function updateBattleLog (situationText) {
     updateLog(text);
 }
 
-function addElement(addToId, elementType, elementContent, idToInclude, classToInclude, functionToTrigger) {
-    var newElement = document.createElement(elementType);//create a new element
-    var newContent = document.createTextNode(elementContent);//create content
+function addElement(addToId, elementType, elementContent, idToInclude, classToInclude, clickFunctionToInclude) {
+    var newElement = document.createElement(elementType),//create a new element
+    newContent = document.createTextNode(elementContent);//create content
 
-    if (classToInclude !== undefined) {
-        if (classToInclude !== "noClass") {
+    
+    if (classToInclude !== undefined && classToInclude !== "noClass") {
         newElement.classList.add(classToInclude);
+    }
+    
+    if (idToInclude !== undefined && idToInclude !== "noId") {
+        newElement.id = idToInclude;
+        if (clickFunctionToInclude !== undefined && clickFunctionToInclude !== "noFunction") {
+            newElement.onclick = function() { clickFunctionToInclude(idToInclude); };
         }
     }
-    if (idToInclude !== undefined) {
-        if (idToInclude !== "noId") {
-            newElement.id = idToInclude;
-            if (functionToTrigger !== undefined) {
-                if (functionToTrigger !== "noFunction") {
-                newElement.onclick = battleWinner();
-                //this is not working perfectly
-                }
-            }
-        }
-    }
+    //add text node to new element
+    newElement.appendChild(newContent);
 
-    newElement.appendChild(newContent);//add text node to new element
-
-    var currentElement = document.getElementById(addToId);//add new element and contents to DOM
+    //add new element and contents to DOM
+    var currentElement = document.getElementById(addToId);
     currentElement.appendChild(newElement);
+}
+
+function removeElement(parentId, elementId) {
+    if (typeof(document.getElementById(parentId)) !== undefined && document.getElementById(elementId) !== null) {
+        document.getElementById(parentId).removeChild(document.getElementById(elementId));
+    }
 }

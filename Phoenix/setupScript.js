@@ -1,7 +1,68 @@
 
 
-
 //Runtime
+
+function findBattleDeckName(playerId) {
+    var battleDecks = gameVars.battleScreenInfo.battleDecks,
+    nameToFind = "";
+
+    for (var i = 0; i < battleDecks.length; i ++) {
+        var currentBattleDeck = battleDecks[i].player;
+
+        if (playerId == currentBattleDeck) {
+            nameToFind = gameVars.battleScreenInfo.battleDecks[i].deck.deckName;
+        }
+    }
+    return nameToFind;
+}
+
+function gameResultsLogText(confirmationResults, orderOfWinners) {
+    var resultsLogText = [];
+    //add game duration and consequence to log
+
+    for (var i = 0; i < confirmationResults.length; i++) {
+        var currentDeckName = findBattleDeckName(orderOfWinners[i]);
+
+        resultsLogText.push(confirmationResults[i] + " with " + currentDeckName);
+    }
+    return resultsLogText;
+}
+
+function clearBattleScreenInfo() {
+    gameVars.battleScreenInfo.groundZero = "";
+    gameVars.battleScreenInfo.text = "";
+    gameVars.battleScreenInfo.playersInBattleCount = [];
+    gameVars.battleScreenInfo.battleDecks = [];
+    gameVars.battleScreenInfo.battleWinners = [];
+}
+
+
+function setupBoard(confirmationResults, orderOfWinners) {
+    var logText = gameResultsLogText(confirmationResults, orderOfWinners);
+
+    gameVars.gameStatus.turnOrder.push(orderOfWinners);
+    updateLog(logText);
+    clearBattleScreenInfo();
+
+    console.log("build map buttons for each country");
+
+    if (gameVars.globalGameOptions.randomMapSetup === true) {
+        console.log("add random decks to country list and go to first players turn")
+    }
+
+    else {
+        console.log("go to country placement");
+    }
+
+
+
+
+    hideId("battle-screen");
+    unhideId("map-screen");
+
+}
+
+
 
 
 function prepDeckList() {
@@ -25,8 +86,6 @@ function prepDeckList() {
     }
 }
 
-
-
 function setupPlayerName() {
     var currentPlayerName = gameVars.playerInfo["Player" + gameVars.playerScreenOptions.activeSetupPlayer].name,
     changePlayerNameTo = prompt("Change Name to:", currentPlayerName);
@@ -45,19 +104,16 @@ function setupPlayerColor(color, value) {
 }
 
 function clearSetupDeckList() {
-    var parentToClear = document.getElementById("library-table-container"),
-    childToClear = document.getElementById("setup-player-decklist-table");
+    var parentToClear = "library-table-container",
+    childToClear = "setup-player-decklist-table";
 
-    if (typeof(childToClear) != 'undefined' && childToClear != null) {
-        parentToClear.removeChild(childToClear);
-    }
+    removeElement(parentToClear, childToClear)
 }
 
 function setupPlayerChange() {
     var playerNum = document.getElementById("player-drop-select").value;
 
     gameVars.playerScreenOptions.activeSetupPlayer = playerNum;
-    clearSetupDeckList()
     refreshPlayerSetupInformation();
 }
 
@@ -66,8 +122,7 @@ function refreshNameShown(selectedPlayer) {
     placeToShow = document.getElementById("name-to-show");
 
     placeToShow.innerHTML = nameToShow;
-    refreshDeckAuthor();   
-    clearSetupDeckList();
+    refreshDeckAuthor();
     refreshDeckListShown(selectedPlayer);
 }
 
@@ -121,6 +176,8 @@ function refreshDeckListShown(selectedPlayer) {
 
     var tblHeaderValues = ["Name", "Color", "Format", "Cards", "Rank", "Notes"],
     tblHeaderRow = document.createElement("tr");
+    
+    clearSetupDeckList();
 
     if (gameVars.globalGameOptions.sharedDeckPool === true) {
         tblHeaderValues.push("Author");
@@ -177,11 +234,6 @@ function refreshDeckAuthor() {
             currentLibrary[d].deckAuthorName = currentDeckAuthorName;
         }
     }
-
-
-    
-   
-
 }
 
 function addAuthorToDecklists(maxPlayers) {

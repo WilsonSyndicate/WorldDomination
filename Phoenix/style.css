@@ -11,11 +11,13 @@
 
 #battle-screen {
     border: 2px solid pink;
-
+    background-image: url('art/battle-screen-1.jpg');
+    background-repeat: no-repeat;
 }
 
-.battle-screen-background-class {
-    background-image: url('art/battle-screen-1.jpg');
+#map-screen {
+    border: 2px solid purple;
+    background-image: url('art/world-map-1.png');
     background-repeat: no-repeat;
 }
 
@@ -36,3 +38,4 @@
 .battle-player {
     border: 2px solid yellow;
 }
+
