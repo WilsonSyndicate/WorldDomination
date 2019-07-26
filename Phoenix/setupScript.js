@@ -2,6 +2,94 @@
 
 //Runtime
 
+function countPlayerDecks(playerNumber) {
+    var deckCount = 0;
+
+    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
+        if (typeof gameVars.mapInfo.countryList[i].deck !== "undefined" &&
+         playerNumber === gameVars.mapInfo.countryList[i].deck.player)
+        deckCount += 1;
+    }
+    return deckCount;
+}
+
+function updateCountryWithDeck(country, deck) {
+    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
+        if (country === gameVars.mapInfo.countryList[i].country) {
+            gameVars.mapInfo.countryList[i].deck = deck;
+            updateDOMElement(country, countryMapName(gameVars.mapInfo.countryList[i]));
+            
+            var playerId = deck.deckAuthor,
+            r = findPlayerColor(playerId)[0],
+            g = findPlayerColor(playerId)[1],
+            b = findPlayerColor(playerId)[2];
+
+            setIDBackgrounColor(country, r, g, b);
+        }
+    }
+}
+
+function checkForSetupFinish() {
+    var countryCount = gameVars.mapInfo.countryList.length,
+    playerCount = gameVars.globalGameOptions.totalPlayers,
+    countriesPerPlayer = Math.floor(countryCount/playerCount),
+    totalSetupCountries = (countriesPerPlayer * playerCount),
+    placedCountries = 0;
+
+    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
+        if (typeof gameVars.mapInfo.countryList[i].deck !== "undefined") {
+            placedCountries += 1;
+        }
+    }
+    if (totalSetupCountries === placedCountries) {
+        for (var c = 0; c < countryCount; c++) {
+            undisableId(gameVars.mapInfo.countryList[c].country);
+        }
+        settopOfTurn(gameVars.gameStatus.currentTurn);
+    }
+}
+
+function placeCountry(country) {
+    var currentTurn = gameVars.gameStatus.currentTurn,
+    deckIdToPlace = countPlayerDecks(currentTurn) + 1,
+    deckToPlace = gameVars.playerInfo["Player" + currentTurn].gameDeckRandomLibrary[deckIdToPlace];
+
+    updateCountryWithDeck(country, deckToPlace);
+    gameVars.gameStatus.currentTurn = findNextPlayerTurn(currentTurn);
+    disableId(country);
+    checkForSetupFinish();
+}
+
+function countryMapName(currentCountryId) {
+    if (currentCountryId.deck) {
+        var useDeckName = currentCountryId.deck.deckName,
+        usePlayerName = gameVars.playerInfo["Player" + currentCountryId.deck.player].name;
+
+        if (currentCountryId.deck.unHidden) {
+            //shows deck name once currentCountryId.deck.unHidden === true
+            return usePlayerName + " (" + useDeckName + ")";
+        }
+        else {
+            return usePlayerName;
+        }
+    }
+    else {
+        return currentCountryId.country + " (Empty)";
+    }
+}
+
+function BuildMapButtons() {
+    var totalCountries = gameVars.mapInfo.countryList.length;
+    
+    for (var i = 0; i < totalCountries; i++) {
+        var currentCountry = gameVars.mapInfo.countryList[i].country,
+        currentCountryId = gameVars.mapInfo.countryList[i];
+
+        removeElement("map-countries", currentCountry);
+        addElement("map-countries", "button", countryMapName(currentCountryId), currentCountry, "country-button", mapCountryClick);
+    }
+}
+
 function findBattleDeckName(playerId) {
     var battleDecks = gameVars.battleScreenInfo.battleDecks,
     nameToFind = "";
@@ -18,6 +106,7 @@ function findBattleDeckName(playerId) {
 
 function gameResultsLogText(confirmationResults, orderOfWinners) {
     var resultsLogText = [];
+
     //add game duration and consequence to log
 
     for (var i = 0; i < confirmationResults.length; i++) {
@@ -36,34 +125,71 @@ function clearBattleScreenInfo() {
     gameVars.battleScreenInfo.battleWinners = [];
 }
 
+function getRandomSetup() {
+    var countryCount = gameVars.mapInfo.countryList.length,
+    playerCount = gameVars.globalGameOptions.totalPlayers,
+    countriesPerPlayer = Math.floor(countryCount/playerCount),
+    deckListToAdd = [],
+    countryListToAddTo = gameVars.mapInfo.countryList.slice();
+
+    for (var p = 1; p <= playerCount; p++) {
+        for (var i = 1; i <= countriesPerPlayer; i++) {
+            var currentDeck = gameVars.playerInfo["Player" + p].gameDeckRandomLibrary[i];
+            
+            deckListToAdd.push(currentDeck);
+        }
+    }
+    shuffleArray(deckListToAdd);
+    shuffleArray(countryListToAddTo);
+    for (var c = 0; c < deckListToAdd.length; c++) {
+        countryListToAddTo[c].deck = deckListToAdd[c];
+    }
+    orderArray(countryListToAddTo, "country")
+    gameVars.mapInfo.countryList = countryListToAddTo;
+}
+
+function findPlayerColor(playerId) {
+    var playerColor = gameVars.playerInfo["Player" + playerId].playerColor;
+
+    return playerColor;
+}
+
+function refreshMapButtonColors() {
+    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
+        if (typeof gameVars.mapInfo.countryList[i].deck !== 'undefined') {
+            var playerId = gameVars.mapInfo.countryList[i].deck.deckAuthor,
+            r = findPlayerColor(playerId)[0],
+            g = findPlayerColor(playerId)[1],
+            b = findPlayerColor(playerId)[2];
+
+            setIDBackgrounColor(gameVars.mapInfo.countryList[i].country, r, g, b);
+        }
+        else {
+            setIDBackgrounColor(gameVars.mapInfo.countryList[i].country, 180, 180, 180);
+        }
+    }
+}
 
 function setupBoard(confirmationResults, orderOfWinners) {
     var logText = gameResultsLogText(confirmationResults, orderOfWinners);
 
-    gameVars.gameStatus.turnOrder.push(orderOfWinners);
+    gameVars.gameStatus.turnOrder = orderOfWinners;
+    gameVars.gameStatus.turn = orderOfWinners[0];
     updateLog(logText);
+    gameVars.gameStatus.currentTurn = gameVars.gameStatus.turnOrder[0];
     clearBattleScreenInfo();
-
-    console.log("build map buttons for each country");
-
-    if (gameVars.globalGameOptions.randomMapSetup === true) {
-        console.log("add random decks to country list and go to first players turn")
-    }
-
-    else {
-        console.log("go to country placement");
-    }
-
-
-
-
     hideId("battle-screen");
     unhideId("map-screen");
-
+    if (gameVars.globalGameOptions.randomMapSetup === true) {
+        getRandomSetup();
+        settopOfTurn(gameVars.gameStatus.turnOrder[0])
+        }
+    else {
+        gameVars.gameStatus.mode = "placement";
+    }
+    BuildMapButtons();
+    refreshMapButtonColors();
 }
-
-
-
 
 function prepDeckList() {
     var tempDeckList = gameVars.playerInfo.Player1.gameDeckLibrary,
@@ -84,6 +210,7 @@ function prepDeckList() {
             }
         }
     }
+    addPlayerToDecklists();
 }
 
 function setupPlayerName() {
@@ -98,7 +225,7 @@ function setupPlayerName() {
 
 function setupPlayerColor(color, value) {
     var currentPlayer = gameVars.playerScreenOptions.activeSetupPlayer
-    gameVars.playerInfo["Player" + currentPlayer].playerColor[color] = value;
+    gameVars.playerInfo["Player" + currentPlayer].playerColor[color] = parseInt(value);
 
     refreshColorShown(currentPlayer);
 }
@@ -236,6 +363,18 @@ function refreshDeckAuthor() {
     }
 }
 
+function addPlayerToDecklists() {
+    for (var p = 1; p <= gameVars.globalGameOptions.totalPlayers; p++) {
+        for (var i = 0; i < gameVars.playerInfo["Player" + p].gameDeckRandomLibrary.length; i++) {
+            var currentRandomDeck = gameVars.playerInfo["Player" + p].gameDeckRandomLibrary[i],
+            currentDeck = gameVars.playerInfo["Player" + p].gameDeckLibrary[i];
+            
+            currentRandomDeck.player = p;
+            currentDeck.player = p;
+        }
+    }
+}
+
 function addAuthorToDecklists(maxPlayers) {
     for (var p = 1; p <= maxPlayers; p++) {
 
@@ -261,10 +400,7 @@ function loadDeckLists(playerNum) {
         gameVars.playerInfo['Player' + playerNum].gameDeckLibrary = listToUse;
     }
 
-    gameVars.playerInfo["Player" + playerNum].gameDeckLibrary.sort(function(a, b) {
-        if (a.deckName.toUpperCase() < b.deckName.toUpperCase()) { return -1; }
-        if (a.deckName.toUpperCase() > b.deckName.toUpperCase()) { return 1;}
-    })
+    orderArray(gameVars.playerInfo["Player" + playerNum].gameDeckLibrary, "deckName");
 }
 
 function createPlayerInfo (plNum) {
@@ -327,7 +463,7 @@ function prepDeckListSharedPool(tempDeckList, totalPlayers, decksPerPlayer) {
         gameVars.playerInfo["Player" + p].gameDeckLibrary = [];
         gameVars.playerInfo["Player" + p].gameDeckLibrary = tempDeckList.splice(0, decksPerPlayer);
         gameVars.playerInfo["Player" + p].gameDeckRandomLibrary = gameVars.playerInfo["Player" + p].gameDeckLibrary.slice();
-        alphaOrderDeckName(gameVars.playerInfo["Player" + p].gameDeckLibrary);
+        orderArray(gameVars.playerInfo["Player" + p].gameDeckLibrary, "deckName");
     }
 }
 
@@ -337,7 +473,7 @@ function prepDeckListNotSharedNormalizedPool(playerNumber, normalizedDeckCount) 
     playerInfo["Player" + playerNumber].gameDeckLibrary.slice(0, normalizedDeckCount);
     playerInfo["Player" + playerNumber].gameDeckLibrary = 
     playerInfo["Player" + playerNumber].gameDeckRandomLibrary.slice();
-    alphaOrderDeckName(playerInfo["Player" + playerNumber].gameDeckLibrary);
+    orderArray(playerInfo["Player" + playerNumber].gameDeckLibrary, "deckName");
 }
 
 function prepDeckListNotSharedNotNormalizedPool(playerNumber) {
@@ -359,10 +495,10 @@ function findLowest(arrayToCheck) {
     return lowest;
 }
 
-function alphaOrderDeckName(deckListToOrder) {
-    deckListToOrder.sort(function(a, b) {
-        if (a.deckName.toUpperCase() < b.deckName.toUpperCase()) { return -1;}
-        if (a.deckName.toUpperCase() > b.deckName.toUpperCase()) { return 1;}
+function orderArray(array, sortBy) {
+    array.sort(function(a, b) {
+        if (a[sortBy].toUpperCase() < b[sortBy].toUpperCase()) { return -1; }
+        if (a[sortBy].toUpperCase() > b[sortBy].toUpperCase()) { return 1;}
     })
 }
 
@@ -396,3 +532,6 @@ function hideId(elem) {
     document.getElementById(elem).classList.add('hide-item-class');
 }
 
+function updateDOMElement(elementId, text) {
+    document.getElementById(elementId).innerHTML = text;
+}

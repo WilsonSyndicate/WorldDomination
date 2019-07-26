@@ -1,6 +1,49 @@
 
 
 
+
+function settopOfTurn(playerNumber) {
+    var currentPlayerId = gameVars.gameStatus.turn,
+    currentPlayerName = gameVars.playerInfo["Player" + currentPlayerId].name;
+
+    gameVars.gameStatus.focus = "map";
+    gameVars.gameStatus.mode = "attack";
+
+    document.getElementById("map-message").innerHTML = currentPlayerName + " Choose Attack";
+    document.getElementById("map-note").innerHTML = getMapNote();
+
+    console.log("begin player " + playerNumber + " turn, focus = " + 
+    gameVars.gameStatus.focus + ", mode = " + gameVars.gameStatus.mode);
+}
+
+
+
+
+//map
+
+function getMapNote() {
+    var possibleAttacks = 3;//use function to find
+
+    if (possibleAttacks === 1) {
+        return "This is your last possible attack"
+    }
+    else {
+        return "You have " + possibleAttacks + " possible attacks"
+    }
+}
+
+function mapCountryClick(country) {
+    switch (gameVars.gameStatus.mode) {
+        case "placement": 
+            placeCountry(country)
+            break;
+        default: 
+            console.log(country + " clicked");
+    }
+}
+
+
+
 //Battle winner Confirmed
 function battleConfirmationText(namesOfWinners) {
     var confirmationText = [];
@@ -28,6 +71,7 @@ function battleWinnerConfirmed() {
             //check for earthshaking event, or end of turn, go to map for next attack if not
             console.log("battle winner confirmed");
         }
+        gameVars.gameStatus.focus = "map";
     }
 }
 
@@ -40,6 +84,11 @@ function resetWinners() {
         buttonToRename = document.getElementById("battle-winner-"+ playerIdToRename);
 
         buttonToRename.innerHTML = playerNameToRename;
+
+
+    }
+    for (var p = 1; p <= gameVars.battleScreenInfo.playersInBattleCount.length; p++) {
+        undisableId("battle-winner-" + p);
     }
     gameVars.battleScreenInfo.battleWinners = [];
 }
@@ -54,13 +103,6 @@ function showWinningButtonText(winningPlace, totalBattlePlayers) {
     }
 }
 
-
-
-
-
-
-//make button unclickable once clicked until reset
-
 //Battle Winners Decided
 function battleWinner(winningPlayerButton) {
     var playerId = winningPlayerButton.slice(14),
@@ -70,7 +112,7 @@ function battleWinner(winningPlayerButton) {
     totalBattlePlayers = gameVars.battleScreenInfo.playersInBattleCount.length,
     winningButtonText = winningPlayer + " is " + showWinningButtonText(winningPlace, totalBattlePlayers);
 
-    //when clicked, display cancel button
+    disableId(winningPlayerButton);
     gameVars.battleScreenInfo.battleWinners.push(playerId);
     winningPlayerCount = gameVars.battleScreenInfo.battleWinners.length
     document.getElementById(winningPlayerButton).innerHTML = winningButtonText;
@@ -89,7 +131,7 @@ function startIniGame() {
 
 //player setup begins
 function beginPlayerSetup() {
-    gameVars.globalGameOptions.totalPlayers = document.getElementById("update-player-count").value;
+    gameVars.globalGameOptions.totalPlayers = parseInt(document.getElementById("update-player-count").value);
     
     if (document.getElementById("shared-deck-pool").checked === true) {
         gameVars.globalGameOptions.sharedDeckPool = true
@@ -148,4 +190,29 @@ function findPlayerNames(playerNumberArray) {
         playerNames.push(gameVars.playerInfo["Player" + playerNumberArray[i]].name);
     }
     return playerNames;
+}
+
+function disableId(Id) {
+    document.getElementById(Id).disabled = true;
+}
+
+function undisableId(Id) {
+    document.getElementById(Id).disabled = false;
+}
+
+function findNextPlayerTurn(currentPlayerNumber) {
+    for (var i = 0; i < gameVars.gameStatus.turnOrder.length; i++) {
+        if (gameVars.gameStatus.turnOrder[i] === currentPlayerNumber) {
+            if (i === gameVars.gameStatus.turnOrder.length - 1) {
+                return gameVars.gameStatus.turnOrder[0];
+            }
+            else {
+                return gameVars.gameStatus.turnOrder[i + 1];
+            }
+        }
+    }
+}
+
+function setIDBackgrounColor(Id, r, g, b) {
+    document.getElementById(Id).style.backgroundColor = 'rgb(' + [(r),(g),(b)].join(',') + ')';
 }
