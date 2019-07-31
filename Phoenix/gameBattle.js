@@ -56,6 +56,9 @@ function displayBattleInfo(battleDeckRef) {
     currentPlayerName = gameVars.playerInfo["Player" + currentPlayer].name,
     currentDeck = gameVars.battleScreenInfo.battleDecks[battleDeckRef].deck.deckName,
     currentDeckColor = gameVars.battleScreenInfo.battleDecks[battleDeckRef].deck.deckColor,
+    r = gameVars.playerInfo["Player" + currentPlayer].playerColor[0],
+    g = gameVars.playerInfo["Player" + currentPlayer].playerColor[1],
+    b = gameVars.playerInfo["Player" + currentPlayer].playerColor[2],
     battleText = [
         currentPlayerName + " playing " + currentDeck + " (" + currentDeckColor + ")"
     ],
@@ -81,6 +84,9 @@ function displayBattleInfo(battleDeckRef) {
     //create buttons
     addElement("battle-player" + battleDeckRef, "button", currentPlayerName, 
     "battle-winner-" + currentPlayer, "noClass", battleWinner);
+
+    //color buttons
+    setIDBackgroundColor("battle-winner-" + currentPlayer, r, g, b)
 
     //for each battle player show player, deck, life, cards
     for (var d = 0; d < gameMods.length; d++) {
@@ -178,4 +184,17 @@ function removeElement(parentId, elementId) {
     if (typeof(document.getElementById(parentId)) !== undefined && document.getElementById(elementId) !== null) {
         document.getElementById(parentId).removeChild(document.getElementById(elementId));
     }
+}
+
+function removeDuplicatesInArray(array) {
+    var newArray = [];
+
+    orderSimpleArray(array);
+
+    for (var c = 0; c < array.length; c++) {
+        if (array[c] !== array[c + 1]) {
+            newArray.push(array[c]);
+        }
+    }
+    return newArray;
 }

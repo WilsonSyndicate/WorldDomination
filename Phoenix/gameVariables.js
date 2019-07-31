@@ -5,6 +5,8 @@ var gameVars = {
     playerInfo: {},
     deckInfo: {},
     mapInfo: {
+        mapSelect1: "",
+        mapSelect2: "",
         countryList: [
             {country: 'Afghanistan', continent: 'Asia', color: 'G', borders: ['Ural', 'China','India','Middle East','Ukraine']},
             {country: 'Alaska', continent: 'North America', color: 'W', borders: ['Kamchatka', 'Northwest Territory','Alberta']},
@@ -55,7 +57,9 @@ var gameVars = {
         text: "",
         playersInBattleCount: [],
         battleDecks: [],
-        battleWinners: []
+        battleWinners: [],
+        possibleAttacks: [],
+        currentPlayerCountries: []
     },
     gameLog: [],
     globalGameOptions: {

@@ -1,6 +1,15 @@
+function findCountryPlayer(countryName) {
+    return gameVars.mapInfo.countryList[findCountryRef(countryName)].deck.player;
+}
 
+function findCountryBorders(countryName) {
+    var borders = [];
 
-
+    for (var i = 0; i < gameVars.mapInfo.countryList[findCountryRef(countryName)].borders.length; i++) {
+        borders.push(gameVars.mapInfo.countryList[findCountryRef(countryName)].borders[i]);
+    }
+    return borders;
+}
 
 function settopOfTurn(playerNumber) {
     var currentPlayerId = gameVars.gameStatus.turn,
@@ -8,12 +17,66 @@ function settopOfTurn(playerNumber) {
 
     gameVars.gameStatus.focus = "map";
     gameVars.gameStatus.mode = "attack";
-
     document.getElementById("map-message").innerHTML = currentPlayerName + " Choose Attack";
     document.getElementById("map-note").innerHTML = getMapNote();
-
     console.log("begin player " + playerNumber + " turn, focus = " + 
     gameVars.gameStatus.focus + ", mode = " + gameVars.gameStatus.mode);
+}
+
+function countPossibleAttacks() {
+    var currentPlayerId = gameVars.gameStatus.turn,
+    currentPlayerCountriesOnMap = [],
+    currentPlayerBorders = [],
+    enemyCountriesOnMap = [],
+    possibleAttacks = [];
+
+    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
+        //add current player decks on map
+        if (typeof gameVars.mapInfo.countryList[i].deck !== 'undefined' && 
+        gameVars.mapInfo.countryList[i].deck.player === currentPlayerId) {
+            currentPlayerCountriesOnMap.push(gameVars.mapInfo.countryList[i].country);
+        }
+        //add enemy decks on map
+        if (typeof gameVars.mapInfo.countryList[i].deck !== 'undefined' && 
+        gameVars.mapInfo.countryList[i].deck.player !== currentPlayerId) {
+            enemyCountriesOnMap.push(gameVars.mapInfo.countryList[i].country);
+        }
+    }
+    //list border countries
+    for (var e = 0; e < currentPlayerCountriesOnMap.length; e++) {
+        var currentCountryId = findCountryRef(currentPlayerCountriesOnMap[e]),
+        currentCountry = gameVars.mapInfo.countryList[currentCountryId];
+        
+        for (var b = 0; b < currentCountry.borders.length; b++) {
+            var currentBorder = currentCountry.borders[b];
+
+            currentPlayerBorders.push(currentBorder);
+        }
+    }
+    //unique border countries
+    currentPlayerBorders = removeDuplicatesInArray(currentPlayerBorders);
+    //add up possible attacks
+    for (var p = 0; p < currentPlayerBorders.length; p++) {
+        for (e = 0; e < enemyCountriesOnMap.length; e++) {
+            if (currentPlayerBorders[p] === enemyCountriesOnMap[e]) {
+                possibleAttacks.push(enemyCountriesOnMap[e]);
+            }
+        }
+    }
+    for (var q = 0; q < possibleAttacks.length; q++) {
+        gameVars.battleScreenInfo.possibleAttacks.push(gameVars.mapInfo.countryList[findCountryRef(possibleAttacks[q])]);
+    }
+    for (var r = 0; r < currentPlayerCountriesOnMap.length; r++) {
+        gameVars.battleScreenInfo.currentPlayerCountries.push(gameVars.mapInfo.countryList[findCountryRef(currentPlayerCountriesOnMap[r])]);
+    }
+    if (possibleAttacks.length === 0) {
+        earthShakingEvent();
+    }
+    return possibleAttacks.length;
+}
+
+function earthShakingEvent() {
+    console.log("Earth Shaking Event");
 }
 
 
@@ -21,8 +84,102 @@ function settopOfTurn(playerNumber) {
 
 //map
 
+function chooseAttackCountry(country) {
+    var isAttackableRange = false,
+    samePlayer = false,
+    possibleAttacks = [],
+    currentPlayer = gameVars.gameStatus.turn;
+
+    clearAllMapBorders();
+    if (gameVars.mapInfo.countryList[findCountryRef(country)].deck) {
+
+        gameVars.mapInfo.mapSelect2 = gameVars.mapInfo.mapSelect1;
+        gameVars.mapInfo.mapSelect1 = country;
+        possibleAttacks = gameVars.mapInfo.countryList[findCountryRef(country)].borders;
+
+        //checks for same player
+        if (findCountryPlayer(country) === findCountryPlayer(gameVars.mapInfo.mapSelect2)) {
+            samePlayer = true;
+        }
+        else {
+            samePlayer = false;
+        }
+
+        //checks for attackable range
+        for (var i = 0; i < possibleAttacks.length; i++) {
+            if (possibleAttacks[i] === gameVars.mapInfo.mapSelect2) {
+                isAttackableRange = true;
+                break;
+            }
+            else {
+                isAttackableRange = false;
+            }
+        }
+
+        //action to take
+        if (samePlayer === true) {
+            //same player
+            gameVars.mapInfo.mapSelect2 = "";
+            gameVars.mapInfo.mapSelect1 = country;
+            removeElement("map-message", "confirm-attack");
+            updateMapNote(country);
+        }
+        else {
+            if (isAttackableRange === true) {
+                //attackable and in range
+                updateMapNote(country + " vs " + gameVars.mapInfo.mapSelect2);
+                addElement("map-message", "button", "Confirm Attack", "confirm-attack", 
+                "noClass", confirmAttack);
+            }
+            else {
+                //Out of range
+                gameVars.mapInfo.mapSelect2 = "";
+                gameVars.mapInfo.mapSelect1 = country;
+                removeElement("map-message", "confirm-attack");
+                updateMapNote(country);
+            }
+        }
+    }
+    else {
+        gameVars.mapInfo.mapSelect2 = "";
+        gameVars.mapInfo.mapSelect1 = "";
+        updateMapNote(country);
+    }
+    //highlight enemies
+    if (gameVars.mapInfo.mapSelect2 === "") {
+        if (currentPlayer === gameVars.mapInfo.countryList[findCountryRef(country)].deck.player) {
+            highlightEnemies(gameVars.mapInfo.countryList[findCountryRef(country)], currentPlayer)
+        }
+    }
+}
+
+function highlightEnemies(country, currentPlayer) {
+    if (country.deck.player === currentPlayer) {
+        for (var j = 0; j < country.borders.length; j++) {
+            //if (!isSurrounded(gameVars.mapInfo.countryList[findCountryRef(country.borders[j])].country, currentPlayer)) {
+                //this needs to not highlight same player countries
+                addClass(country.borders[j], "attack-threat");
+            //}
+       }
+    }
+}
+
+function clearAllMapBorders() {
+    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
+        removeClass(gameVars.mapInfo.countryList[i].country, "attack-threat")
+    }
+}
+
+function confirmAttack(confirmation) {
+    console.log("confirm attack " + confirmation);
+}
+
+function updateMapNote(message) {
+    document.getElementById("map-note").innerHTML = message;
+}
+
 function getMapNote() {
-    var possibleAttacks = 3;//use function to find
+    var possibleAttacks = countPossibleAttacks();
 
     if (possibleAttacks === 1) {
         return "This is your last possible attack"
@@ -35,11 +192,15 @@ function getMapNote() {
 function mapCountryClick(country) {
     switch (gameVars.gameStatus.mode) {
         case "placement": 
-            placeCountry(country)
-            break;
+            placeCountry(country);
+        break;
+        case "attack":
+            chooseAttackCountry(country);
+        break;
         default: 
-            console.log(country + " clicked");
+            console.log(country + " clicked for nothing");
     }
+    refreshMapButtonColors();
 }
 
 
@@ -213,6 +374,32 @@ function findNextPlayerTurn(currentPlayerNumber) {
     }
 }
 
-function setIDBackgrounColor(Id, r, g, b) {
+function setIDBackgroundColor(Id, r, g, b) {
     document.getElementById(Id).style.backgroundColor = 'rgb(' + [(r),(g),(b)].join(',') + ')';
+}
+
+function setIDBorder(Id, r, g, b, px, type) {
+    document.getElementById(Id).style.border = px + 'px ' + type + ' rgb(' + [(r),(g),(b)].join(',') + ')';
+}
+
+function findCountryRef(country) {
+    for (var c = 0; c < gameVars.mapInfo.countryList.length; c++) {
+        if (gameVars.mapInfo.countryList[c].country === country) {
+            return c;
+        }
+    }
+}
+
+function findCountryPlayer(country) {
+    if (country === "") {
+        return false;
+    }
+    else {
+        if (typeof gameVars.mapInfo.countryList[findCountryRef(country)].deck) {
+            return gameVars.mapInfo.countryList[findCountryRef(country)].deck.player;
+        }
+        else {
+            return false;
+        }
+    }
 }
