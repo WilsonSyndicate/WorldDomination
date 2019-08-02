@@ -1,15 +1,4 @@
-function findCountryPlayer(countryName) {
-    return gameVars.mapInfo.countryList[findCountryRef(countryName)].deck.player;
-}
 
-function findCountryBorders(countryName) {
-    var borders = [];
-
-    for (var i = 0; i < gameVars.mapInfo.countryList[findCountryRef(countryName)].borders.length; i++) {
-        borders.push(gameVars.mapInfo.countryList[findCountryRef(countryName)].borders[i]);
-    }
-    return borders;
-}
 
 function settopOfTurn(playerNumber) {
     var currentPlayerId = gameVars.gameStatus.turn,
@@ -155,6 +144,14 @@ function highlightEnemies(country) {
     var countryPlayer = country.deck.player,
     currentPlayer = gameVars.gameStatus.turn;
 
+    //needs to highlight when previous country selected.
+
+
+
+
+
+    
+
     for (var j = 0; j < country.borders.length; j++) {
         var currentBorderCountry = gameVars.mapInfo.countryList[findCountryRef(country.borders[j])];
 
@@ -213,7 +210,87 @@ function mapCountryClick(country) {
     refreshMapButtonColors();
 }
 
+function displayBattleInfo(battleDeckRef) {
+    var currentPlayer = gameVars.battleScreenInfo.battleDecks[battleDeckRef].player,
+    currentPlayerName = gameVars.playerInfo["Player" + currentPlayer].name,
+    currentDeck = gameVars.battleScreenInfo.battleDecks[battleDeckRef].deck.deckName,
+    currentDeckColor = gameVars.battleScreenInfo.battleDecks[battleDeckRef].deck.deckColor,
+    r = gameVars.playerInfo["Player" + currentPlayer].playerColor[0],
+    g = gameVars.playerInfo["Player" + currentPlayer].playerColor[1],
+    b = gameVars.playerInfo["Player" + currentPlayer].playerColor[2],
+    battleText = [
+        currentPlayerName + " playing " + currentDeck + " (" + currentDeckColor + ")"
+    ],
+    gameMods = [
+        countBattleLife(battleDeckRef),
+        countBattleHand(battleDeckRef),
+        countBattlePower(battleDeckRef),
+        countBattleToughness(battleDeckRef),
+        battleVanguard(battleDeckRef),
+        battleDefensePlane(battleDeckRef),
+        countCountrySupport(battleDeckRef),
+        continentBonuses(battleDeckRef),
+        battleHero(battleDeckRef),
+        battleConspiracy(battleDeckRef),
+        countBattleBonuses(battleDeckRef),
+        countBattlePenalties(battleDeckRef)
+    ];
 
+    //add player and deck name (color)
+    addElement("battle-information", "div",battleText, 
+    "battle-player" + battleDeckRef, "battle-player");
+    
+    //create buttons
+    addElement("battle-player" + battleDeckRef, "button", currentPlayerName, 
+    "battle-winner-" + currentPlayer, "noClass", battleWinner);
+
+    //color buttons
+    setIDBackgroundColor("battle-winner-" + currentPlayer, r, g, b)
+    setIdWithPlayerTextColor("battle-winner-" + currentPlayer, currentPlayer);
+
+    //for each battle player show player, deck, life, cards
+    for (var d = 0; d < gameMods.length; d++) {
+        if (gameMods[d] !== "") {
+            var gameModsCurrentText = gameMods[d][0] + gameMods[d][1]
+            addElement("battle-player" + battleDeckRef, "div", gameModsCurrentText);
+        }
+    }
+}
+
+function BattleDeck(deck, player) {
+    this.player = player;
+    this.deck = deck;
+}
+
+function deckChooser(plyrNum) {
+    if (gameVars.gameStatus.mode === "setup") {
+        return gameVars.playerInfo["Player" + plyrNum].gameDeckRandomLibrary[0];
+    }
+    else {
+        //add deck from map choice
+        //find ground zero
+        //tally all bonuses and penalties
+    }
+}
+
+function setupBattleInfo() {
+    var decksInGame = gameVars.battleScreenInfo.playersInBattleCount;
+
+    for (var i = 0; i < decksInGame.length; i++) {
+        var battleDeck = new BattleDeck(deckChooser(decksInGame[i]), decksInGame[i]);
+
+        gameVars.battleScreenInfo.battleDecks.push(battleDeck);
+    }
+}
+
+function openBattleScreen() { //from setup with screen cleared
+    var battleParticipants = gameVars.battleScreenInfo.battleDecks;  
+    setupBattleInfo();
+    updateBattleLog("Initiation Battle Begins");
+    for (var i = battleParticipants.length - 1; i >= 0; i--) {
+        displayBattleInfo(i);
+    }
+}
 
 //Battle winner Confirmed
 function battleConfirmationText(namesOfWinners) {
@@ -343,79 +420,3 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 
-
-//Task Masters
-function numberSuffix(number) {
-    switch (number) {
-        case 1: return "1st";
-        case 2: return "2nd";
-        case 3: return "3rd";
-        default: return number + "th";
-    }
-}
-
-function findPlayerNames(playerNumberArray) {
-    var playerNames = [];
-
-    for (var i = 0; i < playerNumberArray.length; i++) {
-        playerNames.push(gameVars.playerInfo["Player" + playerNumberArray[i]].name);
-    }
-    return playerNames;
-}
-
-function disableId(id) {
-    document.getElementById(id).disabled = true;
-    addClass(id, 'disabled');
-}
-
-function undisableId(id) {
-    document.getElementById(id).disabled = false;
-    removeClass(id, 'disabled');
-}
-
-function findNextPlayerTurn(currentPlayerNumber) {
-    for (var i = 0; i < gameVars.gameStatus.turnOrder.length; i++) {
-        if (gameVars.gameStatus.turnOrder[i] === currentPlayerNumber) {
-            if (i === gameVars.gameStatus.turnOrder.length - 1) {
-                return gameVars.gameStatus.turnOrder[0];
-            }
-            else {
-                return gameVars.gameStatus.turnOrder[i + 1];
-            }
-        }
-    }
-}
-
-function setIDBackgroundColor(Id, r, g, b) {
-    document.getElementById(Id).style.backgroundColor = 'rgb(' + [(r),(g),(b)].join(',') + ')';
-}
-
-function findCountryRef(country) {
-    for (var c = 0; c < gameVars.mapInfo.countryList.length; c++) {
-        if (gameVars.mapInfo.countryList[c].country === country) {
-            return c;
-        }
-    }
-}
-
-function findCountryNameWithCountryId(countryId) {
-    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
-        if (countryId === gameVars.mapInfo.countryList[i].country) {
-            return gameVars.mapInfo.countryList[i].countryName;
-        }
-    }
-}
-
-function findCountryPlayer(country) {
-    if (country === "") {
-        return false;
-    }
-    else {
-        if (typeof gameVars.mapInfo.countryList[findCountryRef(country)].deck) {
-            return gameVars.mapInfo.countryList[findCountryRef(country)].deck.player;
-        }
-        else {
-            return false;
-        }
-    }
-}

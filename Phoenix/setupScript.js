@@ -145,46 +145,6 @@ function getRandomSetup() {
     gameVars.mapInfo.countryList = countryListToAddTo;
 }
 
-function findPlayerColor(playerId) {
-    var playerColor = gameVars.playerInfo["Player" + playerId].playerColor;
-
-    return playerColor;
-}
-
-function findPlayerCountryColor(country, colorRef) {
-    var playerId = country.deck.deckAuthor;
-
-    return findPlayerColor(playerId)[colorRef];
-}
-
-
-function isSurrounded(country, player) {
-    var answer = true;
-
-    for (var i = 0; i < country.borders.length; i++) {
-        var currentCountryBorderCountry = gameVars.mapInfo.countryList[findCountryRef(country.borders[i])];
-
-        if (!!currentCountryBorderCountry.deck && player !== currentCountryBorderCountry.deck.player) {
-            answer = false;
-        }
-    }
-    return answer;
-}
-
-function isSharingBorder(country, player) {
-    var answer = false;
-
-    for (var i = 0; i < country.borders.length; i++) {
-        var currentCountryBorderCountry = gameVars.mapInfo.countryList[findCountryRef(country.borders[i])];
-
-        if (!!currentCountryBorderCountry.deck && currentCountryBorderCountry.deck.player === player) {
-            answer = true;
-        }
-    }
-
-    return answer;
-}
-
 function refreshMapButtonColors() {
     var currentPlayer = gameVars.gameStatus.turn;
 
