@@ -19,7 +19,9 @@
     border: 2px solid purple;
     background-image: url('art/world-map-1.png');
     background-repeat: no-repeat;
-    height: 500px;
+    background-size: contain;
+    width: 1500px;
+    height: 1038px;
 }
 
 .hide-item-class {
@@ -42,4 +44,224 @@
 
 .attack-threat {
     border: 2px solid red;
+}
+
+.attack-impossible {
+    border: 4px solid gray;
+    color: darkgray;
+}
+
+
+.country-button {
+    position: absolute;
+}
+
+#afghanistan {
+    top: 457px;
+    left: 963px;
+}
+
+#alaska {
+    top: 257px;
+    Left: 36px;
+}
+
+#alberta {
+    top: 328px;
+    left: 184px;
+}
+
+#argentina {
+    top: 909px;
+    left: 332px;
+}
+
+#brazil {
+    top: 708px;
+    left: 410px;    
+}
+
+#central-america {
+    top: 552px;
+    left: 189px;    
+}
+
+#china {
+    top: 516px;
+    left: 1118px;    
+}
+
+#congo {
+    top: 819px;
+    left: 748px;
+}
+
+#east-africa {
+    top: 747px;
+    left: 847px;
+}
+
+#eastern-australia {
+    top: 912px;
+    left: 1344px;
+}
+
+#eastern-usa {
+    top: 450px;
+    left: 304px;    
+}
+
+#egypt {
+    top: 644px;
+    Left: 770px;
+}
+
+#great-britan {
+    top: 378px;
+    left: 560px;    
+}
+
+#greenland {
+    top: 191px;
+    left: 454px;    
+}
+
+#iceland {
+    top: 279px;
+    left: 588px;    
+}
+
+#india {
+    top: 591px;
+    left: 1043px;    
+}
+
+#indonesia {
+    top: 799px;
+    left: 1174px;
+}
+
+#irkutsk {
+    top: 340px;
+    left: 1152px;    
+}
+
+#japan {
+    top: 415px;
+    left: 1340px;    
+}
+
+#kamchatka {
+    top: 252px;
+    left: 1279px;    
+}
+
+#madagascar {
+    top: 940px;
+    left: 944px;
+}
+
+#middle-east {
+    top: 556px;
+    left: 842px;    
+}
+
+#mongolia {
+    top: 419px;
+    left: 1164px;    
+}
+
+#new-guinea {
+    top: 766px;
+    left: 1346px;
+}
+
+#north-africa {
+    top: 670px;
+    left: 618px;
+}
+
+#northern-europe {
+    top: 409px;
+    left: 698px;    
+}
+
+#northwest-territory {
+    top: 228px;
+    left: 182px;    
+}
+
+#ontario {
+    top: 286px;
+    left: 306px;    
+}
+
+#peru {
+    top: 740px;
+    left: 306px;    
+}
+
+#quebec {
+    top: 318px;
+    left: 406px;    
+}
+
+#scandanavia {
+    top: 241px;
+    left: 710px;    
+}
+
+#siam {
+    top: 655px;
+    left: 1184px;    
+}
+
+#siberia {
+    top: 236px;
+    left: 1047px;    
+}
+
+#south-africa {
+    top: 975px;
+    left: 751px;
+}
+
+#southern-europe {
+    top: 499px;
+    left: 708px;    
+}
+
+#ukraine {
+    top: 271px;
+    left: 848px;    
+}
+
+#ural {
+    top: 316px;
+    left: 998px;    
+}
+
+#veneseulea {
+    top: 631px;
+    left: 328px;    
+}
+
+#western-australia {
+    top: 955px;
+    left: 1246px;
+}
+
+#western-europe {
+    top: 526px;
+    left: 588px;    
+}
+
+#western-usa {
+    top: 418px;
+    left: 188px;    
+}
+
+#yakutsk {
+    top: 208px;
+    left: 1188px;    
 }

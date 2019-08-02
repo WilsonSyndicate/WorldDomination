@@ -147,20 +147,30 @@ function chooseAttackCountry(country) {
     }
     //highlight enemies
     if (gameVars.mapInfo.mapSelect2 === "") {
-        if (currentPlayer === gameVars.mapInfo.countryList[findCountryRef(country)].deck.player) {
-            highlightEnemies(gameVars.mapInfo.countryList[findCountryRef(country)], currentPlayer)
-        }
+        highlightEnemies(gameVars.mapInfo.countryList[findCountryRef(country)])
     }
 }
 
-function highlightEnemies(country, currentPlayer) {
-    if (country.deck.player === currentPlayer) {
-        for (var j = 0; j < country.borders.length; j++) {
-            //if (!isSurrounded(gameVars.mapInfo.countryList[findCountryRef(country.borders[j])].country, currentPlayer)) {
-                //this needs to not highlight same player countries
+function highlightEnemies(country) {
+    var countryPlayer = country.deck.player,
+    currentPlayer = gameVars.gameStatus.turn;
+
+    for (var j = 0; j < country.borders.length; j++) {
+        var currentBorderCountry = gameVars.mapInfo.countryList[findCountryRef(country.borders[j])];
+
+        //if counrty player is not current player highlight borders that are current player
+        if (countryPlayer !== currentPlayer) {
+            if (!!currentBorderCountry.deck && currentBorderCountry.deck.player === currentPlayer) {  
                 addClass(country.borders[j], "attack-threat");
-            //}
-       }
+            }        
+        }
+
+        //if coountry player is current player highlight all borders of other players
+        else {
+            if (!!currentBorderCountry.deck && currentBorderCountry.deck.player !== countryPlayer) {  
+                addClass(country.borders[j], "attack-threat");
+            }        
+        }
     }
 }
 
@@ -353,12 +363,14 @@ function findPlayerNames(playerNumberArray) {
     return playerNames;
 }
 
-function disableId(Id) {
-    document.getElementById(Id).disabled = true;
+function disableId(id) {
+    document.getElementById(id).disabled = true;
+    addClass(id, 'disabled');
 }
 
-function undisableId(Id) {
-    document.getElementById(Id).disabled = false;
+function undisableId(id) {
+    document.getElementById(id).disabled = false;
+    removeClass(id, 'disabled');
 }
 
 function findNextPlayerTurn(currentPlayerNumber) {
@@ -378,14 +390,18 @@ function setIDBackgroundColor(Id, r, g, b) {
     document.getElementById(Id).style.backgroundColor = 'rgb(' + [(r),(g),(b)].join(',') + ')';
 }
 
-function setIDBorder(Id, r, g, b, px, type) {
-    document.getElementById(Id).style.border = px + 'px ' + type + ' rgb(' + [(r),(g),(b)].join(',') + ')';
-}
-
 function findCountryRef(country) {
     for (var c = 0; c < gameVars.mapInfo.countryList.length; c++) {
         if (gameVars.mapInfo.countryList[c].country === country) {
             return c;
+        }
+    }
+}
+
+function findCountryNameWithCountryId(countryId) {
+    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
+        if (countryId === gameVars.mapInfo.countryList[i].country) {
+            return gameVars.mapInfo.countryList[i].countryName;
         }
     }
 }

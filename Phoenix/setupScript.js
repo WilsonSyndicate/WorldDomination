@@ -67,11 +67,11 @@ function countryMapName(currentCountryId) {
             return usePlayerName + " (" + useDeckName + ")";
         }
         else {
-            return currentCountryId.country + " (" + usePlayerName + ")";
+            return currentCountryId.countryName + " (" + usePlayerName + ")";
         }
     }
     else {
-        return currentCountryId.country + " (Empty)";
+        return currentCountryId.countryName + " (Empty)";
     }
 }
 
@@ -157,50 +157,68 @@ function findPlayerCountryColor(country, colorRef) {
     return findPlayerColor(playerId)[colorRef];
 }
 
-function isSurrounded(country, surroundedBy) {
-    for (var i = 0; i < country.borders.length; i++) {
-        var currentCountryBorder = country.borders[i],
-        currentCountryBorderPlayer = findCountryRef(currentCountryBorder);
 
-        if (surroundedBy !== currentCountryBorderPlayer) {
-            return false;
+function isSurrounded(country, player) {
+    var answer = true;
+
+    for (var i = 0; i < country.borders.length; i++) {
+        var currentCountryBorderCountry = gameVars.mapInfo.countryList[findCountryRef(country.borders[i])];
+
+        if (!!currentCountryBorderCountry.deck && player !== currentCountryBorderCountry.deck.player) {
+            answer = false;
         }
     }
-    return true;
+    return answer;
+}
+
+function isSharingBorder(country, player) {
+    var answer = false;
+
+    for (var i = 0; i < country.borders.length; i++) {
+        var currentCountryBorderCountry = gameVars.mapInfo.countryList[findCountryRef(country.borders[i])];
+
+        if (!!currentCountryBorderCountry.deck && currentCountryBorderCountry.deck.player === player) {
+            answer = true;
+        }
+    }
+
+    return answer;
 }
 
 function refreshMapButtonColors() {
-
-
+    var currentPlayer = gameVars.gameStatus.turn;
 
     //check for unoccupied countries and player color
     for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
         var currentCountry = gameVars.mapInfo.countryList[i];
 
+        removeClass(currentCountry.country, "attack-impossible");
+
         if (!!currentCountry.deck) {
-            setIDBackgroundColor(currentCountry.country, findPlayerCountryColor(currentCountry, [0]), findPlayerCountryColor(currentCountry, [1]), findPlayerCountryColor(currentCountry, [2]));
-            
+            setIDBackgroundColor(currentCountry.country, findPlayerCountryColor(currentCountry, [0]), 
+            findPlayerCountryColor(currentCountry, [1]), findPlayerCountryColor(currentCountry, [2]));
+
+            setIdWithPlayerTextColor(currentCountry.country, currentCountry.deck.player);
+
             if (gameVars.gameStatus.mode === "attack") {
-
-
-                //check for attack mode and countries out of current player range
-
-
-                //check for attack mode and current player countries surrounded by current player
-                if (isSurrounded(currentCountry, gameVars.gameStatus.turn) === true) {
-                    
-
-                    console.log('hello');
-
-                    //happening all the time
-                    disableId(currentCountry.country);
+                //check for not current player countries without current player as border
+                if (currentPlayer !== currentCountry.deck.player) {
+                    if (!isSharingBorder(currentCountry, currentPlayer)) {
+                        disableId(currentCountry.country);
+                        addClass(currentCountry.country, "attack-impossible");
+                    }
                 }
+                //check for current player countries surrounded by current player
+                else {
+                    if (isSurrounded(currentCountry, currentPlayer)) {
+                        disableId(currentCountry.country);
+                        addClass(currentCountry.country, "attack-impossible");
+                    }
+                }
+    
+                //check for attack mode and countries that already attacked
 
             }
-
-
-
-
         }
         else {
             if (gameVars.gameStatus.mode === "attack") {
@@ -209,20 +227,10 @@ function refreshMapButtonColors() {
         }
     }
 
-
-
-
-    //check for attack mode and countries that already attacked
-
-
     //check for move mode and for countries not owned by current player
 
 
     //check for drop mode and for countries that have already been dropped
-
-
-    console.log("colors updated");
-
 
 }
 
@@ -600,3 +608,8 @@ function updateDOMElement(elementId, text) {
     document.getElementById(elementId).innerHTML = text;
 }
 
+function setIdWithPlayerTextColor(id, player) {
+    var currentPlayerTextColor = gameVars.playerInfo["Player" + player].textColor;
+
+    document.getElementById(id).style.color = currentPlayerTextColor;
+}

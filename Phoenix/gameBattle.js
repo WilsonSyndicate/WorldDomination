@@ -87,6 +87,7 @@ function displayBattleInfo(battleDeckRef) {
 
     //color buttons
     setIDBackgroundColor("battle-winner-" + currentPlayer, r, g, b)
+    setIdWithPlayerTextColor("battle-winner-" + currentPlayer, currentPlayer);
 
     //for each battle player show player, deck, life, cards
     for (var d = 0; d < gameMods.length; d++) {
@@ -139,7 +140,9 @@ function addClass(idToModify, classToAdd) {
 }
 
 function removeClass(idToModify, classToRemove) {
-    document.getElementById(idToModify).classList.remove(classToRemove);
+    if (!!idToModify && document.getElementById(idToModify).classList.contains(classToRemove)) {
+        document.getElementById(idToModify).classList.remove(classToRemove);
+    }
 }
 
 function updateBattleLog (situationText) {
