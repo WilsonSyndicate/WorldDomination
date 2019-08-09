@@ -1,10 +1,22 @@
 //Task Masters
 
+function endOfTurnCleanup() {
+    gameVars.battleScreenInfo.groundZero = "";
+    gameVars.battleScreenInfo.text = "";
+    gameVars.battleScreenInfo.playersInBattleCount = [];
+    gameVars.battleScreenInfo.battleDecks = [];
+    gameVars.battleScreenInfo.battleWinners = [];
+    gameVars.battleScreenInfo.possibleAttacks = [];
+    gameVars.battleScreenInfo.currentPlayerCountries = []
+}
+
 function numberSuffix(number) {
-    switch (number) {
-        case 1: return "1st";
-        case 2: return "2nd";
-        case 3: return "3rd";
+    var lastDigit = number.toString().split('').pop();
+
+    switch (lastDigit) {
+        case 1: return number + "st";
+        case 2: return number + "nd";
+        case 3: return number + "rd";
         default: return number + "th";
     }
 }
@@ -61,12 +73,37 @@ function findCountryNameWithCountryId(countryId) {
     }
 }
 
+function findAttackingCountry() {
+    if (findCountryPlayer(gameVars.mapInfo.mapSelect1) === gameVars.gameStatus.currentTurn) {
+        return gameVars.mapInfo.mapSelect1;
+    }
+    else {
+        return gameVars.mapInfo.mapSelect2;
+    }
+}
+
+function findDefendingCountry() {
+    if (findCountryPlayer(gameVars.mapInfo.mapSelect1) !== gameVars.gameStatus.currentTurn) {
+        return gameVars.mapInfo.mapSelect1;
+    }
+    else {
+        return gameVars.mapInfo.mapSelect2;
+    }
+}
+
+function findCountryDeck(country) {
+    if (!!gameVars.mapInfo.countryList[findCountryRef(country)].deck) {
+        return gameVars.mapInfo.countryList[findCountryRef(country)].deck;
+    }
+    return false;
+}
+
 function findCountryPlayer(country) {
     if (country === "") {
         return false;
     }
     else {
-        if (typeof gameVars.mapInfo.countryList[findCountryRef(country)].deck) {
+        if (!!gameVars.mapInfo.countryList[findCountryRef(country)].deck) {
             return gameVars.mapInfo.countryList[findCountryRef(country)].deck.player;
         }
         else {
@@ -144,13 +181,13 @@ function addElement(addToId, elementType, elementContent, idToInclude, classToIn
     newContent = document.createTextNode(elementContent);//create content
 
     
-    if (classToInclude !== undefined && classToInclude !== "noClass") {
+    if (!!classToInclude && classToInclude !== "noClass") {
         newElement.classList.add(classToInclude);
     }
     
-    if (idToInclude !== undefined && idToInclude !== "noId") {
+    if (!!idToInclude && idToInclude !== "noId") {
         newElement.id = idToInclude;
-        if (clickFunctionToInclude !== undefined && clickFunctionToInclude !== "noFunction") {
+        if (!!clickFunctionToInclude && clickFunctionToInclude !== "noFunction") {
             newElement.onclick = function() { clickFunctionToInclude(idToInclude); };
         }
     }
@@ -163,7 +200,7 @@ function addElement(addToId, elementType, elementContent, idToInclude, classToIn
 }
 
 function removeElement(parentId, elementId) {
-    if (typeof(document.getElementById(parentId)) !== undefined && document.getElementById(elementId) !== null) {
+    if (!!document.getElementById(parentId) && document.getElementById(elementId) !== null) {
         document.getElementById(parentId).removeChild(document.getElementById(elementId));
     }
 }
@@ -182,7 +219,9 @@ function removeDuplicatesInArray(array) {
 }
 
 function findCountryPlayer(countryName) {
-    return gameVars.mapInfo.countryList[findCountryRef(countryName)].deck.player;
+    if (countryName !== "") {
+        return gameVars.mapInfo.countryList[findCountryRef(countryName)].deck.player;
+    }
 }
 
 function findCountryBorders(countryName) {
@@ -192,4 +231,115 @@ function findCountryBorders(countryName) {
         borders.push(gameVars.mapInfo.countryList[findCountryRef(countryName)].borders[i]);
     }
     return borders;
+}
+
+function findLowest(arrayToCheck) {
+    var lowest = arrayToCheck[0];
+
+    for (var i = 0; i < arrayToCheck.length; i++) {
+        if (arrayToCheck[i] < lowest) {
+            lowest = arrayToCheck[i];
+        }
+    }
+    return lowest;
+}
+
+function orderArray(array, sortBy) {
+    array.sort(function(a, b) {
+        if (a[sortBy].toUpperCase() < b[sortBy].toUpperCase()) { return -1; }
+        if (a[sortBy].toUpperCase() > b[sortBy].toUpperCase()) { return 1;}
+    })
+}
+
+function orderSimpleArray(array) {
+    array.sort(function(a, b) {
+        if (a.toUpperCase() < b.toUpperCase()) { return -1; }
+        if (a.toUpperCase() > b.toUpperCase()) { return 1;}
+    })
+}
+
+function shuffleArray(arrayToShuffle) {
+    //Found on stackoverflow
+    for (var i = arrayToShuffle.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = arrayToShuffle[i];
+        arrayToShuffle[i] = arrayToShuffle[j];
+        arrayToShuffle[j] = temp;
+    }
+}
+
+function tfyn(tf) {
+    if (tf === true) {
+        return "Yes";
+    }
+    else {
+        return "No";
+    }
+}
+
+function updateLog(text) {
+    var logText = [],
+    logLength = gameVars.gameLog.length,
+    lastLog = gameVars.gameLog[logLength - 1];
+
+    logText.push(Date.parse(Date()));
+    for (var i = 0; i < text.length; i++) {
+        logText.push(text[i]);
+    }
+    if (logLength > 1 && lastLog[1].search("Begins") > 0) {
+        logText.push("Game Duration: " + formatDuration(Date.parse(Date()) - lastLog[0]));
+    }
+    gameVars.gameLog.push(logText);
+    console.log(logText);
+}
+
+function calcDuration(duration) {
+    //parts borrowed from Stack Overflow https://stackoverflow.com/questions/19700283/how-to-convert-time-milliseconds-to-hours-min-sec-format-in-javascript
+    let remain = duration;
+
+    let days = Math.floor(remain / (1000 * 60 * 60 * 24));
+    remain = remain % (1000 * 60 * 60 * 24);
+  
+    let hours = Math.floor(remain / (1000 * 60 * 60));
+    remain = remain % (1000 * 60 * 60);
+  
+    let minutes = Math.floor(remain / (1000 * 60));
+    remain = remain % (1000 * 60);
+  
+    let seconds = Math.floor(remain / (1000));
+    remain = remain % (1000);
+  
+    let milliseconds = remain;
+
+    return {
+        days, 
+        hours, 
+        minutes, 
+        seconds, 
+        milliseconds
+    };
+}
+
+function formatDuration(duration) {
+    var time = calcDuration(duration);
+
+    return time.days + ":" + time.hours + ":" + time.minutes + ":" + time.seconds;
+}
+
+function unhideId(elem) {
+    document.getElementById(elem).classList.remove('hide-item-class');
+}
+
+function hideId(elem) {
+    document.getElementById(elem).classList.add('hide-item-class');
+}
+
+function updateDOMElement(elementId, text) {
+    document.getElementById(elementId).innerHTML = text;
+}
+
+function setIdWithPlayerTextColor(id, player) {
+    var currentPlayerTextColor = gameVars.playerInfo["Player" + player].textColor;
+
+    document.getElementById(id).style.color = currentPlayerTextColor;
 }

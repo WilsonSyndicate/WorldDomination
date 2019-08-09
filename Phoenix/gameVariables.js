@@ -84,6 +84,9 @@ var gameVars = {
 const adminSettings = {
     lightTextSetting: 80,
     normalizeDeckList: true,
+    buttonText: {
+        confirmAttack: "Confirm Attack"
+    },
     supportBonus: {
         defendingLife: 3.2,
         defendingHand: 1.2,

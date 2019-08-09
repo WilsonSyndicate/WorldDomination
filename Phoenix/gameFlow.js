@@ -1,6 +1,6 @@
 
 
-function settopOfTurn(playerNumber) {
+function settopOfTurn() {
     var currentPlayerId = gameVars.gameStatus.turn,
     currentPlayerName = gameVars.playerInfo["Player" + currentPlayerId].name;
 
@@ -8,8 +8,6 @@ function settopOfTurn(playerNumber) {
     gameVars.gameStatus.mode = "attack";
     document.getElementById("map-message").innerHTML = currentPlayerName + " Choose Attack";
     document.getElementById("map-note").innerHTML = getMapNote();
-    console.log("begin player " + playerNumber + " turn, focus = " + 
-    gameVars.gameStatus.focus + ", mode = " + gameVars.gameStatus.mode);
 }
 
 function countPossibleAttacks() {
@@ -21,12 +19,12 @@ function countPossibleAttacks() {
 
     for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
         //add current player decks on map
-        if (typeof gameVars.mapInfo.countryList[i].deck !== 'undefined' && 
+        if (!!gameVars.mapInfo.countryList[i].deck && 
         gameVars.mapInfo.countryList[i].deck.player === currentPlayerId) {
             currentPlayerCountriesOnMap.push(gameVars.mapInfo.countryList[i].country);
         }
         //add enemy decks on map
-        if (typeof gameVars.mapInfo.countryList[i].deck !== 'undefined' && 
+        if (!!gameVars.mapInfo.countryList[i].deck && 
         gameVars.mapInfo.countryList[i].deck.player !== currentPlayerId) {
             enemyCountriesOnMap.push(gameVars.mapInfo.countryList[i].country);
         }
@@ -64,9 +62,7 @@ function countPossibleAttacks() {
     return possibleAttacks.length;
 }
 
-function earthShakingEvent() {
-    console.log("Earth Shaking Event");
-}
+
 
 
 
@@ -76,8 +72,7 @@ function earthShakingEvent() {
 function chooseAttackCountry(country) {
     var isAttackableRange = false,
     samePlayer = false,
-    possibleAttacks = [],
-    currentPlayer = gameVars.gameStatus.turn;
+    possibleAttacks = [];
 
     clearAllMapBorders();
     if (gameVars.mapInfo.countryList[findCountryRef(country)].deck) {
@@ -117,7 +112,7 @@ function chooseAttackCountry(country) {
             if (isAttackableRange === true) {
                 //attackable and in range
                 updateMapNote(country + " vs " + gameVars.mapInfo.mapSelect2);
-                addElement("map-message", "button", "Confirm Attack", "confirm-attack", 
+                addElement("map-message", "button", adminSettings.buttonText.confirmAttack, "confirm-attack", 
                 "noClass", confirmAttack);
             }
             else {
@@ -144,14 +139,6 @@ function highlightEnemies(country) {
     var countryPlayer = country.deck.player,
     currentPlayer = gameVars.gameStatus.turn;
 
-    //needs to highlight when previous country selected.
-
-
-
-
-
-    
-
     for (var j = 0; j < country.borders.length; j++) {
         var currentBorderCountry = gameVars.mapInfo.countryList[findCountryRef(country.borders[j])];
 
@@ -177,8 +164,40 @@ function clearAllMapBorders() {
     }
 }
 
-function confirmAttack(confirmation) {
-    console.log("confirm attack " + confirmation);
+function confirmAttack() {
+    var attackingCountry = findAttackingCountry(),
+    attackingDeck = findCountryDeck(attackingCountry),
+    defendingCountry = findDefendingCountry(),
+    defendingDeck = findCountryDeck(defendingCountry),
+    attackConfirmed = confirm("Attack " + defendingCountry + "(" + defendingDeck.deckName +") with " + 
+     attackingCountry + "(" + attackingDeck.deckName + ")"),
+    possibleBattleJoiners = [];
+
+    if (attackConfirmed === true) {
+
+
+        gameVars.battleScreenInfo.groundZero = defendingCountry;
+
+
+        //prompt for joining countries
+
+
+
+
+
+
+        
+
+        console.log("check for joining decks and setup battle info and go to battle screen");
+    }
+
+
+
+
+
+
+
+
 }
 
 function updateMapNote(message) {
@@ -205,7 +224,7 @@ function mapCountryClick(country) {
             chooseAttackCountry(country);
         break;
         default: 
-            console.log(country + " clicked for nothing");
+            console.log("Mode not found in mapCountryClick");
     }
     refreshMapButtonColors();
 }
@@ -237,12 +256,10 @@ function displayBattleInfo(battleDeckRef) {
     ];
 
     //add player and deck name (color)
-    addElement("battle-information", "div",battleText, 
-    "battle-player" + battleDeckRef, "battle-player");
+    addElement("battle-information", "div", battleText, "battle-player" + battleDeckRef, "battle-player");
     
     //create buttons
-    addElement("battle-player" + battleDeckRef, "button", currentPlayerName, 
-    "battle-winner-" + currentPlayer, "noClass", battleWinner);
+    addElement("battle-player" + battleDeckRef, "button", currentPlayerName, "battle-winner-" + currentPlayer, "noClass", battleWinner);
 
     //color buttons
     setIDBackgroundColor("battle-winner-" + currentPlayer, r, g, b)
@@ -286,7 +303,7 @@ function setupBattleInfo() {
 function openBattleScreen() { //from setup with screen cleared
     var battleParticipants = gameVars.battleScreenInfo.battleDecks;  
     setupBattleInfo();
-    updateBattleLog("Initiation Battle Begins");
+    updateBattleLog("Initiation Game Begins");
     for (var i = battleParticipants.length - 1; i >= 0; i--) {
         displayBattleInfo(i);
     }
@@ -416,7 +433,7 @@ document.addEventListener("DOMContentLoaded", function() {
     hideId("battle-screen");
     hideId("map-screen");
     document.getElementById("update-player-count").max = maxPlayers;
-    updateLog("Begin Setup");
+    updateLog(["Begin Setup"]);
 });
 
 

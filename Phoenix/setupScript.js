@@ -10,7 +10,7 @@ function countPlayerDecks(playerNumber) {
     var deckCount = 0;
 
     for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
-        if (typeof gameVars.mapInfo.countryList[i].deck !== "undefined" &&
+        if (!!gameVars.mapInfo.countryList[i].deck &&
          playerNumber === gameVars.mapInfo.countryList[i].deck.player)
         deckCount += 1;
     }
@@ -34,7 +34,7 @@ function checkForSetupFinish() {
     placedCountries = 0;
 
     for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
-        if (typeof gameVars.mapInfo.countryList[i].deck !== "undefined") {
+        if (!!gameVars.mapInfo.countryList[i].deck) {
             placedCountries += 1;
         }
     }
@@ -42,7 +42,8 @@ function checkForSetupFinish() {
         for (var c = 0; c < countryCount; c++) {
             undisableId(gameVars.mapInfo.countryList[c].country);
         }
-        settopOfTurn(gameVars.gameStatus.currentTurn);
+        updateLog(["Setup Complete"]);
+        settopOfTurn();
     }
 }
 
@@ -105,6 +106,9 @@ function gameResultsLogText(confirmationResults, orderOfWinners) {
     var resultsLogText = [];
 
     //add game duration and consequence to log
+    if (gameVars.gameStatus.mode === "setup") {
+        resultsLogText.push("Initiation Game Ends")
+    }
 
     for (var i = 0; i < confirmationResults.length; i++) {
         var currentDeckName = findBattleDeckName(orderOfWinners[i]);
@@ -208,7 +212,8 @@ function setupBoard(confirmationResults, orderOfWinners) {
     unhideId("map-screen");
     if (gameVars.globalGameOptions.randomMapSetup === true) {
         getRandomSetup();
-        settopOfTurn(gameVars.gameStatus.turnOrder[0])
+        updateLog(["Setup Complete"]);
+        settopOfTurn()
         }
     else {
         gameVars.gameStatus.mode = "placement";
@@ -243,7 +248,7 @@ function setupPlayerName() {
     var currentPlayerName = gameVars.playerInfo["Player" + gameVars.playerScreenOptions.activeSetupPlayer].name,
     changePlayerNameTo = prompt("Change Name to:", currentPlayerName);
 
-    if (changePlayerNameTo != null) {
+    if (!!changePlayerNameTo) {
         gameVars.playerInfo["Player" + gameVars.playerScreenOptions.activeSetupPlayer].name = changePlayerNameTo;
     }
     refreshNameShown(gameVars.playerScreenOptions.activeSetupPlayer);
@@ -505,71 +510,3 @@ function prepDeckListNotSharedNotNormalizedPool(playerNumber) {
     shuffleArray(gameVars.playerInfo["Player" + playerNumber].gameDeckRandomLibrary);
 }
 
-
-//Task Masters
-
-function findLowest(arrayToCheck) {
-    var lowest = arrayToCheck[0];
-
-    for (var i = 0; i < arrayToCheck.length; i++) {
-        if (arrayToCheck[i] < lowest) {
-            lowest = arrayToCheck[i];
-        }
-    }
-    return lowest;
-}
-
-function orderArray(array, sortBy) {
-    array.sort(function(a, b) {
-        if (a[sortBy].toUpperCase() < b[sortBy].toUpperCase()) { return -1; }
-        if (a[sortBy].toUpperCase() > b[sortBy].toUpperCase()) { return 1;}
-    })
-}
-
-function orderSimpleArray(array) {
-    array.sort(function(a, b) {
-        if (a.toUpperCase() < b.toUpperCase()) { return -1; }
-        if (a.toUpperCase() > b.toUpperCase()) { return 1;}
-    })
-}
-
-function shuffleArray(arrayToShuffle) {
-    //Found on stackoverflow
-    for (var i = arrayToShuffle.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        var temp = arrayToShuffle[i];
-        arrayToShuffle[i] = arrayToShuffle[j];
-        arrayToShuffle[j] = temp;
-    }
-}
-
-function tfyn(tf) {
-    if (tf === true) {
-        return "Yes";
-    }
-    else {
-        return "No";
-    }
-}
-
-function updateLog(text) {
-    gameVars.gameLog.push([Date(),text]);
-}
-
-function unhideId(elem) {
-    document.getElementById(elem).classList.remove('hide-item-class');
-}
-
-function hideId(elem) {
-    document.getElementById(elem).classList.add('hide-item-class');
-}
-
-function updateDOMElement(elementId, text) {
-    document.getElementById(elementId).innerHTML = text;
-}
-
-function setIdWithPlayerTextColor(id, player) {
-    var currentPlayerTextColor = gameVars.playerInfo["Player" + player].textColor;
-
-    document.getElementById(id).style.color = currentPlayerTextColor;
-}
