@@ -154,9 +154,11 @@ function refreshMapButtonColors() {
 
     //check for unoccupied countries and player color
     for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
-        var currentCountry = gameVars.mapInfo.countryList[i];
+        var currentCountry = gameVars.mapInfo.countryList[i],
+        possibleJoin = gameVars.battleScreenInfo.possibleJoinAttack;
 
         removeClass(currentCountry.country, "attack-impossible");
+        undisableId(currentCountry.country)
 
         if (!!currentCountry.deck) {
             setIDBackgroundColor(currentCountry.country, findPlayerCountryColor(currentCountry, [0]), 
@@ -164,7 +166,7 @@ function refreshMapButtonColors() {
 
             setIdWithPlayerTextColor(currentCountry.country, currentCountry.deck.player);
 
-            if (gameVars.gameStatus.mode === "attack") {
+            if (gameVars.gameStatus.mode === "attack" && isInArray(currentCountry.country, possibleJoin) === false) {
                 //check for not current player countries without current player as border
                 if (currentPlayer !== currentCountry.deck.player) {
                     if (!isSharingBorder(currentCountry, currentPlayer)) {
@@ -174,13 +176,14 @@ function refreshMapButtonColors() {
                 }
                 //check for current player countries surrounded by current player
                 else {
-                    if (isSurrounded(currentCountry, currentPlayer)) {
+                    if (isSurrounded(currentCountry, currentPlayer) && isInArray(currentCountry.country, possibleJoin) === false) {
                         disableId(currentCountry.country);
                         addClass(currentCountry.country, "attack-impossible");
                     }
                 }
     
                 //check for attack mode and countries that already attacked
+
 
             }
         }
@@ -190,6 +193,10 @@ function refreshMapButtonColors() {
             }
         }
     }
+
+
+
+
 
     //check for move mode and for countries not owned by current player
 
@@ -204,7 +211,7 @@ function setupBoard(confirmationResults, orderOfWinners) {
     var logText = gameResultsLogText(confirmationResults, orderOfWinners);
 
     gameVars.gameStatus.turnOrder = orderOfWinners;
-    gameVars.gameStatus.turn = parseInt(orderOfWinners[0]);
+    gameVars.gameStatus.turn = Number(orderOfWinners[0]);
     updateLog(logText);
     gameVars.gameStatus.currentTurn = gameVars.gameStatus.turnOrder[0];
     clearBattleScreenInfo();
@@ -220,6 +227,7 @@ function setupBoard(confirmationResults, orderOfWinners) {
     }
     BuildMapButtons();
     refreshMapButtonColors();
+    convertArrayContentToNumbers(gameVars.gameStatus.turnOrder)
 }
 
 function prepDeckList() {

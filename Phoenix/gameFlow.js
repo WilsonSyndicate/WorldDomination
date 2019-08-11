@@ -74,9 +74,10 @@ function chooseAttackCountry(country) {
     samePlayer = false,
     possibleAttacks = [];
 
+    //redisable attack join threats
     clearAllMapBorders();
+    gameVars.battleScreenInfo.confirmedJoiner = [];
     if (gameVars.mapInfo.countryList[findCountryRef(country)].deck) {
-
         gameVars.mapInfo.mapSelect2 = gameVars.mapInfo.mapSelect1;
         gameVars.mapInfo.mapSelect1 = country;
         possibleAttacks = gameVars.mapInfo.countryList[findCountryRef(country)].borders;
@@ -110,10 +111,20 @@ function chooseAttackCountry(country) {
         }
         else {
             if (isAttackableRange === true) {
-                //attackable and in range
-                updateMapNote(country + " vs " + gameVars.mapInfo.mapSelect2);
-                addElement("map-message", "button", adminSettings.buttonText.confirmAttack, "confirm-attack", 
-                "noClass", confirmAttack);
+                if (gameVars.gameStatus.turn === findCountryPlayer(gameVars.mapInfo.mapSelect1) || 
+                 gameVars.gameStatus.turn === findCountryPlayer(gameVars.mapInfo.mapSelect2)) {
+                    //attackable and in range and one of selected countries is current turn player
+                    updateMapNote(country + " vs " + gameVars.mapInfo.mapSelect2);
+                    removeElement("map-message", "confirm-attack");
+                    addElement("map-message", "button", adminSettings.buttonText.confirmAttack, "confirm-attack", "noClass", confirmAttack);
+                    highlightJoinThreat();
+                }
+                else {
+                    gameVars.mapInfo.mapSelect2 = "";
+                    gameVars.mapInfo.mapSelect1 = country;
+                    removeElement("map-message", "confirm-attack");
+                    updateMapNote(country);
+                }
             }
             else {
                 //Out of range
@@ -133,6 +144,57 @@ function chooseAttackCountry(country) {
     if (gameVars.mapInfo.mapSelect2 === "") {
         highlightEnemies(gameVars.mapInfo.countryList[findCountryRef(country)])
     }
+    highlightMapSelect(country);
+}
+
+function chooseJoiner(country) {
+    var countryPlayer = findCountryPlayer(country),
+    newPossibleJoinAttackList = [];
+
+    gameVars.battleScreenInfo.confirmedJoiner.push(country);
+    addClass(country, 'map-select');
+    
+    
+    for (var i = 0; i < gameVars.battleScreenInfo.possibleJoinAttack.length; i++) {
+        if (countryPlayer === findCountryPlayer(gameVars.battleScreenInfo.possibleJoinAttack[i])) {
+            removeClass(gameVars.battleScreenInfo.possibleJoinAttack[i], 'join-threat');
+        }
+        else {
+            newPossibleJoinAttackList.push(gameVars.battleScreenInfo.possibleJoinAttack[i]);
+        }
+    }
+    gameVars.battleScreenInfo.possibleJoinAttack = newPossibleJoinAttackList;
+}
+
+function highlightMapSelect(country) {
+    addClass(country, 'map-select');
+}
+
+function highlightJoinThreat() {
+    var attackingCountry = findAttackingCountry(),
+    attackingPlayer = findCountryPlayer(attackingCountry),
+    defendingCountry = findDefendingCountry(),
+    defendingPlayer = findCountryPlayer(defendingCountry),
+    nonBattleParticipants = [],
+    defendingBorders = findCountryBorders(defendingCountry);
+
+
+    for (var i = 0; i < gameVars.gameStatus.turnOrder.length; i++) {
+        if (gameVars.gameStatus.turnOrder[i] !== attackingPlayer && gameVars.gameStatus.turnOrder[i] !== defendingPlayer) {
+            nonBattleParticipants.push(gameVars.gameStatus.turnOrder[i]);
+        }
+    }
+    for (var c = 0; c < defendingBorders.length; c++) {
+        for (var p = 0; p < nonBattleParticipants.length; p++) {
+            if (findCountryPlayer(defendingBorders[c]) === nonBattleParticipants[p]) {
+                addClass(defendingBorders[c], 'join-threat');
+                undisableId(defendingBorders[c]);
+                gameVars.battleScreenInfo.possibleJoinAttack.push(defendingBorders[c]);
+            }
+        }
+    }
+    addClass(defendingCountry, 'map-select');
+    addClass(attackingCountry, 'map-select');
 }
 
 function highlightEnemies(country) {
@@ -146,7 +208,7 @@ function highlightEnemies(country) {
         if (countryPlayer !== currentPlayer) {
             if (!!currentBorderCountry.deck && currentBorderCountry.deck.player === currentPlayer) {  
                 addClass(country.borders[j], "attack-threat");
-            }        
+            }     
         }
 
         //if coountry player is current player highlight all borders of other players
@@ -160,7 +222,11 @@ function highlightEnemies(country) {
 
 function clearAllMapBorders() {
     for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
-        removeClass(gameVars.mapInfo.countryList[i].country, "attack-threat")
+        removeClass(gameVars.mapInfo.countryList[i].country, "attack-threat");
+        removeClass(gameVars.mapInfo.countryList[i].country, "join-threat");
+        removeClass(gameVars.mapInfo.countryList[i].country, "map-select");
+
+        gameVars.battleScreenInfo.possibleJoinAttack = [];
     }
 }
 
@@ -169,34 +235,19 @@ function confirmAttack() {
     attackingDeck = findCountryDeck(attackingCountry),
     defendingCountry = findDefendingCountry(),
     defendingDeck = findCountryDeck(defendingCountry),
-    attackConfirmed = confirm("Attack " + defendingCountry + "(" + defendingDeck.deckName +") with " + 
-     attackingCountry + "(" + attackingDeck.deckName + ")"),
-    possibleBattleJoiners = [];
+    attackConfirmed = confirm("Attack " + findCountryLongName(defendingCountry) + "(" + defendingDeck.deckName +") with " + 
+    findCountryLongName(attackingCountry) + "(" + attackingDeck.deckName + ")"),
+    possibleJoinPlayers = [],
+    confirmationBattleText = "";
 
     if (attackConfirmed === true) {
 
 
-        gameVars.battleScreenInfo.groundZero = defendingCountry;
-
-
-        //prompt for joining countries
-
-
-
-
-
-
+        //build confirmation battle text and prompt for battle screen
         
 
-        console.log("check for joining decks and setup battle info and go to battle screen");
+    console.log("check for joining decks and setup battle info and go to battle screen");
     }
-
-
-
-
-
-
-
 
 }
 
@@ -221,7 +272,12 @@ function mapCountryClick(country) {
             placeCountry(country);
         break;
         case "attack":
-            chooseAttackCountry(country);
+            if (isInArray(country, gameVars.battleScreenInfo.possibleJoinAttack)) {
+                chooseJoiner(country);
+            }
+            else {
+                chooseAttackCountry(country);
+            }
         break;
         default: 
             console.log("Mode not found in mapCountryClick");

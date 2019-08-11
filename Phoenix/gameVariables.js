@@ -3,7 +3,6 @@
 
 var gameVars = {
     playerInfo: {},
-    deckInfo: {},
     battleScreenInfo: {
         groundZero: "",
         text: "",
@@ -11,7 +10,9 @@ var gameVars = {
         battleDecks: [],
         battleWinners: [],
         possibleAttacks: [],
-        currentPlayerCountries: []
+        currentPlayerCountries: [],
+        possibleJoinAttack: [],
+        confirmedJoiner: []
     },
     gameLog: [],
     globalGameOptions: {

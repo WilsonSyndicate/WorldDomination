@@ -53,6 +53,16 @@
     outline: 2px solid lightgrey;
 }
 
+.join-threat {
+    border: 2px solid blue;
+    outline: 2px solid green;
+}
+
+.map-select {
+    border: 2px solid gold;
+    outline: 2px solid yellow;
+}
+
 /*Country buttons*/
 .country-button {
     position: absolute;

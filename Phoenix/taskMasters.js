@@ -1,5 +1,11 @@
 //Task Masters
 
+function convertArrayContentToNumbers(array) {
+    for (var i = 0; i < array.length; i++) {
+        array[i] = Number(array[i]);
+    }
+}
+
 function endOfTurnCleanup() {
     gameVars.battleScreenInfo.groundZero = "";
     gameVars.battleScreenInfo.text = "";
@@ -65,10 +71,26 @@ function findCountryRef(country) {
     }
 }
 
+function findCountryLongName(country) {
+    return gameVars.mapInfo.countryList[findCountryRef(country)].countryName;
+}
+
 function findCountryNameWithCountryId(countryId) {
     for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
         if (countryId === gameVars.mapInfo.countryList[i].country) {
             return gameVars.mapInfo.countryList[i].countryName;
+        }
+    }
+}
+
+function findUniqueValuesInArray(array) {
+    var uniqueArray = [];
+
+    for (var i = 0; i < array.length; i++) {
+        for (var u = 0; u < uniqueArray.length; u++) {
+            if (array[i] !== uniqueArray[u]) {
+                uniqueArray.push(array[i]);
+            }
         }
     }
 }
@@ -176,6 +198,15 @@ function updateBattleLog (situationText) {
     updateLog(text);
 }
 
+function isInArray(value, array) {
+    for (var i = 0; i < array.length; i++) {
+        if (array[i] === value) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function addElement(addToId, elementType, elementContent, idToInclude, classToInclude, clickFunctionToInclude) {
     var newElement = document.createElement(elementType),//create a new element
     newContent = document.createTextNode(elementContent);//create content
@@ -219,7 +250,7 @@ function removeDuplicatesInArray(array) {
 }
 
 function findCountryPlayer(countryName) {
-    if (countryName !== "") {
+    if (countryName !== "" && !!gameVars.mapInfo.countryList[findCountryRef(countryName)].deck) {
         return gameVars.mapInfo.countryList[findCountryRef(countryName)].deck.player;
     }
 }
@@ -323,7 +354,19 @@ function calcDuration(duration) {
 function formatDuration(duration) {
     var time = calcDuration(duration);
 
-    return time.days + ":" + time.hours + ":" + time.minutes + ":" + time.seconds;
+    let days = time.days.toString();
+    if (days.length === 1) days = '0' + days;
+
+    let hours = time.hours.toString();
+    if (hours.length === 1) hours = '0' + hours;
+  
+    let minutes = time.minutes.toString();
+    if (minutes.length === 1) minutes = '0' + minutes;
+  
+    let seconds = time.seconds.toString();
+    if (seconds.length === 1) seconds = '0' + seconds;
+  
+    return days + ":" + hours + ":" + minutes + ":" + seconds;
 }
 
 function unhideId(elem) {
