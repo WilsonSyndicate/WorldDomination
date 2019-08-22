@@ -27,7 +27,6 @@ var gameVars = {
         mode: "setup", //topOfTurn, Attack, onGoingAttack, mapSetupComplete
         focus: "setup", //map, battle, log
         turn: "initiation",
-        nextTurn: "undecided",
         turnOrder: [],
         currentAttack: 1
     },

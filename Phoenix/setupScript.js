@@ -48,12 +48,13 @@ function checkForSetupFinish() {
 }
 
 function placeCountry(country) {
-    var currentTurn = gameVars.gameStatus.currentTurn,
+    var currentTurn = gameVars.gameStatus.turn,
     deckIdToPlace = countPlayerDecks(currentTurn) + 1,
     deckToPlace = gameVars.playerInfo["Player" + currentTurn].gameDeckRandomLibrary[deckIdToPlace];
 
     updateCountryWithDeck(country, deckToPlace);
-    gameVars.gameStatus.currentTurn = findNextPlayerTurn(currentTurn);
+    gameVars.gameStatus.turn = findNextPlayerTurn(currentTurn);
+
     disableId(country);
     checkForSetupFinish();
 }
@@ -157,8 +158,10 @@ function refreshMapButtonColors() {
         var currentCountry = gameVars.mapInfo.countryList[i],
         possibleJoin = gameVars.battleScreenInfo.possibleJoinAttack;
 
-        removeClass(currentCountry.country, "attack-impossible");
-        undisableId(currentCountry.country)
+        if (gameVars.gameStatus.mode === "attack") {
+            removeClass(currentCountry.country, "attack-impossible");
+            undisableId(currentCountry.country)
+        }
 
         if (!!currentCountry.deck) {
             setIDBackgroundColor(currentCountry.country, findPlayerCountryColor(currentCountry, [0]), 
@@ -205,7 +208,14 @@ function refreshMapButtonColors() {
 
 }
 
-
+function setupAllPlayerDeckListsAsHidden() {
+    for (var i = 0; i < gameVars.gameStatus.turnOrder.length; i++) {
+        var currentPlayer = gameVars.playerInfo["Player" + gameVars.gameStatus.turnOrder[i]];
+        for (var d = 0; d < currentPlayer.gameDeckRandomLibrary.length; d++) {
+            currentPlayer.gameDeckRandomLibrary[d].deckHidden = true;
+        }
+    }
+}
 
 function setupBoard(confirmationResults, orderOfWinners) {
     var logText = gameResultsLogText(confirmationResults, orderOfWinners);
@@ -227,7 +237,7 @@ function setupBoard(confirmationResults, orderOfWinners) {
     }
     BuildMapButtons();
     refreshMapButtonColors();
-    convertArrayContentToNumbers(gameVars.gameStatus.turnOrder)
+    convertArrayContentToNumbers(gameVars.gameStatus.turnOrder);
 }
 
 function prepDeckList() {

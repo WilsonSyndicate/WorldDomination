@@ -1,4 +1,57 @@
 //Task Masters
+function findRandomLibraryDeckRef(playerNum, deckName, library) {
+    var libraryLocation = gameVars.playerInfo["Player" + playerNum],
+    libraryToSearch = "gameDeckLibrary";
+
+    if (library = "random") {
+        libraryToSearch = "gameDeckRandomLibrary";
+    }
+    for (var i = 0; i < libraryLocation[libraryToSearch].length; i++) {
+        if (libraryLocation[libraryToSearch][i].deckName === deckName) {
+            return i;
+        }
+    }
+    return "Library Deck Ref Error";
+}
+
+function findCurrentDeckInfo(deck) {
+    var currentPlayer = deck.player,
+    deckRef = findDeckRef(currentplayer, deck.deckName, "random");
+
+    return gameVars.playerInfo["Player" + currentPlayer].gameDeckRandomLibrary[deckRef]
+}
+
+function findCurrentCountryInfo(country) {
+    var countryId = findCountryRef(country);
+
+    return gameVars.mapInfo.countryList[countryId];
+}
+
+function findPlayerNameWithDeck(deck) {
+    var playerNum = deck.player;
+
+    return gameVars.playerInfo["Player" + playerNum].name
+}
+
+function displayCountryGUI(country) {
+    var countryNameToShow = findCurrentCountryInfo(country).countryName,
+    currentCountryDeck = findCurrentCountryInfo(country).deck;
+
+    if (!!findCurrentCountryInfo(country).deck) {
+        if (findCurrentCountryInfo(country).deck.isHidden === true) {
+            //if country has deck and is hidden show (Player Name)
+            return countryNameToShow + " (" + findPlayerNameWithDeck(currentCountryDeck) + ")";
+        }
+        else {
+            //if country has deck and is not hiddend show (Deck Name from mapinfocountrylist)
+            return countryNameToShow + " (" + findPlayerNameWithDeck(currentCountryDeck) + " playing " + 
+             findCurrentCountryInfo(country).deck.deckName + ")";
+        }
+    }
+    else {
+        return countryNameToShow + " (Empty)";
+    }
+}
 
 function convertArrayContentToNumbers(array) {
     for (var i = 0; i < array.length; i++) {
@@ -20,9 +73,9 @@ function numberSuffix(number) {
     var lastDigit = number.toString().split('').pop();
 
     switch (lastDigit) {
-        case 1: return number + "st";
-        case 2: return number + "nd";
-        case 3: return number + "rd";
+        case "1": return number + "st";
+        case "2": return number + "nd";
+        case "3": return number + "rd";
         default: return number + "th";
     }
 }

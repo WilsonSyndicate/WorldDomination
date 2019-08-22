@@ -1,9 +1,14 @@
-
+function setupCleanup() {
+    setupAllPlayerDeckListsAsHidden();
+}
 
 function settopOfTurn() {
     var currentPlayerId = gameVars.gameStatus.turn,
     currentPlayerName = gameVars.playerInfo["Player" + currentPlayerId].name;
 
+    if (gameVars.gameStatus.mode === "setup" || gameVars.gameStatus.mode === "placement") {
+        setupCleanup();
+    }
     gameVars.gameStatus.focus = "map";
     gameVars.gameStatus.mode = "attack";
     document.getElementById("map-message").innerHTML = currentPlayerName + " Choose Attack";
@@ -154,7 +159,6 @@ function chooseJoiner(country) {
     gameVars.battleScreenInfo.confirmedJoiner.push(country);
     addClass(country, 'map-select');
     
-    
     for (var i = 0; i < gameVars.battleScreenInfo.possibleJoinAttack.length; i++) {
         if (countryPlayer === findCountryPlayer(gameVars.battleScreenInfo.possibleJoinAttack[i])) {
             removeClass(gameVars.battleScreenInfo.possibleJoinAttack[i], 'join-threat');
@@ -230,23 +234,48 @@ function clearAllMapBorders() {
     }
 }
 
-function confirmAttack() {
+function attackConfirmationText() {
     var attackingCountry = findAttackingCountry(),
     attackingDeck = findCountryDeck(attackingCountry),
     defendingCountry = findDefendingCountry(),
     defendingDeck = findCountryDeck(defendingCountry),
-    attackConfirmed = confirm("Attack " + findCountryLongName(defendingCountry) + "(" + defendingDeck.deckName +") with " + 
-    findCountryLongName(attackingCountry) + "(" + attackingDeck.deckName + ")"),
-    possibleJoinPlayers = [],
-    confirmationBattleText = "";
+    confirmationBattleText = "Confirm " + displayCountryGUI(defendingCountry) + 
+     " to be attacked by " + displayCountryGUI(attackingCountry);
+
+    gameVars.battleScreenInfo.battleDecks = [];
+    gameVars.battleScreenInfo.battleDecks.push(attackingDeck);
+    gameVars.battleScreenInfo.battleDecks.push(defendingDeck);
+    if (gameVars.battleScreenInfo.confirmedJoiner.length > 0) {
+        for (var i = 0; i < gameVars.battleScreenInfo.confirmedJoiner.length; i++) {
+            var currentDeckToAdd = findCountryDeck(gameVars.battleScreenInfo.confirmedJoiner[i]);
+            gameVars.battleScreenInfo.battleDecks.push(currentDeckToAdd);
+            
+            if (currentDeckToAdd === gameVars.battleScreenInfo.confirmedJoiner[0]) {
+                confirmationBattleText += " joined by " + displayCountryGUI(gameVars.battleScreenInfo.confirmedJoiner[i]);
+            }
+            else {
+                confirmationBattleText += " and " + displayCountryGUI(gameVars.battleScreenInfo.confirmedJoiner[i]);
+            }
+        }
+    }
+    confirmationBattleText += "?";
+    return confirmationBattleText;
+}
+
+function confirmAttack() {
+    var attackConfirmed = confirm(attackConfirmationText());
 
     if (attackConfirmed === true) {
 
 
-        //build confirmation battle text and prompt for battle screen
+
         
 
-    console.log("check for joining decks and setup battle info and go to battle screen");
+        console.log("go to battle screen with this info");
+
+        hideId("map-screen");
+        unhideId("battle-screen");
+        openBattleScreen();
     }
 
 }
@@ -330,11 +359,6 @@ function displayBattleInfo(battleDeckRef) {
     }
 }
 
-function BattleDeck(deck, player) {
-    this.player = player;
-    this.deck = deck;
-}
-
 function deckChooser(plyrNum) {
     if (gameVars.gameStatus.mode === "setup") {
         return gameVars.playerInfo["Player" + plyrNum].gameDeckRandomLibrary[0];
@@ -344,6 +368,11 @@ function deckChooser(plyrNum) {
         //find ground zero
         //tally all bonuses and penalties
     }
+}
+
+function BattleDeck(deck, player) {
+    this.player = player;
+    this.deck = deck;
 }
 
 function setupBattleInfo() {
@@ -356,10 +385,24 @@ function setupBattleInfo() {
     }
 }
 
-function openBattleScreen() { //from setup with screen cleared
+function openBattleScreen() {
     var battleParticipants = gameVars.battleScreenInfo.battleDecks;  
+
+    //gameVars.battleScreenInfo.battleDecks is different from initiation and game
+
+
+
+
+
     setupBattleInfo();
-    updateBattleLog("Initiation Game Begins");
+
+    if (gameVars.gameStatus.mode === "setup") {
+        updateBattleLog("Initiation Game Begins");
+    }
+    else {
+        updateBattleLog("### Game Begins"); //now working correctly
+    }
+
     for (var i = battleParticipants.length - 1; i >= 0; i--) {
         displayBattleInfo(i);
     }
@@ -377,6 +420,19 @@ function battleConfirmationText(namesOfWinners) {
     return confirmationText;
 }
 
+function battleScreenCleanup(numberOfPlayers) {
+    //clear note and message
+    document.getElementById("battle-message").innerHTML = "";
+    document.getElementById("battle-note").innerHTML = "";
+    //clear cancel and win buttons
+    removeElement("battle-note", "reset-winners");
+    removeElement("battle-note", "confirm-winners");
+    //clear deck info and buttons
+    for (var i = 0; i < numberOfPlayers; i++) {
+        removeElement("battle-information", "battle-player" + i);
+    }
+}
+
 function battleWinnerConfirmed() {
     var orderOfWinners = gameVars.battleScreenInfo.battleWinners,
     namesOfWinners = findPlayerNames(orderOfWinners),
@@ -384,15 +440,35 @@ function battleWinnerConfirmed() {
     confirmationText = "The turn order will be:\n" + confirmationResults + "\nClick Ok to Accept";
 
     if (confirm (confirmationText)) {
-        if (gameVars.gameStatus.mode === "setup") {
 
-            setupBoard(confirmationResults, orderOfWinners);
+        switch (gameVars.gameStatus.mode) {
+            case "setup":
+                setupBoard(confirmationResults, orderOfWinners);
+                gameVars.gameStatus.focus = "map";
+                battleScreenCleanup(orderOfWinners.length);
+            break;
+            case "attack":
+                //if defender wins
+                    //?(if death is included in penalty) other battle decks get penalties
+                    //*** attacking country button locked and go to map and check for earth shaking event
+
+                //if attacker wins
+                    //* defending deck dies, and other battle decks get penalty
+                    //** winner gets risk card
+                    //mode change to move and go to map
+
+                //if joiner wins
+                    //* defending deck dies, and other battle decks get penalty
+                    //** winner gets risk card
+                    //*** attacking country button locked and go to map and check for earth shaking event
+            break;
+
+
+
+
+
+            default: console.log("battle winner error");
         }
-        else {
-            //check for earthshaking event, or end of turn, go to map for next attack if not
-            console.log("battle winner confirmed");
-        }
-        gameVars.gameStatus.focus = "map";
     }
 }
 
