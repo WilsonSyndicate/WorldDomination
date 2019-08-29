@@ -1,9 +1,21 @@
 //Task Masters
+
+function countPreviousGames() {
+    var previousGames = 0;
+
+    for (var i = 0; i < gameVars.gameLog.length; i++) {
+        if (gameVars.gameLog[i][1].slice(-17, 0) === "Battle Game Begins") {
+            previousGames += 1;
+        }
+    }
+    return previousGames;
+}
+
 function findRandomLibraryDeckRef(playerNum, deckName, library) {
     var libraryLocation = gameVars.playerInfo["Player" + playerNum],
     libraryToSearch = "gameDeckLibrary";
 
-    if (library = "random") {
+    if (library === "random") {
         libraryToSearch = "gameDeckRandomLibrary";
     }
     for (var i = 0; i < libraryLocation[libraryToSearch].length; i++) {
@@ -66,7 +78,8 @@ function endOfTurnCleanup() {
     gameVars.battleScreenInfo.battleDecks = [];
     gameVars.battleScreenInfo.battleWinners = [];
     gameVars.battleScreenInfo.possibleAttacks = [];
-    gameVars.battleScreenInfo.currentPlayerCountries = []
+    gameVars.battleScreenInfo.currentPlayerCountries = [];
+    gameVars.battleScreenInfo.tempDeckInfo = [];
 }
 
 function numberSuffix(number) {
@@ -199,7 +212,6 @@ function findPlayerCountryColor(country, colorRef) {
     return findPlayerColor(playerId)[colorRef];
 }
 
-
 function isSurrounded(country, player) {
     var answer = true;
 
@@ -263,7 +275,6 @@ function isInArray(value, array) {
 function addElement(addToId, elementType, elementContent, idToInclude, classToInclude, clickFunctionToInclude) {
     var newElement = document.createElement(elementType),//create a new element
     newContent = document.createTextNode(elementContent);//create content
-
     
     if (!!classToInclude && classToInclude !== "noClass") {
         newElement.classList.add(classToInclude);

@@ -1,3 +1,7 @@
+//defender clicking first on map doesnt allow correct joiners
+//verify correct decks are getting to battle screen
+
+
 function setupCleanup() {
     setupAllPlayerDeckListsAsHidden();
 }
@@ -79,7 +83,7 @@ function chooseAttackCountry(country) {
     samePlayer = false,
     possibleAttacks = [];
 
-    //redisable attack join threats
+    //disable attack join threats
     clearAllMapBorders();
     gameVars.battleScreenInfo.confirmedJoiner = [];
     if (gameVars.mapInfo.countryList[findCountryRef(country)].deck) {
@@ -259,25 +263,28 @@ function attackConfirmationText() {
         }
     }
     confirmationBattleText += "?";
+    addBattleScreenPlayers(gameVars.battleScreenInfo.battleDecks);
     return confirmationBattleText;
+}
+
+function addBattleScreenPlayers(battleDecks) {
+    gameVars.battleScreenInfo.playersInBattleCount = [];
+
+    for (var i = 0; i < battleDecks.length; i++) {
+        var currentPlayerNumber = battleDecks[i].player;
+
+        gameVars.battleScreenInfo.playersInBattleCount.push(currentPlayerNumber);
+    }
 }
 
 function confirmAttack() {
     var attackConfirmed = confirm(attackConfirmationText());
 
     if (attackConfirmed === true) {
-
-
-
-        
-
-        console.log("go to battle screen with this info");
-
         hideId("map-screen");
         unhideId("battle-screen");
         openBattleScreen();
     }
-
 }
 
 function updateMapNote(message) {
@@ -359,15 +366,31 @@ function displayBattleInfo(battleDeckRef) {
     }
 }
 
+function findAttackPlayerDeckRef(playerNumber) {
+    for (var i = 0; i < gameVars.battleScreenInfo.tempDeckInfo.length; i++) {
+        if (gameVars.battleScreenInfo.tempDeckInfo[i].player === playerNumber) {
+            return findRandomLibraryDeckRef(playerNumber, gameVars.battleScreenInfo.tempDeckInfo[i].deckName, "random")
+        }
+    }
+}
+
 function deckChooser(plyrNum) {
-    if (gameVars.gameStatus.mode === "setup") {
-        return gameVars.playerInfo["Player" + plyrNum].gameDeckRandomLibrary[0];
+    switch(gameVars.gameStatus.mode) {
+        case "setup":
+                return gameVars.playerInfo["Player" + plyrNum].gameDeckRandomLibrary[0];
+        case "attack":
+            return gameVars.playerInfo["Player" + plyrNum].gameDeckRandomLibrary[findAttackPlayerDeckRef(plyrNum)];
+        default:
+            console.log("deck chooser error");
     }
-    else {
-        //add deck from map choice
-        //find ground zero
-        //tally all bonuses and penalties
-    }
+
+
+
+
+    //tally all bonuses and penalties
+
+
+
 }
 
 function BattleDeck(deck, player) {
@@ -377,6 +400,12 @@ function BattleDeck(deck, player) {
 
 function setupBattleInfo() {
     var decksInGame = gameVars.battleScreenInfo.playersInBattleCount;
+
+    if (gameVars.gameStatus.mode === "attack") {
+        gameVars.battleScreenInfo.tempDeckInfo = [];
+        gameVars.battleScreenInfo.tempDeckInfo = gameVars.battleScreenInfo.battleDecks;
+        gameVars.battleScreenInfo.battleDecks = [];
+    }
 
     for (var i = 0; i < decksInGame.length; i++) {
         var battleDeck = new BattleDeck(deckChooser(decksInGame[i]), decksInGame[i]);
@@ -388,21 +417,13 @@ function setupBattleInfo() {
 function openBattleScreen() {
     var battleParticipants = gameVars.battleScreenInfo.battleDecks;  
 
-    //gameVars.battleScreenInfo.battleDecks is different from initiation and game
-
-
-
-
-
     setupBattleInfo();
-
     if (gameVars.gameStatus.mode === "setup") {
         updateBattleLog("Initiation Game Begins");
     }
     else {
-        updateBattleLog("### Game Begins"); //now working correctly
+        updateBattleLog(numberSuffix(countPreviousGames() + 1) + " Battle Game Begins");
     }
-
     for (var i = battleParticipants.length - 1; i >= 0; i--) {
         displayBattleInfo(i);
     }
@@ -461,6 +482,7 @@ function battleWinnerConfirmed() {
                     //* defending deck dies, and other battle decks get penalty
                     //** winner gets risk card
                     //*** attacking country button locked and go to map and check for earth shaking event
+                console.log("end attack");
             break;
 
 
@@ -481,8 +503,6 @@ function resetWinners() {
         buttonToRename = document.getElementById("battle-winner-"+ playerIdToRename);
 
         buttonToRename.innerHTML = playerNameToRename;
-
-
     }
     for (var p = 1; p <= gameVars.battleScreenInfo.playersInBattleCount.length; p++) {
         undisableId("battle-winner-" + p);
@@ -491,12 +511,21 @@ function resetWinners() {
 }
 
 function showWinningButtonText(winningPlace, totalBattlePlayers) {
-    if (totalBattlePlayers === winningPlace) {
-        addElement("battle-note", "button", "Confirm Winners", "confirm-winners", "noClass", battleWinnerConfirmed);
-        return "utterly defeated";
-    }
-    else {
-        return numberSuffix(winningPlace) + " place";
+    switch(gameVars.gameStatus.mode) {
+        case "setup":
+            if (totalBattlePlayers === winningPlace) {
+                addElement("battle-note", "button", "Confirm Winners", "confirm-winners", "noClass", battleWinnerConfirmed);
+                return "utterly defeated";
+            }
+            return numberSuffix(winningPlace) + " place";
+
+
+
+        case "attack":
+            addElement("battle-note", "button", "Confirm Winners", "confirm-winners", "noClass", battleWinnerConfirmed);
+            return "the winner!";
+
+        default: console.log("show winning button text error");
     }
 }
 
@@ -509,14 +538,26 @@ function battleWinner(winningPlayerButton) {
     totalBattlePlayers = gameVars.battleScreenInfo.playersInBattleCount.length,
     winningButtonText = winningPlayer + " is " + showWinningButtonText(winningPlace, totalBattlePlayers);
 
-    disableId(winningPlayerButton);
+    if (gameVars.gameStatus.mode === "attack") {
+        for (var i = 0; i < gameVars.battleScreenInfo.playersInBattleCount.length; i++) {
+            disableId("battle-winner-" + gameVars.battleScreenInfo.playersInBattleCount[i]);
+        }
+    }
+    else {
+        disableId(winningPlayerButton);
+    }
     gameVars.battleScreenInfo.battleWinners.push(playerId);
     winningPlayerCount = gameVars.battleScreenInfo.battleWinners.length
     document.getElementById(winningPlayerButton).innerHTML = winningButtonText;
 
+
+    //needs to be different for attack mode
     if (winningPlayerCount === 1) {
         addElement("battle-note", "button", "Reset Winners", "reset-winners", "noClass", resetWinners);
     }
+
+
+
 }
 
 //Initiation game begins

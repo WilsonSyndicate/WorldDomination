@@ -4,7 +4,6 @@
 var gameVars = {
     playerInfo: {},
     battleScreenInfo: {
-        groundZero: "",
         text: "",
         playersInBattleCount: [],
         battleDecks: [],
@@ -12,7 +11,8 @@ var gameVars = {
         possibleAttacks: [],
         currentPlayerCountries: [],
         possibleJoinAttack: [],
-        confirmedJoiner: []
+        confirmedJoiner: [],
+        tempDeckInfo: []
     },
     gameLog: [],
     globalGameOptions: {

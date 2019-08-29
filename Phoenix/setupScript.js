@@ -54,7 +54,6 @@ function placeCountry(country) {
 
     updateCountryWithDeck(country, deckToPlace);
     gameVars.gameStatus.turn = findNextPlayerTurn(currentTurn);
-
     disableId(country);
     checkForSetupFinish();
 }
