@@ -53,6 +53,11 @@
     outline: 2px solid lightgrey;
 }
 
+.already-attacked {
+    border: 2px solid lightgray;
+    outline: 2px solid grey;
+}
+
 .join-threat {
     border: 2px solid blue;
     outline: 2px solid green;

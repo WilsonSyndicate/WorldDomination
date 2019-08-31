@@ -1,9 +1,3 @@
-
-//look up double bang !! info
-
-
-
-
 //Runtime
 
 function countPlayerDecks(playerNumber) {
@@ -157,14 +151,15 @@ function refreshMapButtonColors() {
         var currentCountry = gameVars.mapInfo.countryList[i],
         possibleJoin = gameVars.battleScreenInfo.possibleJoinAttack;
 
-        if (gameVars.gameStatus.mode === "attack") {
-            removeClass(currentCountry.country, "attack-impossible");
-            undisableId(currentCountry.country)
-        }
-
+        removeClass(currentCountry.country, "already-attacked");
+        removeClass(currentCountry.country, "attack-impossible");
+        undisableId(currentCountry.country);
+        setIDBackgroundColor(currentCountry.country, adminSettings.defaultColor, 
+            adminSettings.defaultColor, adminSettings.defaultColor);
+        //needs to check for previous attack
         if (!!currentCountry.deck) {
             setIDBackgroundColor(currentCountry.country, findPlayerCountryColor(currentCountry, [0]), 
-            findPlayerCountryColor(currentCountry, [1]), findPlayerCountryColor(currentCountry, [2]));
+             findPlayerCountryColor(currentCountry, [1]), findPlayerCountryColor(currentCountry, [2]));
 
             setIdWithPlayerTextColor(currentCountry.country, currentCountry.deck.player);
 
@@ -183,13 +178,16 @@ function refreshMapButtonColors() {
                         addClass(currentCountry.country, "attack-impossible");
                     }
                 }
-    
                 //check for attack mode and countries that already attacked
-
-
+                for (var a = 0; a < gameVars.battleScreenInfo.alreadyAttacked.length; a++) {
+                    if (gameVars.battleScreenInfo.alreadyAttacked[a] === currentCountry.country) {
+                        disableId(currentCountry.country);
+                        addClass(currentCountry.country, "already-attacked");
+                    }
+                }
             }
         }
-        else {
+        else {//no deck
             if (gameVars.gameStatus.mode === "attack") {
                 disableId(currentCountry.country);
             }
@@ -207,11 +205,22 @@ function refreshMapButtonColors() {
 
 }
 
-function setupAllPlayerDeckListsAsHidden() {
+
+function cleanupPlayerDeckLists() {
     for (var i = 0; i < gameVars.gameStatus.turnOrder.length; i++) {
         var currentPlayer = gameVars.playerInfo["Player" + gameVars.gameStatus.turnOrder[i]];
         for (var d = 0; d < currentPlayer.gameDeckRandomLibrary.length; d++) {
             currentPlayer.gameDeckRandomLibrary[d].deckHidden = true;
+            currentPlayer.gameDeckRandomLibrary[d].deckEliminated = false;
+            currentPlayer.gameDeckRandomLibrary[d].deckDefensePlane = "";
+            currentPlayer.gameDeckRandomLibrary[d].deckPenalties = 0;
+            currentPlayer.gameDeckRandomLibrary[d].deckBonuses = 0;
+            currentPlayer.gameDeckRandomLibrary[d].deckVanguards = [];
+            currentPlayer.gameDeckRandomLibrary[d].deckAttacksMade = 0;
+            currentPlayer.gameDeckRandomLibrary[d].deckTimesDefended = 0;
+            currentPlayer.gameDeckRandomLibrary[d].deckGamesPlayed = 0;
+            currentPlayer.gameDeckRandomLibrary[d].deckwins = 0;
+            currentPlayer.gameDeckRandomLibrary[d].deckUniqueId = [currentPlayer.player, currentPlayer.gameDeckRandomLibrary[d].deckName];
         }
     }
 }
@@ -222,7 +231,7 @@ function setupBoard(confirmationResults, orderOfWinners) {
     gameVars.gameStatus.turnOrder = orderOfWinners;
     gameVars.gameStatus.turn = Number(orderOfWinners[0]);
     updateLog(logText);
-    gameVars.gameStatus.currentTurn = gameVars.gameStatus.turnOrder[0];
+    gameVars.gameStatus.currentTurn = Number(gameVars.gameStatus.turnOrder[0]);
     clearBattleScreenInfo();
     hideId("battle-screen");
     unhideId("map-screen");
@@ -458,7 +467,8 @@ function createPlayerInfo (plNum) {
         gameDeckLibrary: [],
         gameDeckRandomLibrary: [],
         continentsControlled: [],
-        continentsOwned: []
+        continentsOwned: [],
+        supplyPoints: []
     };
     gameVars.battleScreenInfo.playersInBattleCount.push(plNum);
 }

@@ -1,9 +1,27 @@
 //defender clicking first on map doesnt allow correct joiners
 //verify correct decks are getting to battle screen
 
+function buildSupplyPointPool() {
+    var supplyPointType = 1;
+
+    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
+        gameVars.gameStatus.availableSupplyPoints.push([supplyPointType, gameVars.mapInfo.countryList[i].country]);
+        if (supplyPointType === gameVars.globalGameOptions.numberOfSupplyPointTypes) {
+            supplyPointType = 1;
+        }
+        else {
+            supplyPointType += 1;
+        }
+    }
+    for (var s = 0; s < gameVars.globalGameOptions.numberOfRandomSupplyPoints; s++) {
+        gameVars.gameStatus.availableSupplyPoints.push(["wild"]);
+    }
+    shuffleArray(gameVars.gameStatus.availableSupplyPoints);
+}
 
 function setupCleanup() {
-    setupAllPlayerDeckListsAsHidden();
+    cleanupPlayerDeckLists();
+    buildSupplyPointPool();
 }
 
 function settopOfTurn() {
@@ -17,6 +35,7 @@ function settopOfTurn() {
     gameVars.gameStatus.mode = "attack";
     document.getElementById("map-message").innerHTML = currentPlayerName + " Choose Attack";
     document.getElementById("map-note").innerHTML = getMapNote();
+    addElement("map-message", "button", "Cancel Attack", "cancel-attack", "map-button", forfeitAttack);
 }
 
 function countPossibleAttacks() {
@@ -125,7 +144,7 @@ function chooseAttackCountry(country) {
                     //attackable and in range and one of selected countries is current turn player
                     updateMapNote(country + " vs " + gameVars.mapInfo.mapSelect2);
                     removeElement("map-message", "confirm-attack");
-                    addElement("map-message", "button", adminSettings.buttonText.confirmAttack, "confirm-attack", "noClass", confirmAttack);
+                    addElement("map-message", "button", adminSettings.buttonText.confirmAttack, "confirm-attack", "map-button", confirmAttack);
                     highlightJoinThreat();
                 }
                 else {
@@ -369,7 +388,7 @@ function displayBattleInfo(battleDeckRef) {
 function findAttackPlayerDeckRef(playerNumber) {
     for (var i = 0; i < gameVars.battleScreenInfo.tempDeckInfo.length; i++) {
         if (gameVars.battleScreenInfo.tempDeckInfo[i].player === playerNumber) {
-            return findRandomLibraryDeckRef(playerNumber, gameVars.battleScreenInfo.tempDeckInfo[i].deckName, "random")
+            return findDeckRef(playerNumber, gameVars.battleScreenInfo.tempDeckInfo[i].deckName, "random")
         }
     }
 }
@@ -430,11 +449,19 @@ function openBattleScreen() {
 }
 
 //Battle winner Confirmed
+function battleWinerNote(placement) {
+    switch (gameVars.gameStatus.mode) {
+        case "setup": return numberSuffix(placement + 1);
+        case "attack": return "the winner!";
+        default: console.log("battle winner note error");
+    }
+}
+
 function battleConfirmationText(namesOfWinners) {
     var confirmationText = [];
 
     for (var i = 0; i < namesOfWinners.length; i++) {
-        var textToAdd = " " + namesOfWinners[i] + " is " + numberSuffix(i + 1);
+        var textToAdd = namesOfWinners[i] + " is " + battleWinerNote(i);
 
         confirmationText.push(textToAdd);
     }
@@ -454,13 +481,153 @@ function battleScreenCleanup(numberOfPlayers) {
     }
 }
 
+function joinerGamePlayers() {
+    var joinerPlayers = [];
+
+    if (gameVars.battleScreenInfo.battleDecks.length > 2) {
+        for (var i = 2; i < gameVars.battleScreenInfo.battleDecks.length; i++) {
+            joinerPlayers.push(gameVars.battleScreenInfo.battleDecks[i].player);
+        }      
+    }
+    return joinerPlayers;
+}
+
+function joinerGameDecks() {
+    var joinerDecks = [];
+
+    if (gameVars.battleScreenInfo.battleDecks.length > 2) {
+        for (var i = 2; i < gameVars.battleScreenInfo.battleDecks.length; i++) {
+            joinerDecks.push(gameVars.battleScreenInfo.battleDecks[i].deck.deckName);
+        }      
+    }
+    return joinerDecks;
+}
+
+function endOfAttack() {
+    gameVars.gameStatus.mode = "move";
+    removeElement("map-message", "cancel-attack");
+    clearMapSelect();
+    //remove all highlights
+    //lock only enemy countries by running map colors and highlights
+
+    //change map message to move
+
+    //change map note
+
+
+
+
+
+    
+    console.log("changed mode to move");
+}
+
+function forfeitAttack() {
+    var confirmEndOfAttack = confirm("Forfeit additional attacks and go to move?");
+
+    if (confirmEndOfAttack === true) {
+        endOfAttack();
+    }
+}
+
+function attackWinnerConfirmed(winningPlayerNumber) {
+    var attackingPlayerNumber = gameVars.battleScreenInfo.battleDecks[0].player,
+    attackingDeckName = gameVars.battleScreenInfo.battleDecks[0].deck.deckName,
+    defendingPlayerNumber = gameVars.battleScreenInfo.battleDecks[1].player,
+    defendingDeckName = gameVars.battleScreenInfo.battleDecks[1].deck.deckName,
+    joinerPlayerNumbers = joinerGamePlayers(),
+    joinerDecks = joinerGameDecks(),
+    groundZero = findDefendingCountry()
+    winningDeckName = findDeckNameWithPlayer(winningPlayerNumber);
+
+
+
+    //needs to log end of battle
+
+
+
+
+
+
+    switch (winningPlayerNumber) {
+        case attackingPlayerNumber://attacker wins
+            //defending deck eliminated
+            battleConsequenceEliminated(defendingPlayerNumber, defendingDeckName);
+            //joiner decks get penalty
+            for (var i = 0; i < joinerDecks.length; i++) {
+                battleConsequencePenalty(joinerPlayerNumbers[i], joinerDecks[i]);
+            }
+            //winner gets risk card
+            getSupplyPoint(winningPlayerNumber);
+            //attacker deck moves to defending country
+            deckMovesTo(winningPlayerNumber, winningDeckName, groundZero);
+            endOfAttack();
+        break;
+        case defendingPlayerNumber://defender wins
+            //attacking deck get penalties
+            battleConsequencePenalty(attackingPlayerNumber, attackingDeckName);
+            //joiner decks get penalty
+            for (var i = 0; i < joinerDecks.length; i++) {
+                battleConsequencePenalty(joinerPlayerNumbers[i], joinerDecks[i]);
+            }
+            //attacking country button locked
+            gameVars.battleScreenInfo.alreadyAttacked.push(findAttackingCountry());
+            //check for end of attack
+            if (countPossibleAttacks() === 0) {
+                endOfAttack();
+            }
+            else {
+                refreshMapButtonColors();
+            }
+        break;
+        default://joiner wins
+            //defending deck dies
+            battleConsequenceEliminated(defendingPlayerNumber, defendingDeckName);
+            //attacker deck penalty
+            battleConsequencePenalty(attackingPlayerNumber, attackingDeckName);
+            //other joiner decks get penalty
+            for (var i = 0; i < joinerDecks.length; i++) {
+                if (joinerDecks[i] !== winningDeckName) {
+                    battleConsequencePenalty(joinerPlayerNumbers[i], joinerDecks[i]);
+                }
+            }
+            //winner gets risk card
+            getSupplyPoint(winningPlayerNumber);
+            //joiner deck moves to ground zero
+            deckMovesTo(winningPlayerNumber, winningDeckName, groundZero);
+            //attacking country button locked
+            gameVars.battleScreenInfo.alreadyAttacked.push(findAttackingCountry());
+            //check for end of attack
+            if (countPossibleAttacks() === 0) {
+                endOfAttack();
+            }
+            else {
+                refreshMapButtonColors();
+            }
+    }
+    //change focus to map
+    gameVars.gameStatus.focus = "map";
+    hideId("battle-screen");
+    unhideId("map-screen");
+}
+
+function battleWinnerText(confirmationResults) {
+    if (gameVars.gameStatus.mode === "setup") {
+        return "The turn order will be:\n" + confirmationResults + "\nClick Ok to Accept";
+    }
+    else {
+        return "Confirm " + confirmationResults + "\nClick Ok to Accept";
+    }
+}
+
 function battleWinnerConfirmed() {
     var orderOfWinners = gameVars.battleScreenInfo.battleWinners,
     namesOfWinners = findPlayerNames(orderOfWinners),
     confirmationResults = battleConfirmationText(namesOfWinners),
-    confirmationText = "The turn order will be:\n" + confirmationResults + "\nClick Ok to Accept";
+    confirmationText = battleWinnerText(confirmationResults),
+    attackWinner = Number(orderOfWinners[0]);
 
-    if (confirm (confirmationText)) {
+    if (confirm(confirmationText)) {
 
         switch (gameVars.gameStatus.mode) {
             case "setup":
@@ -469,26 +636,8 @@ function battleWinnerConfirmed() {
                 battleScreenCleanup(orderOfWinners.length);
             break;
             case "attack":
-                //if defender wins
-                    //?(if death is included in penalty) other battle decks get penalties
-                    //*** attacking country button locked and go to map and check for earth shaking event
-
-                //if attacker wins
-                    //* defending deck dies, and other battle decks get penalty
-                    //** winner gets risk card
-                    //mode change to move and go to map
-
-                //if joiner wins
-                    //* defending deck dies, and other battle decks get penalty
-                    //** winner gets risk card
-                    //*** attacking country button locked and go to map and check for earth shaking event
-                console.log("end attack");
+                attackWinnerConfirmed(attackWinner)
             break;
-
-
-
-
-
             default: console.log("battle winner error");
         }
     }
@@ -518,13 +667,10 @@ function showWinningButtonText(winningPlace, totalBattlePlayers) {
                 return "utterly defeated";
             }
             return numberSuffix(winningPlace) + " place";
-
-
-
         case "attack":
-            addElement("battle-note", "button", "Confirm Winners", "confirm-winners", "noClass", battleWinnerConfirmed);
+            addElement("battle-note", "button", "Cancel", "reset-winners", "noClass", resetWinners);
+            addElement("battle-note", "button", "Confirm Winner", "confirm-winners", "noClass", battleWinnerConfirmed);
             return "the winner!";
-
         default: console.log("show winning button text error");
     }
 }
@@ -547,17 +693,12 @@ function battleWinner(winningPlayerButton) {
         disableId(winningPlayerButton);
     }
     gameVars.battleScreenInfo.battleWinners.push(playerId);
-    winningPlayerCount = gameVars.battleScreenInfo.battleWinners.length
+    winningPlayerCount = gameVars.battleScreenInfo.battleWinners.length;
     document.getElementById(winningPlayerButton).innerHTML = winningButtonText;
-
-
-    //needs to be different for attack mode
-    if (winningPlayerCount === 1) {
-        addElement("battle-note", "button", "Reset Winners", "reset-winners", "noClass", resetWinners);
+    convertArrayContentToNumbers(gameVars.battleScreenInfo.battleWinners);
+    if (winningPlayerCount === 1 && gameVars.gameStatus.mode === "setup") {
+        addElement("battle-note", "button", "Cancel", "reset-winners", "noClass", resetWinners);
     }
-
-
-
 }
 
 //Initiation game begins
@@ -570,21 +711,19 @@ function startIniGame() {
 //player setup begins
 function beginPlayerSetup() {
     gameVars.globalGameOptions.totalPlayers = parseInt(document.getElementById("update-player-count").value);
-    
     if (document.getElementById("shared-deck-pool").checked === true) {
-        gameVars.globalGameOptions.sharedDeckPool = true
+        gameVars.globalGameOptions.sharedDeckPool = true;
     } 
     else {
-        gameVars.globalGameOptions.sharedDeckPool = false
-    };
+        gameVars.globalGameOptions.sharedDeckPool = false;
+    }
 
     if (document.getElementById("random-map-setup").checked === true) {
-        gameVars.globalGameOptions.randomMapSetup = true
+        gameVars.globalGameOptions.randomMapSetup = true;
     } 
     else {
-        gameVars.globalGameOptions.randomMapSetup = false
-    };
-
+        gameVars.globalGameOptions.randomMapSetup = false;
+    }
     if (confirm("Are you sure you want these options for this game?\n Total Players: " + gameVars.globalGameOptions.totalPlayers + 
     "\n Shared Deck Pool: " + tfyn(gameVars.globalGameOptions.sharedDeckPool) + 
     "\n Random Map Setup: " + tfyn(gameVars.globalGameOptions.randomMapSetup))) {
@@ -601,7 +740,6 @@ document.addEventListener("DOMContentLoaded", function() {
     var maxPlayers = Object.keys(masterDeckList).length;
 
     addAuthorToDecklists(maxPlayers);
-
     hideId("player-info");
     hideId("battle-screen");
     hideId("map-screen");

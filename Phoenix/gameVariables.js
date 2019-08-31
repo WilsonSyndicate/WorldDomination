@@ -1,3 +1,9 @@
+//attack confirmation dialog needs to take hidden into account
+//possible attacks need to check for already attacked
+//unselect map screen after battle
+//cancel confirmation after battle
+
+
 
 //Game Variables
 
@@ -12,23 +18,27 @@ var gameVars = {
         currentPlayerCountries: [],
         possibleJoinAttack: [],
         confirmedJoiner: [],
-        tempDeckInfo: []
+        tempDeckInfo: [],
+        alreadyAttacked: []
     },
     gameLog: [],
     globalGameOptions: {
         totalPlayers: 2,
         sharedDeckPool: false,
-        randomMapSetup: true
+        randomMapSetup: true,
+        numberOfSupplyPointTypes: 3,
+        numberOfRandomSupplyPoints: 2
     },
     playerScreenOptions: {
         activeSetupPlayer: 1
     },
     gameStatus: {
-        mode: "setup", //topOfTurn, Attack, onGoingAttack, mapSetupComplete
-        focus: "setup", //map, battle, log
+        mode: "setup", //setup placement attack move
+        focus: "setup", //setup map battle log
         turn: "initiation",
         turnOrder: [],
-        currentAttack: 1
+        currentAttack: 1,
+        availableSupplyPoints: []
     },
     mapInfo: {
         mapSelect1: "",
@@ -83,6 +93,7 @@ var gameVars = {
 //Admin Settings
 const adminSettings = {
     lightTextSetting: 80,
+    defaultColor: 220,
     normalizeDeckList: true,
     buttonText: {
         confirmAttack: "Confirm Attack"

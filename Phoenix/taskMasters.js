@@ -1,5 +1,73 @@
 //Task Masters
 
+function removeDeckFromCountry(country) {
+    delete country.deck;
+}
+
+function findDeckWithUniqueId(uniqueId) {
+    return gameVars.playerInfo["Player" + uniqueId[0]].gameDeckRandomLibrary[findDeckRef(uniqueId[0], uniqueId[1], "random")];
+}
+
+function battleConsequenceEliminated(playerNumber, deckName) {
+    //remove deck from country list
+    removeDeckFromCountry(findDefendingCountry());
+
+    //change deck status to eliminated
+    findDeckWithUniqueId([playerNumber, deckName]).deckEliminated = true;
+
+    console.log(deckName + " is eliminated from " + findDefendingCountry());
+}
+
+function battleConsequencePenalty(playerNumber, deckName) {
+    findDeckWithUniqueId([playerNumber, deckName]).deckPenalties += 1;
+
+    console.log(deckName + " gets a penalty and now has " + findDeckWithUniqueId([playerNumber, deckName]).deckPenalties);
+}
+
+function getSupplyPoint(playerNumber) {
+    var nextSupplyPoint = gameVars.gameStatus.availableSupplyPoints.pop();
+
+    gameVars.playerInfo["Player" + playerNumber].supplyPoints.push(nextSupplyPoint);
+
+    console.log("player" + playerNumber + " gets a supply point of " + nextSupplyPoint);
+}
+
+function findCountryDeckIsOn(deckUniqueId) {
+    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
+        if (!!gameVars.mapInfo.countryList[i].deck && gameVars.mapInfo.countryList[i].deck.deckUniqueId === deckUniqueId) {
+            return gameVars.mapInfo.countryList[i];
+        }
+    }
+}
+
+function findDeckWithUniqueId(deckUniqueId) {
+    return gameVars.playerInfo["Player" + deckUniqueId[0]].gameDeckRandomLibrary[findDeckRef(deckUniqueId[0], deckUniqueId[1], "random")];
+}
+
+function deckMovesTo(playerNumber, deckName, destination) {
+    var countryMovingFrom = findCountryDeckIsOn([playerNumber, deckName]),
+    countryMovingTo = gameVars.mapInfo.countryList[findCountryRef(destination)],
+    deckMoving = findDeckWithUniqueId(playerNumber, deckName);
+    
+    countryMovingTo.deck = deckMoving;
+    delete countryMovingFrom.deck
+
+    console.log(deckName + " moves to " + destination)
+}
+
+function findDeckNameWithPlayer(playerNumber) {
+    for (var i = 0; i < gameVars.battleScreenInfo.battleDecks.length; i++) {
+        if (gameVars.battleScreenInfo.battleDecks[i].player === playerNumber) {
+            return gameVars.battleScreenInfo.battleDecks[i].deck.deckName
+        }
+    }
+}
+
+function clearMapSelect() {
+    gameVars.mapInfo.mapSelect1 = "";
+    gameVars.mapInfo.mapSelect2 = "";
+}
+
 function countPreviousGames() {
     var previousGames = 0;
 
@@ -11,7 +79,7 @@ function countPreviousGames() {
     return previousGames;
 }
 
-function findRandomLibraryDeckRef(playerNum, deckName, library) {
+function findDeckRef(playerNum, deckName, library) {
     var libraryLocation = gameVars.playerInfo["Player" + playerNum],
     libraryToSearch = "gameDeckLibrary";
 
@@ -24,13 +92,6 @@ function findRandomLibraryDeckRef(playerNum, deckName, library) {
         }
     }
     return "Library Deck Ref Error";
-}
-
-function findCurrentDeckInfo(deck) {
-    var currentPlayer = deck.player,
-    deckRef = findDeckRef(currentplayer, deck.deckName, "random");
-
-    return gameVars.playerInfo["Player" + currentPlayer].gameDeckRandomLibrary[deckRef]
 }
 
 function findCurrentCountryInfo(country) {
@@ -80,6 +141,7 @@ function endOfTurnCleanup() {
     gameVars.battleScreenInfo.possibleAttacks = [];
     gameVars.battleScreenInfo.currentPlayerCountries = [];
     gameVars.battleScreenInfo.tempDeckInfo = [];
+    gameVars.battleScreenInfo.alreadyAttacked = [];
 }
 
 function numberSuffix(number) {
