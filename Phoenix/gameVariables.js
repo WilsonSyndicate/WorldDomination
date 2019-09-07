@@ -1,7 +1,9 @@
-//attack confirmation dialog needs to take hidden into account
-//possible attacks need to check for already attacked
-//unselect map screen after battle
-//cancel confirmation after battle
+
+//recheck possible attacks after battle
+
+//game info stored on random list or country list?
+
+//verify correct decks are getting to battle screen
 
 
 

@@ -1,0 +1,66 @@
+﻿<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <title>World Domination</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body id="entire-background" onload="initialStartup()">
+    <h1 id="game-header">World Domination</h1>
+
+    <div id="pre-game-screen">
+        <div id="player-setup">
+            <h2>Player Setup</h2>
+            <div id="setup-toolbar">
+                <button id="complete-setup-button" onclick="toIniGame()">Complete Setup</button>
+                <div id="player-count-label">Choose Number of Players</div>
+                <input type="number" id="update-player-count" min=2 max=5 value=5 onchange="changeNumberOfPlayers()">
+                <div id="current-setup-player">Current Setup Player</div>
+                <input type="number" id="update-setup-player" min=1 max=5 value=1 onchange="changeCurrentSetupPlayer()">
+                
+            </div>
+
+            <div id="player-information">
+                <h3 id="display-name">Player 1</h3>
+                <button id="button-change-name" onclick="setupPlayerName()">Change Name</button>
+    
+                <div id="player-decklist">
+                    <h2 id="potential-decklist">Potential Decklist</h2>
+                    <div id="decklist-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="battle-screen">
+        <div id="battle-screen-toolbar">
+                <h2 id="battle-title">Battle</h2>
+                <h3 id="battle-message">Initiation Game</h3>
+                <h4 id="battle-note">Click order of winners for turn order</h4>
+        </div>
+        <div id="battle-information"></div>
+    </div>
+
+    <div id="map-screen">
+        <div id="map-screen-toolbar">
+            <h2 id="map-title">World Map</h2>
+            <h3 id="map-message">Map Message</h3>
+            <h4 id="map-note">Map Note</h4>
+        </div>
+        <div id="map-countries"></div>
+    </div>
+
+    <script src="setupPlayers.js"></script>
+    <script src="codeMasters.js"></script>
+    <script src="gameVariables.js"></script>
+<!--
+
+
+<script src="setupScript.js"></script>
+<script src="gameBattle.js"></script>
+<script src="gameFlow.js"></script>
+<script src="taskMasters.js"></script>
+-->
+</body>
+</html>

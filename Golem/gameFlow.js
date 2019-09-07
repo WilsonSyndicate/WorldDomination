@@ -341,50 +341,7 @@ function mapCountryClick(country) {
     refreshMapButtonColors();
 }
 
-function displayBattleInfo(battleDeckRef) {
-    var currentPlayer = gameVars.battleScreenInfo.battleDecks[battleDeckRef].player,
-    currentPlayerName = gameVars.playerInfo["Player" + currentPlayer].name,
-    currentDeck = gameVars.battleScreenInfo.battleDecks[battleDeckRef].deck.deckName,
-    currentDeckColor = gameVars.battleScreenInfo.battleDecks[battleDeckRef].deck.deckColor,
-    r = gameVars.playerInfo["Player" + currentPlayer].playerColor[0],
-    g = gameVars.playerInfo["Player" + currentPlayer].playerColor[1],
-    b = gameVars.playerInfo["Player" + currentPlayer].playerColor[2],
-    battleText = [
-        currentPlayerName + " playing " + currentDeck + " (" + currentDeckColor + ")"
-    ],
-    gameMods = [
-        countBattleLife(battleDeckRef),
-        countBattleHand(battleDeckRef),
-        countBattlePower(battleDeckRef),
-        countBattleToughness(battleDeckRef),
-        battleVanguard(battleDeckRef),
-        battleDefensePlane(battleDeckRef),
-        countCountrySupport(battleDeckRef),
-        continentBonuses(battleDeckRef),
-        battleHero(battleDeckRef),
-        battleConspiracy(battleDeckRef),
-        countBattleBonuses(battleDeckRef),
-        countBattlePenalties(battleDeckRef)
-    ];
 
-    //add player and deck name (color)
-    addElement("battle-information", "div", battleText, "battle-player" + battleDeckRef, "battle-player");
-    
-    //create buttons
-    addElement("battle-player" + battleDeckRef, "button", currentPlayerName, "battle-winner-" + currentPlayer, "noClass", battleWinner);
-
-    //color buttons
-    setIDBackgroundColor("battle-winner-" + currentPlayer, r, g, b)
-    setIdWithPlayerTextColor("battle-winner-" + currentPlayer, currentPlayer);
-
-    //for each battle player show player, deck, life, cards
-    for (var d = 0; d < gameMods.length; d++) {
-        if (gameMods[d] !== "") {
-            var gameModsCurrentText = gameMods[d][0] + gameMods[d][1]
-            addElement("battle-player" + battleDeckRef, "div", gameModsCurrentText);
-        }
-    }
-}
 
 function findAttackPlayerDeckRef(playerNumber) {
     for (var i = 0; i < gameVars.battleScreenInfo.tempDeckInfo.length; i++) {
