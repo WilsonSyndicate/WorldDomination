@@ -2,59 +2,44 @@
 
 
 function setupComplete() {
-    //add deck info
-
+    var logText = [];
     
+    console.log("go to map and set up board");
+    console.log(gameVars.battleScreenInfo.battleWinners);
+
+    //log end of game, add winner decks in order
+    //push note, then push winners
+    updateLog(logText)
+
+    //update turn order
+    gameVars.gameStatus.turnOrder = gameVars.battleScreenInfo.battleWinners;
+
+    //update turn
+    gameVars.gameStatus.turn = gameVars.battleScreenInfo.battleWinners[0];
+    
+    //add deck info to decklists (bonus,penalties,etc)
+
+
+    //change mode
+    gameVars.gameStatus.focus = "attack";
+
+    //change focus
+    gameVars.gameStatus.focus = "map";
+
+    //clear all battle buttons and battle variables
+    //battleScreenCleanup(orderOfWinners.length);
+
+    //hide battle screen
+    hideId("battle-screen");
+
+    //go to map
+    unhideId("map-screen");
+
+    //set up board
+    //setupBoard(confirmationResults, orderOfWinners);
 }
 
 
-
-
-
-function displayBattleInfo(battleDeckRef) {
-    var currentPlayer = gameVars.battleScreenInfo.battleDecks[battleDeckRef].player,
-    currentPlayerName = gameVars.playerInfo["Player" + currentPlayer].name,
-    currentDeck = gameVars.battleScreenInfo.battleDecks[battleDeckRef].deck.deckName,
-    currentDeckColor = gameVars.battleScreenInfo.battleDecks[battleDeckRef].deck.deckColor,
-    r = gameVars.playerInfo["Player" + currentPlayer].playerColor[0],
-    g = gameVars.playerInfo["Player" + currentPlayer].playerColor[1],
-    b = gameVars.playerInfo["Player" + currentPlayer].playerColor[2],
-    battleText = [
-        currentPlayerName + " playing " + currentDeck + " (" + currentDeckColor + ")"
-    ],
-    gameMods = [
-        countBattleLife(battleDeckRef),
-        countBattleHand(battleDeckRef),
-        countBattlePower(battleDeckRef),
-        countBattleToughness(battleDeckRef),
-        battleVanguard(battleDeckRef),
-        battleDefensePlane(battleDeckRef),
-        countCountrySupport(battleDeckRef),
-        continentBonuses(battleDeckRef),
-        battleHero(battleDeckRef),
-        battleConspiracy(battleDeckRef),
-        countBattleBonuses(battleDeckRef),
-        countBattlePenalties(battleDeckRef)
-    ];
-
-    //add player and deck name (color)
-    addElement("battle-information", "div", battleText, "battle-player" + battleDeckRef, "battle-player");
-    
-    //create buttons
-    addElement("battle-player" + battleDeckRef, "button", currentPlayerName, "battle-winner-" + currentPlayer, "noClass", battleWinner);
-
-    //color buttons
-    setIDBackgroundColor("battle-winner-" + currentPlayer, r, g, b)
-    setIdWithPlayerTextColor("battle-winner-" + currentPlayer, currentPlayer);
-
-    //for each battle player show player, deck, life, cards
-    for (var d = 0; d < gameMods.length; d++) {
-        if (gameMods[d] !== "") {
-            var gameModsCurrentText = gameMods[d][0] + gameMods[d][1]
-            addElement("battle-player" + battleDeckRef, "div", gameModsCurrentText);
-        }
-    }
-}
 
 
 
@@ -67,28 +52,38 @@ function toIniGame() {
 
     if (toIniGame === true) {
 
-    //shuffledecklists
-    shuffleAllDecklists();
+        //shuffledecklists
+        shuffleAllDecklists();
 
-    //hide pre game screen
-    hideId("pre-game-screen");
+        //hide pre game screen
+        hideId("pre-game-screen");
 
-    //show battle screen
-    unhideId("battle-screen");
+        //show battle screen
+        unhideId("battle-screen");
 
-    //show battle screen info for initiation
+        //update focus to battle
+        gameVars.gameStatus.focus = "battle";
 
+        //load initiation decks as battle decks
+        for (var i = 1; i <= gameVars.globalGameOptions.totalPlayers; i++) {
+            var currentPlayer = i,
+            currentIniDeck = gameVars.playerInfo["player" + i].playerDecklist[0];
 
-    //log beginning of initiation game
+            gameVars.battleScreenInfo.battleDecks.push([currentPlayer, currentIniDeck]);
+        }
 
+        //update battle players count
+        gameVars.battleScreenInfo.playersInBattleCount = gameVars.battleScreenInfo.battleDecks.length;
 
+        //show battle screen info for initiation
+        for (var j = 0; j < gameVars.battleScreenInfo.playersInBattleCount; j++) {
+            displayBattleInfo(j);
+        }
 
-    console.log("begin initiation game");
+        //log beginning of initiation game
+        updateLog(["Initiation Game Begins"]);
     }
 }
-
-
-
 
 function refreshDeckListShown(decklistCount, deckList) {
     var tableBody = document.getElementById("decklist-container"), //reference for body

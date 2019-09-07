@@ -407,24 +407,8 @@ function openBattleScreen() {
 }
 
 //Battle winner Confirmed
-function battleWinerNote(placement) {
-    switch (gameVars.gameStatus.mode) {
-        case "setup": return numberSuffix(placement + 1);
-        case "attack": return "the winner!";
-        default: console.log("battle winner note error");
-    }
-}
 
-function battleConfirmationText(namesOfWinners) {
-    var confirmationText = [];
 
-    for (var i = 0; i < namesOfWinners.length; i++) {
-        var textToAdd = namesOfWinners[i] + " is " + battleWinerNote(i);
-
-        confirmationText.push(textToAdd);
-    }
-    return confirmationText;
-}
 
 function battleScreenCleanup(numberOfPlayers) {
     //clear note and message
@@ -581,95 +565,12 @@ function attackWinnerConfirmed(winningPlayerNumber) {
     unhideId("map-screen");
 }
 
-function battleWinnerText(confirmationResults) {
-    if (gameVars.gameStatus.mode === "setup") {
-        return "The turn order will be:\n" + confirmationResults + "\nClick Ok to Accept";
-    }
-    else {
-        return "Confirm " + confirmationResults + "\nClick Ok to Accept";
-    }
-}
 
-function battleWinnerConfirmed() {
-    var orderOfWinners = gameVars.battleScreenInfo.battleWinners,
-    namesOfWinners = findPlayerNames(orderOfWinners),
-    confirmationResults = battleConfirmationText(namesOfWinners),
-    confirmationText = battleWinnerText(confirmationResults),
-    attackWinner = Number(orderOfWinners[0]);
 
-    if (confirm(confirmationText)) {
 
-        switch (gameVars.gameStatus.mode) {
-            case "setup":
-                setupBoard(confirmationResults, orderOfWinners);
-                gameVars.gameStatus.focus = "map";
-                battleScreenCleanup(orderOfWinners.length);
-            break;
-            case "attack":
-                attackWinnerConfirmed(attackWinner)
-            break;
-            default: console.log("battle winner error");
-        }
-    }
-}
-
-function resetWinners() {
-    removeElement("battle-note", "confirm-winners");
-    removeElement("battle-note", "reset-winners");
-    for (var i = 0; i < gameVars.battleScreenInfo.battleWinners.length; i++) {
-        var playerIdToRename = gameVars.battleScreenInfo.battleWinners[i],
-        playerNameToRename = gameVars.playerInfo["Player" + playerIdToRename].name,
-        buttonToRename = document.getElementById("battle-winner-"+ playerIdToRename);
-
-        buttonToRename.innerHTML = playerNameToRename;
-    }
-    for (var p = 1; p <= gameVars.battleScreenInfo.playersInBattleCount.length; p++) {
-        undisableId("battle-winner-" + p);
-    }
-    gameVars.battleScreenInfo.battleWinners = [];
-}
-
-function showWinningButtonText(winningPlace, totalBattlePlayers) {
-    switch(gameVars.gameStatus.mode) {
-        case "setup":
-            if (totalBattlePlayers === winningPlace) {
-                addElement("battle-note", "button", "Confirm Winners", "confirm-winners", "noClass", battleWinnerConfirmed);
-                return "utterly defeated";
-            }
-            return numberSuffix(winningPlace) + " place";
-        case "attack":
-            addElement("battle-note", "button", "Cancel", "reset-winners", "noClass", resetWinners);
-            addElement("battle-note", "button", "Confirm Winner", "confirm-winners", "noClass", battleWinnerConfirmed);
-            return "the winner!";
-        default: console.log("show winning button text error");
-    }
-}
 
 //Battle Winners Decided
-function battleWinner(winningPlayerButton) {
-    var playerId = winningPlayerButton.slice(14),
-    winningPlayer = gameVars.playerInfo["Player" + playerId].name,
-    winningPlayerCount = gameVars.battleScreenInfo.battleWinners.length,
-    winningPlace = winningPlayerCount + 1,
-    totalBattlePlayers = gameVars.battleScreenInfo.playersInBattleCount.length,
-    winningButtonText = winningPlayer + " is " + showWinningButtonText(winningPlace, totalBattlePlayers);
 
-    if (gameVars.gameStatus.mode === "attack") {
-        for (var i = 0; i < gameVars.battleScreenInfo.playersInBattleCount.length; i++) {
-            disableId("battle-winner-" + gameVars.battleScreenInfo.playersInBattleCount[i]);
-        }
-    }
-    else {
-        disableId(winningPlayerButton);
-    }
-    gameVars.battleScreenInfo.battleWinners.push(playerId);
-    winningPlayerCount = gameVars.battleScreenInfo.battleWinners.length;
-    document.getElementById(winningPlayerButton).innerHTML = winningButtonText;
-    convertArrayContentToNumbers(gameVars.battleScreenInfo.battleWinners);
-    if (winningPlayerCount === 1 && gameVars.gameStatus.mode === "setup") {
-        addElement("battle-note", "button", "Cancel", "reset-winners", "noClass", resetWinners);
-    }
-}
 
 //Initiation game begins
 function startIniGame() {

@@ -193,35 +193,9 @@ function endOfTurnCleanup() {
     gameVars.battleScreenInfo.alreadyAttacked = [];
 }
 
-function numberSuffix(number) {
-    var lastDigit = number.toString().split('').pop();
 
-    switch (lastDigit) {
-        case "1": return number + "st";
-        case "2": return number + "nd";
-        case "3": return number + "rd";
-        default: return number + "th";
-    }
-}
 
-function findPlayerNames(playerNumberArray) {
-    var playerNames = [];
 
-    for (var i = 0; i < playerNumberArray.length; i++) {
-        playerNames.push(gameVars.playerInfo["Player" + playerNumberArray[i]].name);
-    }
-    return playerNames;
-}
-
-function disableId(id) {
-    document.getElementById(id).disabled = true;
-    addClass(id, 'disabled');
-}
-
-function undisableId(id) {
-    document.getElementById(id).disabled = false;
-    removeClass(id, 'disabled');
-}
 
 function findNextPlayerTurn(currentPlayerNumber) {
     for (var i = 0; i < gameVars.gameStatus.turnOrder.length; i++) {

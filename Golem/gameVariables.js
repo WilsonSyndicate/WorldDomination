@@ -23,7 +23,6 @@ var gameVars = {
         currentPlayerCountries: [],
         possibleJoinAttack: [],
         confirmedJoiner: [],
-        tempDeckInfo: [],
         alreadyAttacked: []
     },
     gameLog: [],

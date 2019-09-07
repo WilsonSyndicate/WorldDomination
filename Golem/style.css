@@ -28,6 +28,14 @@
     background-color: lightgoldenrodyellow;
 }
 
+.battle-player {
+    border: 2px solid yellow;
+}
+
+
+
+
+
 
 
 
@@ -61,9 +69,6 @@
     text-align: left;
 }
 
-.battle-player {
-    border: 2px solid yellow;
-}
 
 /*Country Outlines*/
 .attack-threat {

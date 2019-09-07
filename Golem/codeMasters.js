@@ -2,26 +2,43 @@
 
 
 
-
-function updateLog(text) {
-    var logText = [],
-    logLength = gameVars.gameLog.length,
-    lastLog = gameVars.gameLog[logLength - 1];
-
-    logText.push(Date.parse(Date()));
-    for (var i = 0; i < text.length; i++) {
-        logText.push(text[i]);
-    }
-    if (logLength > 1 && lastLog[1].search("Begins") > 0) {
-        logText.push("Game Duration: " + formatDuration(Date.parse(Date()) - lastLog[0]));
-    }
-    gameVars.gameLog.push(logText);
-    console.log(logText);
+function disableId(id) {
+    document.getElementById(id).disabled = true;
+    addClass(id, 'disabled');
 }
 
+function undisableId(id) {
+    document.getElementById(id).disabled = false;
+    removeClass(id, 'disabled');
+}
 
+function numberSuffix(number) {
+    var lastDigit = number.toString().split('').pop();
 
+    switch (lastDigit) {
+        case "1": return number + "st";
+        case "2": return number + "nd";
+        case "3": return number + "rd";
+        default: return number + "th";
+    }
+}
 
+function findDeckWithPlayerAndRef(playerNumber, deckRef) {
+    return gameVars.playerInfo["player" + playerNumber].playerDecklist[deckRef];
+}
+
+function findArrayOfPlayerNames(playerNumberArray) {
+    var playerNames = [];
+
+    for (var i = 0; i < playerNumberArray.length; i++) {
+        playerNames.push(findPlayerName(playerNumberArray[i]));
+    }
+    return playerNames;
+}
+
+function findPlayerName(playerNumber) {
+    return gameVars.playerInfo["player" + playerNumber].playerName;
+}
 
 function addElement(addToId, elementType, elementContent, idToInclude, classToInclude, clickFunctionToInclude) {
     var newElement = document.createElement(elementType),//create a new element
@@ -43,6 +60,22 @@ function addElement(addToId, elementType, elementContent, idToInclude, classToIn
     //add new element and contents to DOM
     var currentElement = document.getElementById(addToId);
     currentElement.appendChild(newElement);
+}
+
+function updateLog(text) {
+    var logText = [],
+    logLength = gameVars.gameLog.length,
+    lastLog = gameVars.gameLog[logLength - 1];
+
+    logText.push(Date.parse(Date()));
+    for (var i = 0; i < text.length; i++) {
+        logText.push(text[i]);
+    }
+    if (logLength > 1 && lastLog[1].search("Begins") > 0) {
+        logText.push("Game Duration: " + formatDuration(Date.parse(Date()) - lastLog[0]));
+    }
+    gameVars.gameLog.push(logText);
+    console.log(logText);
 }
 
 function removeElement(parentId, elementId) {
