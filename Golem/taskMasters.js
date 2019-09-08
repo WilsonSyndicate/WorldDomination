@@ -117,16 +117,6 @@ function clearMapSelect() {
     }
 }
 
-function countPreviousGames() {
-    var previousGames = 0;
-
-    for (var i = 0; i < gameVars.gameLog.length; i++) {
-        if (gameVars.gameLog[i][1].slice(-17, 0) === "Battle Game Begins") {
-            previousGames += 1;
-        }
-    }
-    return previousGames;
-}
 
 function findDeckRef(playerNum, deckName, library) {
     var libraryLocation = gameVars.playerInfo["Player" + playerNum],

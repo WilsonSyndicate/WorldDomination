@@ -1,14 +1,36 @@
 //Player Setup
 
+function cleanupPlayerDeckLists() {
+    for (var i = 0; i < gameVars.gameStatus.turnOrder.length; i++) {
+        var currentPlayer = gameVars.gameStatus.turnOrder[i]
+        currentPlayerDecklist = gameVars.playerInfo["player" + currentPlayer].playerDecklist;
+
+        for (var d = 0; d < currentPlayerDecklist.length; d++) {
+            currentPlayerDecklist[d].deckHidden = true;
+            currentPlayerDecklist[d].deckEliminated = false;
+            currentPlayerDecklist[d].deckDefensePlane = "";
+            currentPlayerDecklist[d].deckPenalties = 0;
+            currentPlayerDecklist[d].deckBonuses = 0;
+            currentPlayerDecklist[d].deckVanguards = [];
+            currentPlayerDecklist[d].deckAttacksMade = 0;
+            currentPlayerDecklist[d].deckTimesDefended = 0;
+            currentPlayerDecklist[d].deckGamesPlayed = 0;
+            currentPlayerDecklist[d].deckwins = 0;
+            currentPlayerDecklist[d].deckUniqueId = [currentPlayer, currentPlayerDecklist[d].deckName];
+        }
+    }
+}
 
 function setupComplete() {
-    var logText = [];
-    
-    console.log("go to map and set up board");
-    console.log(gameVars.battleScreenInfo.battleWinners);
+    var logText = ["Initiation Game Complete"];
 
     //log end of game, add winner decks in order
-    //push note, then push winners
+    for (var i = 0; i < gameVars.battleScreenInfo.battleWinners.length; i++) {
+        var currentBattlePlayer = gameVars.battleScreenInfo.battleWinners[i],
+        currentBattleDeck = findBattleDeckNameWithPlayer(currentBattlePlayer);
+
+        logText.push([currentBattlePlayer, currentBattleDeck]);
+    }
     updateLog(logText)
 
     //update turn order
@@ -17,35 +39,15 @@ function setupComplete() {
     //update turn
     gameVars.gameStatus.turn = gameVars.battleScreenInfo.battleWinners[0];
     
-    //add deck info to decklists (bonus,penalties,etc)
+    //cleanup decklists
+    cleanupPlayerDeckLists();
 
+    //set up map
+    setupMapInformation();
 
-    //change mode
-    gameVars.gameStatus.focus = "attack";
-
-    //change focus
-    gameVars.gameStatus.focus = "map";
-
-    //clear all battle buttons and battle variables
-    //battleScreenCleanup(orderOfWinners.length);
-
-    //hide battle screen
-    hideId("battle-screen");
-
-    //go to map
-    unhideId("map-screen");
-
-    //set up board
-    //setupBoard(confirmationResults, orderOfWinners);
+    //top of turn
+    topOfTurn();
 }
-
-
-
-
-
-
-
-
 
 function toIniGame() {
     var toIniGame = confirm("Save this information and proceed to Initiation Game?");
@@ -73,10 +75,10 @@ function toIniGame() {
         }
 
         //update battle players count
-        gameVars.battleScreenInfo.playersInBattleCount = gameVars.battleScreenInfo.battleDecks.length;
+        gameVars.battleScreenInfo.battlePlayersCount = gameVars.battleScreenInfo.battleDecks.length;
 
         //show battle screen info for initiation
-        for (var j = 0; j < gameVars.battleScreenInfo.playersInBattleCount; j++) {
+        for (var j = 0; j < gameVars.battleScreenInfo.battlePlayersCount; j++) {
             displayBattleInfo(j);
         }
 
@@ -135,7 +137,6 @@ function shuffleAllDecklists() {
     for (var i = 1; i < 6; i++) {
         shuffleArray(gameVars.playerInfo["player" + i].playerDecklist);
     }
-    console.log("decks shuffled")
 }
 
 function countPlayerDecklist(playerNumber) {

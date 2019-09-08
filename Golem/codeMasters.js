@@ -1,5 +1,26 @@
 //Code Masters
 
+/*
+function findFullCountryWithCountry(country) {
+    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
+        if (gameVars.mapInfo.countryList[i].country === country) {
+            return gameVars.mapInfo.countryList[i];
+        }
+    }
+}
+
+
+function countPreviousGames() {
+    var previousGames = 0;
+
+    for (var i = 0; i < gameVars.gameLog.length; i++) {
+        if (gameVars.gameLog[i][1].slice(-12, 0) === "Game Complete") {
+            previousGames += 1;
+        }
+    }
+    return previousGames;
+}
+*/
 
 
 function disableId(id) {
@@ -20,6 +41,16 @@ function numberSuffix(number) {
         case "2": return number + "nd";
         case "3": return number + "rd";
         default: return number + "th";
+    }
+}
+
+function findDeckWithPlayerNumberAndName(playerNumber, deckName) {
+    var currentPlayer = gameVars.playerInfo["player" + playerNumber];
+        
+    for (var i = 0; i < currentPlayer.playerDecklist.length; i++) {
+        if (currentPlayer.playerDecklist[i].deckName === deckName) {
+            return currentPlayer.playerDecklist[i];
+        }
     }
 }
 
@@ -62,6 +93,12 @@ function addElement(addToId, elementType, elementContent, idToInclude, classToIn
     currentElement.appendChild(newElement);
 }
 
+function removeElement(parentId, elementId) {
+    if (!!document.getElementById(parentId) && document.getElementById(elementId) !== null) {
+        document.getElementById(parentId).removeChild(document.getElementById(elementId));
+    }
+}
+
 function updateLog(text) {
     var logText = [],
     logLength = gameVars.gameLog.length,
@@ -76,12 +113,6 @@ function updateLog(text) {
     }
     gameVars.gameLog.push(logText);
     console.log(logText);
-}
-
-function removeElement(parentId, elementId) {
-    if (!!document.getElementById(parentId) && document.getElementById(elementId) !== null) {
-        document.getElementById(parentId).removeChild(document.getElementById(elementId));
-    }
 }
 
 function orderArray(array, sortBy) {

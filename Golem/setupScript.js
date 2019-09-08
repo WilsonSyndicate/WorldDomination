@@ -52,35 +52,9 @@ function placeCountry(country) {
     checkForSetupFinish();
 }
 
-function countryMapName(currentCountryId) {
-    if (currentCountryId.deck) {
-        var useDeckName = currentCountryId.deck.deckName,
-        usePlayerName = gameVars.playerInfo["Player" + currentCountryId.deck.player].name;
 
-        if (currentCountryId.deck.unHidden) {
-            //shows deck name once currentCountryId.deck.unHidden === true
-            return usePlayerName + " (" + useDeckName + ")";
-        }
-        else {
-            return currentCountryId.countryName + " (" + usePlayerName + ")";
-        }
-    }
-    else {
-        return currentCountryId.countryName + " (Empty)";
-    }
-}
 
-function BuildMapButtons() {
-    var totalCountries = gameVars.mapInfo.countryList.length;
-    
-    for (var i = 0; i < totalCountries; i++) {
-        var currentCountry = gameVars.mapInfo.countryList[i].country,
-        currentCountryId = gameVars.mapInfo.countryList[i];
 
-        removeElement("map-countries", currentCountry);
-        addElement("map-countries", "button", countryMapName(currentCountryId), currentCountry, "country-button", mapCountryClick);
-    }
-}
 
 function findBattleDeckName(playerId) {
     var battleDecks = gameVars.battleScreenInfo.battleDecks,
@@ -120,28 +94,6 @@ function clearBattleScreenInfo() {
     gameVars.battleScreenInfo.battleWinners = [];
 }
 
-function getRandomSetup() {
-    var countryCount = gameVars.mapInfo.countryList.length,
-    playerCount = gameVars.globalGameOptions.totalPlayers,
-    countriesPerPlayer = Math.floor(countryCount/playerCount),
-    deckListToAdd = [],
-    countryListToAddTo = gameVars.mapInfo.countryList.slice();
-
-    for (var p = 1; p <= playerCount; p++) {
-        for (var i = 1; i <= countriesPerPlayer; i++) {
-            var currentDeck = gameVars.playerInfo["Player" + p].gameDeckRandomLibrary[i];
-            
-            deckListToAdd.push(currentDeck);
-        }
-    }
-    shuffleArray(deckListToAdd);
-    shuffleArray(countryListToAddTo);
-    for (var c = 0; c < deckListToAdd.length; c++) {
-        countryListToAddTo[c].deck = deckListToAdd[c];
-    }
-    orderArray(countryListToAddTo, "country")
-    gameVars.mapInfo.countryList = countryListToAddTo;
-}
 
 function refreshMapButtonColors() {
     var currentPlayer = gameVars.gameStatus.turn;
@@ -206,24 +158,6 @@ function refreshMapButtonColors() {
 }
 
 
-function cleanupPlayerDeckLists() {
-    for (var i = 0; i < gameVars.gameStatus.turnOrder.length; i++) {
-        var currentPlayer = gameVars.playerInfo["Player" + gameVars.gameStatus.turnOrder[i]];
-        for (var d = 0; d < currentPlayer.gameDeckRandomLibrary.length; d++) {
-            currentPlayer.gameDeckRandomLibrary[d].deckHidden = true;
-            currentPlayer.gameDeckRandomLibrary[d].deckEliminated = false;
-            currentPlayer.gameDeckRandomLibrary[d].deckDefensePlane = "";
-            currentPlayer.gameDeckRandomLibrary[d].deckPenalties = 0;
-            currentPlayer.gameDeckRandomLibrary[d].deckBonuses = 0;
-            currentPlayer.gameDeckRandomLibrary[d].deckVanguards = [];
-            currentPlayer.gameDeckRandomLibrary[d].deckAttacksMade = 0;
-            currentPlayer.gameDeckRandomLibrary[d].deckTimesDefended = 0;
-            currentPlayer.gameDeckRandomLibrary[d].deckGamesPlayed = 0;
-            currentPlayer.gameDeckRandomLibrary[d].deckwins = 0;
-            currentPlayer.gameDeckRandomLibrary[d].deckUniqueId = [currentPlayer.player, currentPlayer.gameDeckRandomLibrary[d].deckName];
-        }
-    }
-}
 
 function setupBoard(confirmationResults, orderOfWinners) {
     var logText = gameResultsLogText(confirmationResults, orderOfWinners);

@@ -1,4 +1,10 @@
 ﻿/*Page Styles*/
+.country-button {
+    position: absolute;
+    height: 40px;
+    border: 1px solid black;
+    background-color: lightgrey;
+}
 
 #setup-toolbar {
     border: 2px solid green;
@@ -97,9 +103,7 @@
 }
 
 /*Country buttons*/
-.country-button {
-    position: absolute;
-}
+
 
 #afghanistan {
     top: 457px;

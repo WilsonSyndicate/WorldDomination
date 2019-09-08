@@ -15,15 +15,14 @@ const adminSettings = {
 //Game Variables
 var gameVars = {
     battleScreenInfo: {
-        text: "",
-        playersInBattleCount: [],
+        battlePlayersCount: [],
         battleDecks: [],
         battleWinners: [],
-        possibleAttacks: [],
-        currentPlayerCountries: [],
-        possibleJoinAttack: [],
-        confirmedJoiner: [],
-        alreadyAttacked: []
+        mapPossibleAttacks: [],
+        mapCurrentPlayerCountries: [],
+        mapPossibleJoinAttack: [],
+        mapConfirmedJoiner: [],
+        mapAlreadyAttacked: []
     },
     gameLog: [],
     globalGameOptions: {

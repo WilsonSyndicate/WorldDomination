@@ -54,7 +54,41 @@ function countBattlePenalties(battleDeckRef) {
 
 
 
+function attackComplete() {
+    console.log(attackWinner + " confirmed. change attack battle winner confirmation");
 
+
+    //attack winner confirmed, go from here
+
+    //attackWinnerConfirmed(attackWinner);
+}
+
+
+
+
+function battleScreenCleanup() {
+    //clear cancel and win buttons
+    removeElement("battle-screen-toolbar", "reset-winners");
+    removeElement("battle-screen-toolbar", "confirm-winners");
+
+    //clear deck info and buttons
+    for (var i = 0; i < gameVars.battleScreenInfo.battleDecks.length; i++) {
+        removeElement("battle-information", "battle-player" + i);
+    }
+
+    //clear battle variables
+    gameVars.battleScreenInfo.battlePlayersCount = [];
+    gameVars.battleScreenInfo.battleDecks = [];
+    gameVars.battleScreenInfo.battleWinners = [];
+}
+
+function findBattleDeckNameWithPlayer(currentBattlePlayer) {
+    for (var i = 0; i < gameVars.battleScreenInfo.battleDecks.length; i++) {
+        if (gameVars.battleScreenInfo.battleDecks[i][0] === currentBattlePlayer) {
+            return gameVars.battleScreenInfo.battleDecks[i][1];
+        }
+    }
+}
 
 function battleWinnerText(confirmationResults) {
     if (gameVars.gameStatus.mode === "setup") {
@@ -98,12 +132,7 @@ function battleWinnerConfirmed() {
                 setupComplete();
             break;
             case "attack":
-                console.log(attackWinner + " confirmed. change attack battle winner confirmation");
-
-
-                //attack winner confirmed, go from here
-
-                //attackWinnerConfirmed(attackWinner);
+                attackComplete();
             break;
             default: console.log("battle winner error");
         }
@@ -120,7 +149,7 @@ function resetWinners() {
 
         buttonToRename.innerHTML = playerNameToRename;
     }
-    for (var p = 1; p <= gameVars.battleScreenInfo.playersInBattleCount; p++) {
+    for (var p = 1; p <= gameVars.battleScreenInfo.battlePlayersCount; p++) {
         undisableId("battle-winner-" + p);
     }
     gameVars.battleScreenInfo.battleWinners = [];
@@ -149,12 +178,12 @@ function battleWinner(winningPlayerButton) {
     winningPlayer = gameVars.playerInfo["player" + playerId].playerName,
     winningPlayerCount = gameVars.battleScreenInfo.battleWinners.length,
     winningPlace = winningPlayerCount + 1,
-    totalBattlePlayers = gameVars.battleScreenInfo.playersInBattleCount,
+    totalBattlePlayers = gameVars.battleScreenInfo.battlePlayersCount,
     winningButtonText = winningPlayer + " is " + showWinningButtonText(winningPlace, totalBattlePlayers);
 
     if (gameVars.gameStatus.mode === "attack") {
-        for (var i = 0; i < gameVars.battleScreenInfo.playersInBattleCount; i++) {
-            disableId("battle-winner-" + gameVars.battleScreenInfo.playersInBattleCount[i]);
+        for (var i = 0; i < gameVars.battleScreenInfo.battlePlayersCount; i++) {
+            disableId("battle-winner-" + gameVars.battleScreenInfo.battlePlayersCount[i]);
         }
     }
     else {

@@ -322,24 +322,7 @@ function getMapNote() {
     }
 }
 
-function mapCountryClick(country) {
-    switch (gameVars.gameStatus.mode) {
-        case "placement": 
-            placeCountry(country);
-        break;
-        case "attack":
-            if (isInArray(country, gameVars.battleScreenInfo.possibleJoinAttack)) {
-                chooseJoiner(country);
-            }
-            else {
-                chooseAttackCountry(country);
-            }
-        break;
-        default: 
-            console.log("Mode not found in mapCountryClick");
-    }
-    refreshMapButtonColors();
-}
+
 
 
 
@@ -410,18 +393,6 @@ function openBattleScreen() {
 
 
 
-function battleScreenCleanup(numberOfPlayers) {
-    //clear note and message
-    document.getElementById("battle-message").innerHTML = "";
-    document.getElementById("battle-note").innerHTML = "";
-    //clear cancel and win buttons
-    removeElement("battle-note", "reset-winners");
-    removeElement("battle-note", "confirm-winners");
-    //clear deck info and buttons
-    for (var i = 0; i < numberOfPlayers; i++) {
-        removeElement("battle-information", "battle-player" + i);
-    }
-}
 
 function joinerGamePlayers() {
     var joinerPlayers = [];
