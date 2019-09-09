@@ -23,6 +23,31 @@ function countPreviousGames() {
 */
 
 
+function findCountryPlayer(country) {
+    if (!!country.deck) {
+        var deckPlayer = country.deck.deckPlayer,
+        deckName = country.deck.deckName;
+
+        return findDeckWithPlayerNumberAndName(deckPlayer, deckName);
+    }
+    else {
+        console.log("no deck on country");
+    }
+}
+
+function findUniqueValuesInArray(array) {
+    var uniqueArray = [];
+
+    for (var i = 1; i < array.length; i++) {
+        var currentArrayItem = array[i];
+
+        if (uniqueArray.indexOf(currentArrayItem) === -1) {
+            uniqueArray.push(currentArrayItem);
+        }
+    }
+    return uniqueArray;
+}
+
 function disableId(id) {
     document.getElementById(id).disabled = true;
     addClass(id, 'disabled');

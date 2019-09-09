@@ -1,3 +1,7 @@
+//add intro screen at beginning of game and at top of turn
+//attack select
+
+
 //Admin Settings
 const adminSettings = {
     supportBonus: {

@@ -224,17 +224,6 @@ function findCountryNameWithCountryId(countryId) {
     }
 }
 
-function findUniqueValuesInArray(array) {
-    var uniqueArray = [];
-
-    for (var i = 0; i < array.length; i++) {
-        for (var u = 0; u < uniqueArray.length; u++) {
-            if (array[i] !== uniqueArray[u]) {
-                uniqueArray.push(array[i]);
-            }
-        }
-    }
-}
 
 function findAttackingCountry() {
     if (findCountryPlayer(gameVars.mapInfo.mapSelect1) === gameVars.gameStatus.currentTurn) {
@@ -261,19 +250,6 @@ function findCountryDeck(country) {
     return false;
 }
 
-function findCountryPlayer(country) {
-    if (country === "") {
-        return false;
-    }
-    else {
-        if (!!gameVars.mapInfo.countryList[findCountryRef(country)].deck) {
-            return gameVars.mapInfo.countryList[findCountryRef(country)].deck.player;
-        }
-        else {
-            return false;
-        }
-    }
-}
 
 function findPlayerColor(playerId) {
     var playerColor = gameVars.playerInfo["Player" + playerId].playerColor;

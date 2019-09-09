@@ -2,7 +2,9 @@
 
 
 function mapCountryClick(country) {
-    switch (gameVars.gameStatus.mode) {
+    var gameMode = gameVars.gameStatus.mode;
+
+    switch (gameMode) {
         case "attack":
             console.log(country);
 
@@ -17,6 +19,9 @@ function mapCountryClick(country) {
             }
             */
         break;
+        case "placement" :
+            console.log(country + " clicked for placement mode")
+        break;
         default: console.log("Mode not found in mapCountryClick");
     }
     //refreshMapButtonColors();
@@ -30,8 +35,8 @@ function countryMapName(currentCountry) {
     hasDeck = !!currentCountry.deck;
 
     if (hasDeck) {
-        var currentPlayerNumber = currentCountry.deck[0],
-        curentDeckName = currentCountry.deck[1],
+        var currentPlayerNumber = currentCountry.deck.deckPlayer,
+        curentDeckName = currentCountry.deck.deckName,
         currentPlayerName = findPlayerName(currentPlayerNumber),
         isHidden = findDeckWithPlayerNumberAndName(currentPlayerNumber, curentDeckName).deckHidden;  
 
@@ -56,7 +61,7 @@ function buildMapButtons() {
         addElement("map-countries", "svg", countryMapName(currentFullCountry), currentCountry, "country-button", mapCountryClick);
 
         if (!!currentFullCountry.deck) {
-            var currentPlayer = currentFullCountry.deck[0];
+            var currentPlayer = currentFullCountry.deck.deckPlayer;
 
             addClass(currentCountry, "player-color-" + currentPlayer);
         }
@@ -65,6 +70,8 @@ function buildMapButtons() {
 }
 
 function topOfTurn() {
+    //go to intro screen before map
+
     //change mode
     gameVars.gameStatus.mode = "attack";
 
@@ -83,6 +90,46 @@ function topOfTurn() {
     //build map buttons
     buildMapButtons();
 }
+
+
+
+function playerCountOnContinent(continent) {
+    var playersOnContinent = [];
+
+    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
+        var currentContinent = gameVars.mapInfo.countryList[i].continent,
+        isDeck = !!gameVars.mapInfo.countryList[i].deck;
+
+        if (currentContinent === continent && isDeck) {
+            playersOnContinent.push(gameVars.mapInfo.countryList[i].deck.deckPlayer);
+        }
+    }
+    return findUniqueValuesInArray(playersOnContinent).length;
+}
+
+function setupContinentCheck() {
+    var continents = [];
+
+    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
+        var currentContinent = gameVars.mapInfo.countryList[i].continent;
+        //for each country push the continent to the continents array
+        continents.push(currentContinent);
+    }
+
+    //change the continents array to unique values
+    continents = findUniqueValuesInArray(continents);
+
+    //if any continent has only 1 player then return true
+    for (var c = 0; c < continents.length; c++) {
+        if (playerCountOnContinent(continents[c]) === 1) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+
 
 function setupMapInformation() {
     var countryCount = gameVars.mapInfo.countryList.length,
@@ -103,6 +150,12 @@ function setupMapInformation() {
     for (var c = 0; c < deckListToAdd.length; c++) {
         countryListToAddTo[c].deck = deckListToAdd[c];
     }
-    orderArray(countryListToAddTo, "country")
-    gameVars.mapInfo.countryList = countryListToAddTo;
+
+    if (setupContinentCheck() === true) {
+        setupMapInformation();
+    }
+    else {
+        orderArray(countryListToAddTo, "country")
+        gameVars.mapInfo.countryList = countryListToAddTo;
+    }
 }

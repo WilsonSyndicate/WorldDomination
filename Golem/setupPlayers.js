@@ -16,13 +16,35 @@ function cleanupPlayerDeckLists() {
             currentPlayerDecklist[d].deckTimesDefended = 0;
             currentPlayerDecklist[d].deckGamesPlayed = 0;
             currentPlayerDecklist[d].deckwins = 0;
-            currentPlayerDecklist[d].deckUniqueId = [currentPlayer, currentPlayerDecklist[d].deckName];
+            currentPlayerDecklist[d].deckUniqueId = {deckPlayer: currentPlayer, deckName: currentPlayerDecklist[d].deckName};
         }
     }
 }
 
+function topOfPlacementSetup() {
+        //future version
+    //change focus
+    gameVars.gameStatus.focus = "map";
+
+    //clear all battle buttons and battle variables
+    battleScreenCleanup();
+
+    //hide battle screen
+    hideId("battle-screen");
+
+    //go to map
+    unhideId("map-screen");
+
+    //build map buttons
+    buildMapButtons();
+
+    //starting with ref 1, add decks in turn order until all decks are set.
+    //once setup is complete, go to top of turn
+}
+
 function setupComplete() {
-    var logText = ["Initiation Game Complete"];
+    var logText = ["Initiation Game Complete"],
+    randomSetup = true;//change when placement setup enabled
 
     //log end of game, add winner decks in order
     for (var i = 0; i < gameVars.battleScreenInfo.battleWinners.length; i++) {
@@ -42,11 +64,19 @@ function setupComplete() {
     //cleanup decklists
     cleanupPlayerDeckLists();
 
-    //set up map
-    setupMapInformation();
 
-    //top of turn
-    topOfTurn();
+    if (randomSetup) {
+        //set up map
+        setupMapInformation();
+
+        //top of turn
+        topOfTurn();
+    }
+    else {
+        //top of placement setup
+        topOfPlacementSetup()
+    }
+    
 }
 
 function toIniGame() {
@@ -71,7 +101,7 @@ function toIniGame() {
             var currentPlayer = i,
             currentIniDeck = gameVars.playerInfo["player" + i].playerDecklist[0];
 
-            gameVars.battleScreenInfo.battleDecks.push([currentPlayer, currentIniDeck]);
+            gameVars.battleScreenInfo.battleDecks.push({deckPlayer: currentPlayer, deckName: currentIniDeck.deckName});
         }
 
         //update battle players count
@@ -204,6 +234,7 @@ function setupPlayerName() {
 
 function initialStartup() {
     //hide game screens
+    hideId("intro-screen");
     hideId("battle-screen");
     hideId("map-screen");
 

@@ -200,9 +200,9 @@ function battleWinner(winningPlayerButton) {
 
 
 function displayBattleInfo(battleDeckRef) {
-    var currentPlayer = gameVars.battleScreenInfo.battleDecks[battleDeckRef][0],
+    var currentPlayer = gameVars.battleScreenInfo.battleDecks[battleDeckRef].deckPlayer,
     currentPlayerName = findPlayerName(currentPlayer),
-    currentDeckName = gameVars.battleScreenInfo.battleDecks[battleDeckRef][1].deckName,
+    currentDeckName = gameVars.battleScreenInfo.battleDecks[battleDeckRef].deckName,
     currentDeckColor = findDeckWithPlayerAndRef(currentPlayer, 0).deckColors,
     battleText = [
         currentPlayerName + " playing " + currentDeckName + " (" + currentDeckColor + ")"
