@@ -39,10 +39,14 @@
 
 #intro-screen {
     background-color: darkgrey;
+    width: 1000px;
+    height: 700px;
 }
 
 
-
+.toolbar {
+    border: 2px solid red;
+}
 
 
 

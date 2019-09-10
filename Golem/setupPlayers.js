@@ -22,22 +22,12 @@ function cleanupPlayerDeckLists() {
 }
 
 function topOfPlacementSetup() {
-        //future version
-    //change focus
-    gameVars.gameStatus.focus = "map";
-
     //clear all battle buttons and battle variables
     battleScreenCleanup();
 
-    //hide battle screen
-    hideId("battle-screen");
+    showMap();
 
-    //go to map
-    unhideId("map-screen");
-
-    //build map buttons
-    buildMapButtons();
-
+        //future version
     //starting with ref 1, add decks in turn order until all decks are set.
     //once setup is complete, go to top of turn
 }
@@ -87,14 +77,7 @@ function toIniGame() {
         //shuffledecklists
         shuffleAllDecklists();
 
-        //hide pre game screen
-        hideId("pre-game-screen");
-
-        //show battle screen
-        unhideId("battle-screen");
-
-        //update focus to battle
-        gameVars.gameStatus.focus = "battle";
+        showBattle();
 
         //load initiation decks as battle decks
         for (var i = 1; i <= gameVars.globalGameOptions.totalPlayers; i++) {
@@ -233,10 +216,7 @@ function setupPlayerName() {
 }
 
 function initialStartup() {
-    //hide game screens
-    hideId("intro-screen");
-    hideId("battle-screen");
-    hideId("map-screen");
+    showIntro();
 
     //refresh player 1 info
     changeCurrentSetupPlayer();

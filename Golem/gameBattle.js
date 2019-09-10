@@ -58,7 +58,7 @@ function attackComplete() {
     console.log(attackWinner + " confirmed. change attack battle winner confirmation");
 
 
-    //attack winner confirmed, go from here
+    //attack winner confirmed, go from here after attack
 
     //attackWinnerConfirmed(attackWinner);
 }

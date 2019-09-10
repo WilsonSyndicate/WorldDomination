@@ -1,23 +1,97 @@
 //Game Map
 
+function removeAllClassFromMapbuttons(classToRemove) {
+    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
+        removeClass(gameVars.mapInfo.countryList[i].country, classToRemove);
+    }
+}
+
+function mapSelectPlayerNotSelected(countryPlayer) {
+    for (var i = 0; i < gameVars.mapInfo.mapSelect.length; i++) {
+        if (gameVars.mapInfo.mapSelect[i].deckPlayer === countryPlayer) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function attackCountryClicked(country) {
+    var currentTurnPlayer = gameVars.gameStatus.turn,
+    currentTurnPlayerName = gameVars.playerInfo["player" + currentTurnPlayer].playerName,
+    currentClick = gameVars.mapInfo.mapSelect.length,
+    countryDeck = findDeckWithCountry(country),
+    countryBorders = gameVars.mapInfo.countryList[findCountryRef(country)].borders;
+
+    if (!!countryDeck) {
+        var countryPlayer = countryDeck.deckPlayer,
+        countryDeckName = shownDeckName(countryPlayer, countryDeck.deckName);
+
+        if (currentTurnPlayer === countryPlayer) {
+            //clear previous selection
+            removeAllClassFromMapbuttons("attack-threat");
+            removeAllClassFromMapbuttons("join-threat");
+            //add deck to mapSelect
+            gameVars.mapInfo.mapSelect = [countryDeck];
+            //update message and note
+            document.getElementById("map-message").innerHTML = currentTurnPlayerName + " Choose Country To Attack";
+            document.getElementById("map-note").innerHTML = countryDeckName + " attacks... ";
+            //highlight border countries not controlled by curentTurnPlayer as attack threat
+            for (var i = 0; i < countryBorders.length; i++) {
+                var checkForDeck = !!findFullCountryWithCountry(countryBorders[i]).deck;
+
+                if (checkForDeck && findFullCountryWithCountry(countryBorders[i]).deck.deckPlayer !== currentTurnPlayer) {
+                    addClass(countryBorders[i], "attack-threat");
+                }
+            }
+        }
+        else {
+            switch (currentClick) {
+                case 0:
+                    document.getElementById("map-note").innerHTML = "Choose one of " + currentTurnPlayerName + "'s decks to attack";
+                break;
+                case 1:
+                    //refactor this and use variables to simplify
+
+
+
+
+
+                    //if countryclicked borders first click && player is not currentturnplayer
+                    var borderingCountryCheck = doesCountryBorderFullCountry(country, findFullCountryWithCountry(findFullCountryWithDeckPlayerAndDeckName(gameVars.mapInfo.mapSelect[0])));
+                    
+                    if (borderingCountryCheck && currentTurnPlayer !== countryPlayer) {
+                        //add deck to map select
+                        gameVars.mapInfo.mapSelect.push(countryDeck);
+                        //update message and note
+                        document.getElementById("map-message").innerHTML = currentTurnPlayerName + " Choose Country To Attack";
+                        document.getElementById("map-note").innerHTML = countryDeckName + " attacks... ";
+                        //hightlight border countries not controlled by either player as join-threat
+                        for (var i = 0; i < countryBorders.length; i++) {
+                            var checkForDeck = !!findFullCountryWithCountry(countryBorders[i]).deck;
+            
+                            if (checkForDeck && mapSelectPlayerNotSelected(countryPlayer)) {
+                                addClass(countryBorders[i], "join-threat");
+                            }
+                        }
+                        //add button to accept attack
+                    }
+                break;
+                case 2:
+    
+                break;
+                default:
+            }
+            
+        }
+    }
+}
 
 function mapCountryClick(country) {
     var gameMode = gameVars.gameStatus.mode;
 
     switch (gameMode) {
         case "attack":
-            console.log(country);
-
-        /*
-            if (isInArray(country, gameVars.battleScreenInfo.possibleJoinAttack)) {
-                console.log(country + " is a joiner");
-                //chooseJoiner(country);
-            }
-            else {
-                console.log(country + " is clicked");
-                //chooseAttackCountry(country);
-            }
-            */
+            attackCountryClicked(country);
         break;
         case "placement" :
             console.log(country + " clicked for placement mode")
@@ -26,9 +100,6 @@ function mapCountryClick(country) {
     }
     //refreshMapButtonColors();
 }
-
-
-
 
 function countryMapName(currentCountry) {
     var currentCountryName = currentCountry.countryName,
@@ -65,33 +136,38 @@ function buildMapButtons() {
 
             addClass(currentCountry, "player-color-" + currentPlayer);
         }
+    }
+}
 
+function beginAttack() {
+    var currentTurnPlayerNumber = gameVars.gameStatus.turn,
+    currentTurnPlayerName = findPlayerName(currentTurnPlayerNumber);
+    
+
+    if (gameVars.gameStatus.mode === "setup") {
+        showPregame();
+    }
+    else {
+        showMap();
+        
+        //build map buttons
+        buildMapButtons();
+    
+        //update message and note
+        document.getElementById("map-message").innerHTML = currentTurnPlayerName + " Choose Your Attack";
+        document.getElementById("map-note").innerHTML = "";
     }
 }
 
 function topOfTurn() {
-    //go to intro screen before map
+    //clear all battle buttons and battle variables
+    battleScreenCleanup();
 
     //change mode
     gameVars.gameStatus.mode = "attack";
 
-    //change focus
-    gameVars.gameStatus.focus = "map";
-
-    //clear all battle buttons and battle variables
-    battleScreenCleanup();
-
-    //hide battle screen
-    hideId("battle-screen");
-
-    //go to map
-    unhideId("map-screen");
-
-    //build map buttons
-    buildMapButtons();
+    showIntro();
 }
-
-
 
 function playerCountOnContinent(continent) {
     var playersOnContinent = [];
@@ -127,9 +203,6 @@ function setupContinentCheck() {
     }
     return false;
 }
-
-
-
 
 function setupMapInformation() {
     var countryCount = gameVars.mapInfo.countryList.length,

@@ -43,8 +43,7 @@ var gameVars = {
         availableSupplyPoints: []
     },
     mapInfo: {
-        mapSelect1: "",
-        mapSelect2: "",
+        mapSelect: [],
         countryList: [
             {countryName: 'Afghanistan', country: 'afghanistan', continent: 'Asia', color: 'G', borders: ['ural', 'china','india','middle-east','ukraine']},
             {countryName: 'Alaska', country: 'alaska', continent: 'North America', color: 'W', borders: ['kamchatka', 'northwest-territory','alberta']},

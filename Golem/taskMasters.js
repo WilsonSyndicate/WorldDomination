@@ -1,4 +1,28 @@
 //Task Masters
+
+/*
+function findFullCountryWithCountry(country) {
+    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
+        if (gameVars.mapInfo.countryList[i].country === country) {
+            return gameVars.mapInfo.countryList[i];
+        }
+    }
+}
+
+
+function countPreviousGames() {
+    var previousGames = 0;
+
+    for (var i = 0; i < gameVars.gameLog.length; i++) {
+        if (gameVars.gameLog[i][1].slice(-12, 0) === "Game Complete") {
+            previousGames += 1;
+        }
+    }
+    return previousGames;
+}
+*/
+
+
 function battleCleanup() {
     clearMapSelect();
     removeElement("battle-note", "reset-winners");
