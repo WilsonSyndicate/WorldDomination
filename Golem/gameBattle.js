@@ -54,13 +54,26 @@ function countBattlePenalties(battleDeckRef) {
 
 
 
-function attackComplete() {
-    console.log(attackWinner + " confirmed. change attack battle winner confirmation");
+function attackChosen() {
 
 
-    //attack winner confirmed, go from here after attack
+    console.log("attack confirmed");
 
-    //attackWinnerConfirmed(attackWinner);
+    //update battle decks
+
+    //load game mods
+
+    //change focus
+
+
+
+
+    //go to battle screen 
+
+    //future version
+    //check if deck has defended, if not go to plane chooser
+
+
 }
 
 
@@ -80,6 +93,7 @@ function battleScreenCleanup() {
     gameVars.battleScreenInfo.battlePlayersCount = [];
     gameVars.battleScreenInfo.battleDecks = [];
     gameVars.battleScreenInfo.battleWinners = [];
+    gameVars.battleScreenInfo.groundZero = "";
 }
 
 function findBattleDeckNameWithPlayer(currentBattlePlayer) {
@@ -132,7 +146,7 @@ function battleWinnerConfirmed() {
                 setupComplete();
             break;
             case "attack":
-                attackComplete();
+                attackChosen();
             break;
             default: console.log("battle winner error");
         }

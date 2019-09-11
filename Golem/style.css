@@ -66,6 +66,18 @@
     height: 1038px;
 }
 
+.map-attack {
+background-color: yellow;
+}
+
+.map-defend {
+background-color: red;
+}
+
+.map-join {
+background-color: blue;
+}
+
 .hide-item-class {
     display: none;
 }

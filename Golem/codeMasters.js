@@ -1,5 +1,14 @@
 //Code Masters
 
+function isItemInArray(item, array) {
+    for (var i = 0; i < array.length; i++) {
+        if (item === array[i]) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function findFullCountryWithDeckPlayerAndDeckName(deckPlayer, deckName) {
     for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
         if (!!gameVars.mapInfo.countryList[i].deck && gameVars.mapInfo.countryList[i].deck.deckPlayer === deckPlayer && gameVars.mapInfo.countryList[i].deck.deckName === deckName) {

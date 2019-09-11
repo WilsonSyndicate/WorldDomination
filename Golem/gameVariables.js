@@ -1,5 +1,6 @@
-//add intro screen at beginning of game and at top of turn
-//attack select
+//attack battle screen
+//supply drop
+//game ends
 
 
 //Admin Settings
@@ -19,14 +20,10 @@ const adminSettings = {
 //Game Variables
 var gameVars = {
     battleScreenInfo: {
+        groundZero: "",
         battlePlayersCount: [],
         battleDecks: [],
-        battleWinners: [],
-        mapPossibleAttacks: [],
-        mapCurrentPlayerCountries: [],
-        mapPossibleJoinAttack: [],
-        mapConfirmedJoiner: [],
-        mapAlreadyAttacked: []
+        battleWinners: []
     },
     gameLog: [],
     globalGameOptions: {
@@ -44,6 +41,8 @@ var gameVars = {
     },
     mapInfo: {
         mapSelect: [],
+        possibleBattle: [],
+        alreadyAttacked: [],
         countryList: [
             {countryName: 'Afghanistan', country: 'afghanistan', continent: 'Asia', color: 'G', borders: ['ural', 'china','india','middle-east','ukraine']},
             {countryName: 'Alaska', country: 'alaska', continent: 'North America', color: 'W', borders: ['kamchatka', 'northwest-territory','alberta']},

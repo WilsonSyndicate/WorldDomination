@@ -15,73 +15,131 @@ function mapSelectPlayerNotSelected(countryPlayer) {
     return true;
 }
 
+function isPlayerNotOnDeckList(player, deckList) {
+    for (var i = 0; i < deckList.length; i++) {
+        var currentDeckPlayer = deckList[i].deckPlayer;
+
+        if (currentDeckPlayer === player) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function markToSurroundingPossibleBattle(country, classToAdd) {
+    var fullCountry = findFullCountryWithCountry(country),
+    playersToExclude = gameVars.mapInfo.mapSelect;
+    
+    if (!!fullCountry.deck) {
+        for (var i = 0; i < fullCountry.borders.length; i++) {
+            var currentBorderCountry = fullCountry.borders[i];
+
+            if (!!findFullCountryWithCountry(currentBorderCountry).deck && isPlayerNotOnDeckList(findFullCountryWithCountry(currentBorderCountry).deck.deckPlayer, playersToExclude)) {
+                addClass(fullCountry.borders[i], classToAdd);
+                gameVars.mapInfo.possibleBattle.push(fullCountry.borders[i]);
+            }
+        }
+    }
+}
+
+function isPlayerOnCountry(player, country) {
+    if (!!findFullCountryWithCountry(country).deck && findFullCountryWithCountry(country).deck.deckPlayer === player) {
+        return true;
+    }
+    return false;
+}
+
+function selectAttacker(country, countryDeck, currentTurnPlayerName, countryDeckName) {
+    //remove all attack classes
+    removeAllClassFromMapbuttons("attack-threat");
+    removeAllClassFromMapbuttons("join-threat");
+    removeAllClassFromMapbuttons("map-attack");
+    removeAllClassFromMapbuttons("map-defend");
+    removeAllClassFromMapbuttons("map-join");
+
+    //remove button to accept attack
+    removeElement("map-screen-toolbar", "confirm-attack");
+
+    //clear ground zero
+    gameVars.battleScreenInfo.groundZero = "";
+
+    //make mapSelect = deck on country clicked
+    gameVars.mapInfo.mapSelect = [countryDeck];
+
+    //highlight as attacker
+    addClass(country, "map-attack");
+
+    //add bordering countries with deck and not same player as on map select as possible battle and highlight as possible attack
+    gameVars.mapInfo.possibleBattle = [];
+    markToSurroundingPossibleBattle(country, "attack-threat");
+
+    //update map message and note with countryDeckName
+    document.getElementById("map-message").innerHTML = currentTurnPlayerName + " Choose Country To Attack";
+    document.getElementById("map-note").innerHTML = countryDeckName + " attacks... ";
+}
+
+function selectDefender(country, countryPlayer, countryDeckName) {
+    removeAllClassFromMapbuttons("join-threat");
+
+    //add button to accept attack
+    addElement("map-screen-toolbar", "button", "Confirm Attack", "confirm-attack", "attack-button", attackChosen);
+
+    //highlight as defender
+    addClass(country, "map-defend");
+
+    //remove attack threat class
+    removeAllClassFromMapbuttons("attack-threat");
+
+    //set ground zero
+    gameVars.battleScreenInfo.groundZero = country;
+
+    //push to mapSelect
+    gameVars.mapInfo.mapSelect.push({deckPlayer: countryPlayer, deckName: countryDeckName});
+
+    //add bordering countries with deck and not same player as on map select as possible battle and highlight as possible joiner
+    gameVars.mapInfo.possibleBattle = [];
+    markToSurroundingPossibleBattle(country, "join-threat");
+}
+
+function selectJoiner(country, countryPlayer, countryDeckName) {
+    removeAllClassFromMapbuttons("join-threat");
+
+    //highlight as joiner
+    addClass(country, "map-join");
+
+    //push to mapSelect
+    gameVars.mapInfo.mapSelect.push({deckPlayer: countryPlayer, deckName: countryDeckName});
+
+    //add bordering countries with deck and not same player as on map select as possible battle and highlight as possible joiner
+    gameVars.mapInfo.possibleBattle = [];
+    markToSurroundingPossibleBattle(gameVars.battleScreenInfo.groundZero, "join-threat");
+}
+
 function attackCountryClicked(country) {
     var currentTurnPlayer = gameVars.gameStatus.turn,
     currentTurnPlayerName = gameVars.playerInfo["player" + currentTurnPlayer].playerName,
     currentClick = gameVars.mapInfo.mapSelect.length,
-    countryDeck = findDeckWithCountry(country),
-    countryBorders = gameVars.mapInfo.countryList[findCountryRef(country)].borders;
+    countryDeck = findDeckWithCountry(country);
 
     if (!!countryDeck) {
         var countryPlayer = countryDeck.deckPlayer,
         countryDeckName = shownDeckName(countryPlayer, countryDeck.deckName);
 
         if (currentTurnPlayer === countryPlayer) {
-            //clear previous selection
-            removeAllClassFromMapbuttons("attack-threat");
-            removeAllClassFromMapbuttons("join-threat");
-            //add deck to mapSelect
-            gameVars.mapInfo.mapSelect = [countryDeck];
-            //update message and note
-            document.getElementById("map-message").innerHTML = currentTurnPlayerName + " Choose Country To Attack";
-            document.getElementById("map-note").innerHTML = countryDeckName + " attacks... ";
-            //highlight border countries not controlled by curentTurnPlayer as attack threat
-            for (var i = 0; i < countryBorders.length; i++) {
-                var checkForDeck = !!findFullCountryWithCountry(countryBorders[i]).deck;
+            selectAttacker(country, countryDeck, currentTurnPlayerName, countryDeckName);
 
-                if (checkForDeck && findFullCountryWithCountry(countryBorders[i]).deck.deckPlayer !== currentTurnPlayer) {
-                    addClass(countryBorders[i], "attack-threat");
-                }
-            }
         }
-        else {
-            switch (currentClick) {
-                case 0:
-                    document.getElementById("map-note").innerHTML = "Choose one of " + currentTurnPlayerName + "'s decks to attack";
-                break;
-                case 1:
-                    //refactor this and use variables to simplify
-
-
-
-
-
-                    //if countryclicked borders first click && player is not currentturnplayer
-                    var borderingCountryCheck = doesCountryBorderFullCountry(country, findFullCountryWithCountry(findFullCountryWithDeckPlayerAndDeckName(gameVars.mapInfo.mapSelect[0])));
-                    
-                    if (borderingCountryCheck && currentTurnPlayer !== countryPlayer) {
-                        //add deck to map select
-                        gameVars.mapInfo.mapSelect.push(countryDeck);
-                        //update message and note
-                        document.getElementById("map-message").innerHTML = currentTurnPlayerName + " Choose Country To Attack";
-                        document.getElementById("map-note").innerHTML = countryDeckName + " attacks... ";
-                        //hightlight border countries not controlled by either player as join-threat
-                        for (var i = 0; i < countryBorders.length; i++) {
-                            var checkForDeck = !!findFullCountryWithCountry(countryBorders[i]).deck;
-            
-                            if (checkForDeck && mapSelectPlayerNotSelected(countryPlayer)) {
-                                addClass(countryBorders[i], "join-threat");
-                            }
-                        }
-                        //add button to accept attack
+        else if (isItemInArray(country, gameVars.mapInfo.possibleBattle)){
+            for (var i = 0; i < gameVars.mapInfo.possibleBattle.length; i++) {
+                if (gameVars.mapInfo.possibleBattle[i] === country) {
+                    if (currentClick > 1) {
+                        selectJoiner(country, countryPlayer, countryDeckName);
                     }
-                break;
-                case 2:
-    
-                break;
-                default:
-            }
-            
+                    else {
+                        selectDefender(country, countryPlayer, countryDeckName);
+                    }
+                }
+            }   
         }
     }
 }
@@ -98,7 +156,6 @@ function mapCountryClick(country) {
         break;
         default: console.log("Mode not found in mapCountryClick");
     }
-    //refreshMapButtonColors();
 }
 
 function countryMapName(currentCountry) {
@@ -142,7 +199,6 @@ function buildMapButtons() {
 function beginAttack() {
     var currentTurnPlayerNumber = gameVars.gameStatus.turn,
     currentTurnPlayerName = findPlayerName(currentTurnPlayerNumber);
-    
 
     if (gameVars.gameStatus.mode === "setup") {
         showPregame();
@@ -166,6 +222,7 @@ function topOfTurn() {
     //change mode
     gameVars.gameStatus.mode = "attack";
 
+    //go to intro screen
     showIntro();
 }
 
@@ -205,6 +262,9 @@ function setupContinentCheck() {
 }
 
 function setupMapInformation() {
+
+    //needs to delete all decks off countries here
+
     var countryCount = gameVars.mapInfo.countryList.length,
     playerCount = gameVars.globalGameOptions.totalPlayers,
     countriesPerPlayer = Math.floor(countryCount/playerCount),
