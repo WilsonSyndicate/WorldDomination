@@ -75,7 +75,7 @@ function selectAttacker(country, countryDeck, currentTurnPlayerName, countryDeck
 
     //update map message and note with countryDeckName
     document.getElementById("map-message").innerHTML = currentTurnPlayerName + " Choose Country To Attack";
-    document.getElementById("map-note").innerHTML = countryDeckName + " attacks... ";
+    document.getElementById("map-note").innerHTML = countryDeckName + " attacks ";
 }
 
 function selectDefender(country, countryPlayer, countryDeckName) {
@@ -99,6 +99,9 @@ function selectDefender(country, countryPlayer, countryDeckName) {
     //add bordering countries with deck and not same player as on map select as possible battle and highlight as possible joiner
     gameVars.mapInfo.possibleBattle = [];
     markToSurroundingPossibleBattle(country, "join-threat");
+
+    //update note with deck shown name
+    document.getElementById("map-note").innerHTML += shownDeckName(countryPlayer, countryDeckName);
 }
 
 function selectJoiner(country, countryPlayer, countryDeckName) {
@@ -113,6 +116,9 @@ function selectJoiner(country, countryPlayer, countryDeckName) {
     //add bordering countries with deck and not same player as on map select as possible battle and highlight as possible joiner
     gameVars.mapInfo.possibleBattle = [];
     markToSurroundingPossibleBattle(gameVars.battleScreenInfo.groundZero, "join-threat");
+
+    //update note with deck shown name
+    document.getElementById("map-note").innerHTML += " with " + shownDeckName(countryPlayer, countryDeckName);
 }
 
 function attackCountryClicked(country) {
@@ -133,10 +139,10 @@ function attackCountryClicked(country) {
             for (var i = 0; i < gameVars.mapInfo.possibleBattle.length; i++) {
                 if (gameVars.mapInfo.possibleBattle[i] === country) {
                     if (currentClick > 1) {
-                        selectJoiner(country, countryPlayer, countryDeckName);
+                        selectJoiner(country, countryPlayer, countryDeck.deckName);
                     }
                     else {
-                        selectDefender(country, countryPlayer, countryDeckName);
+                        selectDefender(country, countryPlayer, countryDeck.deckName);
                     }
                 }
             }   

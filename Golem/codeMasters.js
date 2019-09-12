@@ -26,6 +26,12 @@ function doesCountryBorderFullCountry(country, fullCountry) {
     return false;
 }
 
+function findFullDeckWithPlayerAndName(deckPlayer, deckName) {
+    console.log(deckPlayer);
+    console.log(deckName);
+    return gameVars.playerInfo["player" + deckPlayer].playerDecklist[findDeckRef(deckPlayer, deckName)]
+}
+
 function findFullCountryWithCountry(country) {
     for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
         if (gameVars.mapInfo.countryList[i].country === country) {
@@ -205,6 +211,19 @@ function removeElement(parentId, elementId) {
     if (!!document.getElementById(parentId) && document.getElementById(elementId) !== null) {
         document.getElementById(parentId).removeChild(document.getElementById(elementId));
     }
+}
+
+function gameCount() {
+    var count = 0;
+
+    for (var i = 0; i < gameVars.gameLog.length; i++) {
+        var endGameLogs = gameVars.gameLog[i][1].slice(-8);
+
+        if (endGameLogs === "Complete") {
+            count += 1;
+        }
+    }
+    return count;
 }
 
 function updateLog(text) {

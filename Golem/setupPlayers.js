@@ -15,7 +15,7 @@ function cleanupPlayerDeckLists() {
             currentPlayerDecklist[d].deckAttacksMade = 0;
             currentPlayerDecklist[d].deckTimesDefended = 0;
             currentPlayerDecklist[d].deckGamesPlayed = 0;
-            currentPlayerDecklist[d].deckwins = 0;
+            currentPlayerDecklist[d].deckWins = 0;
             currentPlayerDecklist[d].deckUniqueId = {deckPlayer: currentPlayer, deckName: currentPlayerDecklist[d].deckName};
         }
     }
@@ -37,8 +37,8 @@ function setupComplete() {
     randomSetup = true;//change when placement setup enabled
 
     //log end of game, add winner decks in order
-    for (var i = 0; i < gameVars.battleScreenInfo.battleWinners.length; i++) {
-        var currentBattlePlayer = gameVars.battleScreenInfo.battleWinners[i],
+    for (var i = 0; i < gameVars.battleScreenInfo.battleWinner.length; i++) {
+        var currentBattlePlayer = gameVars.battleScreenInfo.battleWinner[i],
         currentBattleDeck = findBattleDeckNameWithPlayer(currentBattlePlayer);
 
         logText.push([currentBattlePlayer, currentBattleDeck]);
@@ -46,10 +46,10 @@ function setupComplete() {
     updateLog(logText)
 
     //update turn order
-    gameVars.gameStatus.turnOrder = gameVars.battleScreenInfo.battleWinners;
+    gameVars.gameStatus.turnOrder = gameVars.battleScreenInfo.battleWinner;
 
     //update turn
-    gameVars.gameStatus.turn = gameVars.battleScreenInfo.battleWinners[0];
+    gameVars.gameStatus.turn = gameVars.battleScreenInfo.battleWinner[0];
     
     //cleanup decklists
     cleanupPlayerDeckLists();

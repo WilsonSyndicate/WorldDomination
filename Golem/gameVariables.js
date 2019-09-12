@@ -1,7 +1,15 @@
+//unhide decks on attack confirmation
+//add attacking country to already attacked list on attack confirmation
+
 //attack battle screen
 //supply drop
 //game ends
 
+
+
+//future versions
+//placement setup
+//defense plane
 
 //Admin Settings
 const adminSettings = {
@@ -23,7 +31,7 @@ var gameVars = {
         groundZero: "",
         battlePlayersCount: [],
         battleDecks: [],
-        battleWinners: []
+        battleWinner: []
     },
     gameLog: [],
     globalGameOptions: {
