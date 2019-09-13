@@ -14,6 +14,7 @@ function cleanupPlayerDeckLists() {
             currentPlayerDecklist[d].deckVanguards = [];
             currentPlayerDecklist[d].deckAttacksMade = 0;
             currentPlayerDecklist[d].deckTimesDefended = 0;
+            currentPlayerDecklist[d].deckTimesJoined = 0;          
             currentPlayerDecklist[d].deckGamesPlayed = 0;
             currentPlayerDecklist[d].deckWins = 0;
             currentPlayerDecklist[d].deckUniqueId = {deckPlayer: currentPlayer, deckName: currentPlayerDecklist[d].deckName};

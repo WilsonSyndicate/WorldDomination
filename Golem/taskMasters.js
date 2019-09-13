@@ -398,50 +398,7 @@ function tfyn(tf) {
 
 
 
-function calcDuration(duration) {
-    //parts borrowed from Stack Overflow https://stackoverflow.com/questions/19700283/how-to-convert-time-milliseconds-to-hours-min-sec-format-in-javascript
-    let remain = duration;
 
-    let days = Math.floor(remain / (1000 * 60 * 60 * 24));
-    remain = remain % (1000 * 60 * 60 * 24);
-  
-    let hours = Math.floor(remain / (1000 * 60 * 60));
-    remain = remain % (1000 * 60 * 60);
-  
-    let minutes = Math.floor(remain / (1000 * 60));
-    remain = remain % (1000 * 60);
-  
-    let seconds = Math.floor(remain / (1000));
-    remain = remain % (1000);
-  
-    let milliseconds = remain;
-
-    return {
-        days, 
-        hours, 
-        minutes, 
-        seconds, 
-        milliseconds
-    };
-}
-
-function formatDuration(duration) {
-    var time = calcDuration(duration);
-
-    let days = time.days.toString();
-    if (days.length === 1) days = '0' + days;
-
-    let hours = time.hours.toString();
-    if (hours.length === 1) hours = '0' + hours;
-  
-    let minutes = time.minutes.toString();
-    if (minutes.length === 1) minutes = '0' + minutes;
-  
-    let seconds = time.seconds.toString();
-    if (seconds.length === 1) seconds = '0' + seconds;
-  
-    return days + ":" + hours + ":" + minutes + ":" + seconds;
-}
 
 function setIdWithPlayerTextColor(id, player) {
     var currentPlayerTextColor = gameVars.playerInfo["Player" + player].textColor;

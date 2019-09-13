@@ -1,5 +1,52 @@
 //Code Masters
 
+function removeItemFromArray(itemToRemove, array) {
+    var newArray = [];
+
+    for (var i = 0; i < array.length; i++) {
+        if (array[i] !== itemToRemove) {
+            newArray.push(array[i]);
+        }
+    }
+    return newArray;
+}
+
+function findFullPlayerWithPlayerNumber(playerNumber) {
+    for (var i = 1; i <= gameVars.globalGameOptions.totalPlayers; i++) {
+        if (playerNumber === i) {
+            return gameVars.playerInfo["player" + i];
+        }
+    }
+}
+/*
+function findPlayersNotCurrentPlayer() {
+    var currentPlayer = gameVars.gameStatus.turn,
+    playerList = [];
+
+    for (var i = 0; i < gameVars.gameStatus.turnOrder.length; i++) {
+        if (gameVars.gameStatus.turnOrder[i] === currentPlayer) {
+            playerList.push(gameVars.gameStatus.turnOrder[i]);
+        }
+    }
+    return playerList;
+}
+
+
+function findFullCountryWithPlayerNumberAndDeckName(deckPlayer, deckName) {
+    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
+        var currentCountry = gameVars.mapInfo.countryList[i];
+
+        if (!!currentCountry.deck) {
+            var currentCountryDeckPlayer = currentCountry.deck.deckPlayer,
+            currentCountryDeckName = currentCountry.deck.deckName;
+
+            if (currentCountryDeckPlayer === deckPlayer && currentCountryDeckName === deckName) {
+                return currentCountry;
+            }
+        }
+    }
+}
+*/
 function isItemInArray(item, array) {
     for (var i = 0; i < array.length; i++) {
         if (item === array[i]) {
@@ -27,8 +74,6 @@ function doesCountryBorderFullCountry(country, fullCountry) {
 }
 
 function findFullDeckWithPlayerAndName(deckPlayer, deckName) {
-    console.log(deckPlayer);
-    console.log(deckName);
     return gameVars.playerInfo["player" + deckPlayer].playerDecklist[findDeckRef(deckPlayer, deckName)]
 }
 
@@ -99,14 +144,11 @@ function showMap() {
 }
 
 function findCountryPlayer(fullCountry) {
-    if (!!country.deck) {
+    if (!!fullCountry.deck) {
         var deckPlayer = fullCountry.deck.deckPlayer,
         deckName = fullCountry.deck.deckName;
 
         return findDeckWithPlayerNumberAndName(deckPlayer, deckName);
-    }
-    else {
-        console.log("no deck on country");
     }
 }
 
@@ -239,7 +281,6 @@ function updateLog(text) {
         logText.push("Game Duration: " + formatDuration(Date.parse(Date()) - lastLog[0]));
     }
     gameVars.gameLog.push(logText);
-    console.log(logText);
 }
 
 function orderArray(array, sortBy) {
@@ -281,3 +322,47 @@ function updateDOMElement(id, text) {
     document.getElementById(id).innerHTML = text;
 }
 
+function calcDuration(duration) {
+    //parts borrowed from Stack Overflow https://stackoverflow.com/questions/19700283/how-to-convert-time-milliseconds-to-hours-min-sec-format-in-javascript
+    let remain = duration;
+
+    let days = Math.floor(remain / (1000 * 60 * 60 * 24));
+    remain = remain % (1000 * 60 * 60 * 24);
+  
+    let hours = Math.floor(remain / (1000 * 60 * 60));
+    remain = remain % (1000 * 60 * 60);
+  
+    let minutes = Math.floor(remain / (1000 * 60));
+    remain = remain % (1000 * 60);
+  
+    let seconds = Math.floor(remain / (1000));
+    remain = remain % (1000);
+  
+    let milliseconds = remain;
+
+    return {
+        days, 
+        hours, 
+        minutes, 
+        seconds, 
+        milliseconds
+    };
+}
+
+function formatDuration(duration) {
+    var time = calcDuration(duration);
+
+    let days = time.days.toString();
+    if (days.length === 1) days = '0' + days;
+
+    let hours = time.hours.toString();
+    if (hours.length === 1) hours = '0' + hours;
+  
+    let minutes = time.minutes.toString();
+    if (minutes.length === 1) minutes = '0' + minutes;
+  
+    let seconds = time.seconds.toString();
+    if (seconds.length === 1) seconds = '0' + seconds;
+  
+    return days + ":" + hours + ":" + minutes + ":" + seconds;
+}

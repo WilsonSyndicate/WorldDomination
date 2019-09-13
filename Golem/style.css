@@ -49,7 +49,9 @@
 }
 
 
-
+.already-attacked {
+    background-color: grey;
+}
 
 #battle-screen {
     border: 2px solid pink;
@@ -67,15 +69,19 @@
 }
 
 .map-attack {
-background-color: yellow;
+    background-color: yellow;
 }
 
 .map-defend {
-background-color: red;
+    background-color: red;
 }
 
 .map-join {
-background-color: blue;
+    background-color: blue;
+}
+
+.not-attackable {
+    background-color: grey; 
 }
 
 .hide-item-class {
@@ -104,10 +110,7 @@ background-color: blue;
     outline: 2px solid lightgrey;
 }
 
-.already-attacked {
-    border: 2px solid lightgray;
-    outline: 2px solid grey;
-}
+
 
 .join-threat {
     border: 2px solid blue;

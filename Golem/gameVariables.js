@@ -1,7 +1,5 @@
-//unhide decks on attack confirmation
-//add attacking country to already attacked list on attack confirmation
 
-//attack battle screen
+
 //supply drop
 //game ends
 
@@ -31,7 +29,8 @@ var gameVars = {
         groundZero: "",
         battlePlayersCount: [],
         battleDecks: [],
-        battleWinner: []
+        battleWinner: [],
+        eliminatedDeck: {}
     },
     gameLog: [],
     globalGameOptions: {
@@ -51,6 +50,7 @@ var gameVars = {
         mapSelect: [],
         possibleBattle: [],
         alreadyAttacked: [],
+        possibleAttack: 0,
         countryList: [
             {countryName: 'Afghanistan', country: 'afghanistan', continent: 'Asia', color: 'G', borders: ['ural', 'china','india','middle-east','ukraine']},
             {countryName: 'Alaska', country: 'alaska', continent: 'North America', color: 'W', borders: ['kamchatka', 'northwest-territory','alberta']},

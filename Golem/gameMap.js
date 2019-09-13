@@ -1,5 +1,43 @@
 //Game Map
 
+function setEndOfTurn() {
+    //clear already attacked list
+
+
+    //set mode
+
+    //set next turn
+
+    //go to intro
+}
+
+function setToMove() {
+
+
+    //update map note and message
+
+
+
+    gameVars.gameStatus.mode = "move";
+    console.log("change mode to move");
+}
+
+function resetMapScreen() {
+    //remove all attack classes
+    removeAllClassFromMapbuttons("attack-threat");
+    removeAllClassFromMapbuttons("join-threat");
+    removeAllClassFromMapbuttons("map-attack");
+    removeAllClassFromMapbuttons("map-defend");
+    removeAllClassFromMapbuttons("map-join");
+    removeAllClassFromMapbuttons("already-attacked");
+
+    //remove button to accept attack
+    removeElement("map-screen-toolbar", "confirm-attack");
+
+    //clear map select
+    gameVars.mapInfo.mapSelect = [];
+}
+
 function removeAllClassFromMapbuttons(classToRemove) {
     for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
         removeClass(gameVars.mapInfo.countryList[i].country, classToRemove);
@@ -79,16 +117,15 @@ function selectAttacker(country, countryDeck, currentTurnPlayerName, countryDeck
 }
 
 function selectDefender(country, countryPlayer, countryDeckName) {
-    removeAllClassFromMapbuttons("join-threat");
-
     //add button to accept attack
     addElement("map-screen-toolbar", "button", "Confirm Attack", "confirm-attack", "attack-button", attackChosen);
 
     //highlight as defender
     addClass(country, "map-defend");
 
-    //remove attack threat class
+    //remove attack and join threat class
     removeAllClassFromMapbuttons("attack-threat");
+    removeAllClassFromMapbuttons("join-threat");
 
     //set ground zero
     gameVars.battleScreenInfo.groundZero = country;
@@ -125,13 +162,14 @@ function attackCountryClicked(country) {
     var currentTurnPlayer = gameVars.gameStatus.turn,
     currentTurnPlayerName = gameVars.playerInfo["player" + currentTurnPlayer].playerName,
     currentClick = gameVars.mapInfo.mapSelect.length,
-    countryDeck = findDeckWithCountry(country);
+    countryDeck = findDeckWithCountry(country),
+    alreadyAttacked = isItemInArray(country, gameVars.mapInfo.alreadyAttacked);
 
     if (!!countryDeck) {
         var countryPlayer = countryDeck.deckPlayer,
         countryDeckName = shownDeckName(countryPlayer, countryDeck.deckName);
 
-        if (currentTurnPlayer === countryPlayer) {
+        if (currentTurnPlayer === countryPlayer && alreadyAttacked === false) {
             selectAttacker(country, countryDeck, currentTurnPlayerName, countryDeckName);
 
         }
@@ -186,18 +224,97 @@ function countryMapName(currentCountry) {
     }
 }
 
+function isCountryAttackable(country) {
+    var currentFullCountry = findFullCountryWithCountry(country);
+
+    if (!!currentFullCountry.deck) {
+        var currentPlayerTurn = gameVars.gameStatus.turn,
+        currentCountryPlayer = currentFullCountry.deck.deckPlayer,
+        currentCountryBorders = [],
+        currentCountryBorderPlayers = [],
+        surroundingCountryWithDifferentPlayer = false;
+
+        //remove countries that attacked from border list
+        for (var b = 0; b < currentFullCountry.borders.length; b++) {
+            var currentBorderCountry = currentFullCountry.borders[b];
+
+            if (!!currentFullCountry.deck && !isItemInArray(currentBorderCountry, gameVars.mapInfo.alreadyAttacked)) {
+                var countryBorderFullCountry = findFullCountryWithCountry(currentBorderCountry);
+
+                currentCountryBorders.push(currentBorderCountry);
+
+                if (!!countryBorderFullCountry.deck) {
+                    var countryBorderPlayer = countryBorderFullCountry.deck.deckPlayer;
+
+                    currentCountryBorderPlayers.push(countryBorderPlayer);
+                }
+                
+            }
+        }
+
+        //does surrounding country have a different player
+        for (var c = 0; c < currentCountryBorderPlayers.length; c++) {
+            if (currentCountryBorderPlayers[c] !== currentPlayerTurn) {
+                surroundingCountryWithDifferentPlayer = true;
+            }
+        }
+
+        //if deck on country is current player turn 
+        if (currentCountryPlayer === currentPlayerTurn) {
+            //if deck on country doesnt have a surrounding country with a different player
+            if (surroundingCountryWithDifferentPlayer === false) {
+                return false;
+            }
+            else {
+                gameVars.mapInfo.possibleAttack += 1;
+            }
+        }
+            
+        //if deck on country is not current player turn
+        else {
+            //if a surrounding country doesnt have a deck is current player turn
+            if (isItemInArray(currentPlayerTurn, currentCountryBorderPlayers) === false) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
 function buildMapButtons() {    
+    //reset possible attack count
+    gameVars.mapInfo.possibleAttack = 0;
+
     for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
         var currentFullCountry = gameVars.mapInfo.countryList[i],
-        currentCountry = currentFullCountry.country;
+        currentCountry = currentFullCountry.country,
+        alreadyAttacked = isItemInArray(currentCountry, gameVars.mapInfo.alreadyAttacked);
 
         removeElement("map-countries", currentCountry);
         addElement("map-countries", "svg", countryMapName(currentFullCountry), currentCountry, "country-button", mapCountryClick);
 
+        //check for player color
         if (!!currentFullCountry.deck) {
             var currentPlayer = currentFullCountry.deck.deckPlayer;
 
             addClass(currentCountry, "player-color-" + currentPlayer);
+        }
+
+
+
+
+
+
+        //for attack mode only
+        if (gameVars.gameStatus.mode === "attack") {
+            //check for already attacked
+            if (alreadyAttacked === true) {
+                addClass(currentCountry, "already-attacked");
+            }
+            //check for attackable
+            if (isCountryAttackable(currentCountry) === false) {
+                addClass(currentCountry, "not-attackable");   
+            }
         }
     }
 }
@@ -268,9 +385,6 @@ function setupContinentCheck() {
 }
 
 function setupMapInformation() {
-
-    //needs to delete all decks off countries here
-
     var countryCount = gameVars.mapInfo.countryList.length,
     playerCount = gameVars.globalGameOptions.totalPlayers,
     countriesPerPlayer = Math.floor(countryCount/playerCount),

@@ -51,14 +51,40 @@ function countBattlePenalties(battleDeckRef) {
     return "";
 }
 
+function updateAttackDefendJoined() {
+    for (var i = 0; i < gameVars.battleScreenInfo.battleDecks.length; i++) {
+        var currentDeck = gameVars.battleScreenInfo.battleDecks[i],
+        currentFullDeck = findFullDeckWithPlayerAndName(currentDeck.deckPlayer, currentDeck.deckName);
 
+        if (i === 0) {
+            currentFullDeck.deckAttacksMade += 1;
+        }
+        else if (i === 1) {
+            currentFullDeck.deckTimesDefended += 1;
+        }
+        else {
+            currentFullDeck.deckTimesJoined += 1;
+        }
+    }
+}
 
+function unhideAllBattleDecks() {
+    for (var i = 0; i < gameVars.battleScreenInfo.battleDecks.length; i++) {
+        var currentDeck = gameVars.battleScreenInfo.battleDecks[i],
+        currentFullDeck = findFullDeckWithPlayerAndName(currentDeck.deckPlayer, currentDeck.deckName);
+
+        currentFullDeck.deckHidden = false;
+    }
+}
 
 function attackChosen() {
-    var attackChoiceConfirmed = confirm("Confirm Attack?"),
-    countGames = numberSuffix(gameCount());
+    var attackChoiceConfirmed = confirm("Confirm Attack?");
 
     if (attackChoiceConfirmed) {
+        var attackingPlayer = gameVars.mapInfo.mapSelect[0].deckPlayer,
+        attackingDeckName = gameVars.mapInfo.mapSelect[0].deckName,
+        countGames = numberSuffix(gameCount());
+
         //update battle deck information
         gameVars.battleScreenInfo.battleDecks = gameVars.mapInfo.mapSelect;
     
@@ -72,7 +98,17 @@ function attackChosen() {
 
         //update log
         updateLog([countGames + " Game Begins"]);
-    
+
+        //add attacking country to already attacked list
+        gameVars.mapInfo.alreadyAttacked.push(findFullCountryWithDeckPlayerAndDeckName(attackingPlayer, attackingDeckName).country);
+
+        //unhide all decks
+        unhideAllBattleDecks();
+
+        //update times attacked, defended and joined
+        updateAttackDefendJoined();
+
+        resetMapScreen();
 
         //future version
         //check if defender has a defense plane, if not go to plane chooser instead of battle
@@ -92,9 +128,7 @@ function battleScreenCleanup() {
     removeElement("battle-screen-toolbar", "confirm-winners");
 
     //clear deck info and buttons
-    for (var i = 0; i < gameVars.battleScreenInfo.battleDecks.length; i++) {
-        removeElement("battle-information", "battle-player" + i);
-    }
+    clearBattleScreenInfomration();
 
     //clear battle variables
     gameVars.battleScreenInfo.battlePlayersCount = [];
@@ -114,10 +148,11 @@ function findBattleDeckNameWithPlayer(currentBattlePlayer) {
 }
 
 function battleWinnerNote(placement) {
-    switch (gameVars.gameStatus.mode) {
-        case "setup": return numberSuffix(placement + 1);
-        case "attack": return "the winner!";
-        default: console.log("battle winner note error");
+    if(gameVars.gameStatus.mode === "setup") {
+        return numberSuffix(placement + 1);
+    }
+    else {
+        return "the winner!";
     }
 }
 
@@ -168,12 +203,11 @@ function showWinningButtonText(winningPlace, totalBattlePlayers) {
     return numberSuffix(winningPlace) + " place";
 }
 
-function findLosingDecksNotDefender(winnerPlayerNumber) {
-    var defenderPlayerNumber = [gameVars.battleScreenInfo.battleDecks[1].deckPlayer],
-    decksToReturn = [];
+function findLosingDecks(winnerPlayerNumber) {
+    var decksToReturn = [];
 
     for (var i = 0; i < gameVars.battleScreenInfo.battleDecks.length; i++) {
-        if (gameVars.battleScreenInfo.battleDecks[i].deckPlayer !== defenderPlayerNumber && gameVars.battleScreenInfo.battleDecks[i].deckPlayer !== winnerPlayerNumber) {
+        if (gameVars.battleScreenInfo.battleDecks[i].deckPlayer !== winnerPlayerNumber) {
             decksToReturn.push(gameVars.battleScreenInfo.battleDecks[i]);
         }
     }
@@ -182,13 +216,79 @@ function findLosingDecksNotDefender(winnerPlayerNumber) {
 
 function findWinningPlayerDesignation(winningPlayer) {
     if (gameVars.battleScreenInfo.battleDecks[0].deckPlayer === winningPlayer) {
-        return "attacker";
+        return "attackerWins";
     }
     else if (gameVars.battleScreenInfo.battleDecks[1].deckPlayer === winningPlayer) {
-        return "defender";
+        return "defenderWins";
     }
     else {
-        return "joiner";
+        return "joinerWins";
+    }
+}
+
+function eliminateDeck(deckPlayer, deckName) {
+    var deckToEliminate = findFullDeckWithPlayerAndName(deckPlayer, deckName),
+    eliminatedDeckCountry = findFullCountryWithDeckPlayerAndDeckName(deckPlayer, deckName),
+    winningPlayerNumber = gameVars.battleScreenInfo.battleWinner.deckPlayer,
+    winningPlayerDeckName = gameVars.battleScreenInfo.battleWinner.deckName,
+    winningDeckCountry = findFullCountryWithDeckPlayerAndDeckName(winningPlayerNumber, winningPlayerDeckName);
+    
+    //mark as eliminated
+    deckToEliminate.deckEleminated = true;
+
+    //add winner to losers country
+    eliminatedDeckCountry.deck = {deckPlayer: winningPlayerNumber, deckName: winningPlayerDeckName};
+
+    //remove winner from its country
+    delete winningDeckCountry.deck;
+
+    //winner gets a supply drop card
+    findFullPlayerWithPlayerNumber(winningPlayerNumber).playerSupplyPoints += 1;
+
+    console.log(deckToEliminate.deckName + " eliminated");
+}
+
+function markDeckAsWinner(deckPlayer, deckName) {
+    var fullDeck = findFullDeckWithPlayerAndName(deckPlayer, deckName);
+
+    gameVars.battleScreenInfo.battleWinner = {deckPlayer: deckPlayer, deckName: deckName};
+    fullDeck.deckWins += 1;
+    fullDeck.deckGamesPlayed += 1;
+
+    //future version
+    //get a vanguard if available
+}
+
+function markDeckAsLoser(deckPlayer, deckName, defenderPlayer) {
+    var fullDeck = findFullDeckWithPlayerAndName(deckPlayer, deckName);
+
+    if (defenderPlayer === deckPlayer) {
+        eliminateDeck(deckPlayer, deckName);
+        gameVars.battleScreenInfo.eliminatedDeck = {deckPlayer: deckPlayer, deckName: deckName};
+    }
+    else {
+        fullDeck.deckPenalties += 1;
+        fullDeck.deckGamesPlayed += 1;
+    }
+}
+
+function clearBattleScreenInfomration() {
+    for (var i = 0; i < gameVars.battleScreenInfo.battleDecks.length; i++) {
+        removeElement("battle-information", "battle-player" + i);
+    }
+}
+
+function getNextTurn() {
+    for (var i = 0; i < gameVars.gameStatus.turnOrder.length; i++) {
+        var currentTurn = gameVars.gameStatus.turn,
+        lastTurn = gameVars.gameStatus.turnOrder[gameVars.gameStatus.turnOrder.length];
+
+        if (currentTurn === lastTurn) {
+            return gameVars.gameStatus.turnOrder[0];
+        }
+        else {
+            return gameVars.gameStatus.turnOrder[i + 1];
+        }
     }
 }
 
@@ -202,77 +302,64 @@ function battleWinner(winningPlayerButton) {
 
         if (winnerConfirmed) {
             var battleDefender = gameVars.battleScreenInfo.battleDecks[1],
-            battleAttacker = gameVars.battleScreenInfo.battleDecks[0],
             battleJoiners = [],
             winningDeck = {deckPlayer: winningPlayerId, deckName: findBattleDeckNameWithPlayer(winningPlayerId)},
-            winningDeckName = winningDeck.deckName,
-            winningFullDeck = findFullDeckWithPlayerAndName(winningPlayerId, winningDeckName),
-            decksToGetPenalties = findLosingDecksNotDefender(winningPlayerId),
+            losingDecks = findLosingDecks(winningPlayerId),
             winnerDesignation = findWinningPlayerDesignation(winningPlayerId),
             logTempNote = [],
             logNote = [];
 
+            //update joiner list
             if (gameVars.battleScreenInfo.battleDecks.length > 2) {
                 for (var i = 2; i < gameVars.battleScreenInfo.battleDecks.length; i++) {
                     battleJoiners.push(gameVars.battleScreenInfo.battleDecks[i]);
                 }
             }
 
-            //all
             //update battle winners
-            gameVars.battleScreenInfo.battleWinner.push(winningDeck);
+            markDeckAsWinner(winningDeck.deckPlayer, winningDeck.deckName);
+            logTempNote.push(winningPlayerName + " playing " + winningDeck.deckName + " won")
 
-            //record winner in deck notes
-            winningFullDeck.deckWins += 1;
-            logTempNote += winningPlayerName + " playing " + findBattleDeckNameWithPlayer(winningPlayerId) + " won, ";
+            //update battle losers
+            for (var i = 0; i < losingDecks.length; i++) {
+                markDeckAsLoser(losingDecks[i].deckPlayer, losingDecks[i].deckName, battleDefender.deckPlayer);
 
-            //record non defending losers in deck notes
-            for (var i = 0; i < decksToGetPenalties.length; i++) {
-                var currentLosingFullDeck = findFullDeckWithPlayerAndName(decksToGetPenalties[i].deckPlayer, decksToGetPenalties[i].deckName);
-            
-                currentLosingFullDeck.deckPenalties += 1;
-                logTempNote += findPlayerName(decksToGetPenalties[i].deckPlayer) + " playing " + decksToGetPenalties[i].deckName + " lost, ";
+                if (gameVars.battleScreenInfo.eliminatedDeck.deckPlayer === losingDecks[i].deckPlayer) {
+                    logTempNote.push(findPlayerName(losingDecks[i].deckPlayer) + " playing " + losingDecks[i].deckName + " lost and was eliminated");
+                }
+                else {
+                    logTempNote.push(findPlayerName(losingDecks[i].deckPlayer) + " playing " + losingDecks[i].deckName + " lost");
+                }
             }
 
-
-
-            //find winning player attack/defend/join designation
-
+            // clear battle screen infomration
+            clearBattleScreenInfomration();
+            
             //log end of battle
-
-            //switch to outcome
+            logNote = ["Battle Game Complete"];
+            logNote.push(logTempNote);
+            updateLog(logNote);
             
+            if (winnerDesignation === "attackerWins") {
+                //change mode to move
+                setToMove();
+            }
 
-
-
-            //if defender wins
             //clear game variables and go to map
-            //be sure  previous attack is not able to attack
-            //all other decks get penatlies
+            gameVars.battleScreenInfo.battleDecks = [];
+            gameVars.battleScreenInfo.battlePlayersCount = 0;
+            gameVars.battleScreenInfo.battleWinner = [];
+            gameVars.battleScreenInfo.groundZero = "";
+            showMap();
 
-            //if joiner wins
-            //defender deck is eliminated and all other decks get penatlies
-            //mark defender as losing in deck notes
-            //winner gets a supply drop card
-            //clear country deck on ground zero and move winner to that country(and clear from previous)
-            //clear game variables and go to map
+            buildMapButtons();
+            //check for earth shaking event
 
-            //if attacker wins 
-            //defender deck is eliminated and all other decks get penatlies
-            //mark defender as losing in deck notes
-            //winner gets a supply drop card
-            //clear country deck on ground zero and move winner to that country(and clear from previous)
-            //change mode to move
-            //clear game variables and go to map
-    
-    
-            
-            console.log(winningPlayerButton + " is the winner");
-            console.log("winner is " + winningPlayerName);
-            console.log("defender is " + battleDefender);
-            console.log("attacker is " + battleAttacker);
-            console.log("battle joiners are " + battleJoiners);
-    
+
+
+
+
+
         }
 
 
