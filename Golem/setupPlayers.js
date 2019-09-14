@@ -28,7 +28,7 @@ function topOfPlacementSetup() {
 
     showMap();
 
-    //future version
+    //future version - placement setup
     //starting with ref 1, add decks in turn order until all decks are set.
     //once setup is complete, go to top of turn
 }

@@ -71,8 +71,8 @@ function updateAttackDefendJoined() {
 function unhideAllBattleDecks() {
     for (var i = 0; i < gameVars.battleScreenInfo.battleDecks.length; i++) {
         var currentDeck = gameVars.battleScreenInfo.battleDecks[i],
-        currentFullDeck = findFullDeckWithPlayerAndName(currentDeck.deckPlayer, currentDeck.deckName);
 
+        currentFullDeck = findFullDeckWithPlayerAndName(currentDeck.deckPlayer, currentDeck.deckName);
         currentFullDeck.deckHidden = false;
     }
 }
@@ -83,7 +83,8 @@ function attackChosen() {
     if (attackChoiceConfirmed) {
         var attackingPlayer = gameVars.mapInfo.mapSelect[0].deckPlayer,
         attackingDeckName = gameVars.mapInfo.mapSelect[0].deckName,
-        countGames = numberSuffix(gameCount());
+        countGames = numberSuffix(gameCount()),
+        groundZero = findFullCountryWithCountry(gameVars.battleScreenInfo.groundZero).countryName;
 
         //update battle deck information
         gameVars.battleScreenInfo.battleDecks = gameVars.mapInfo.mapSelect;
@@ -117,7 +118,7 @@ function attackChosen() {
         showBattle();
 
         //update battle message and note
-        document.getElementById("battle-message").innerHTML = countGames + " Battle Game";
+        document.getElementById("battle-message").innerHTML = countGames + " Battle Game for " + groundZero;
         document.getElementById("battle-note").innerHTML = "Click Winning Deck";
     }
 }
@@ -244,8 +245,6 @@ function eliminateDeck(deckPlayer, deckName) {
 
     //winner gets a supply drop card
     findFullPlayerWithPlayerNumber(winningPlayerNumber).playerSupplyPoints += 1;
-
-    console.log(deckToEliminate.deckName + " eliminated");
 }
 
 function markDeckAsWinner(deckPlayer, deckName) {
@@ -307,7 +306,9 @@ function battleWinner(winningPlayerButton) {
             losingDecks = findLosingDecks(winningPlayerId),
             winnerDesignation = findWinningPlayerDesignation(winningPlayerId),
             logTempNote = [],
-            logNote = [];
+            logNote = [],
+            winningPlayerCountryList = playerCounrtyList(winningPlayerId),
+            remainingAttacks = 0;
 
             //update joiner list
             if (gameVars.battleScreenInfo.battleDecks.length > 2) {
@@ -353,16 +354,18 @@ function battleWinner(winningPlayerButton) {
             showMap();
 
             buildMapButtons();
-            //check for earth shaking event
 
-
-
-
-
-
+            //check current player counrty list for no attackable
+            for (var c = 0; c < winningPlayerCountryList.length; c++) {
+                if (isCountryAttackable(winningPlayerCountryList[c]) === true) {
+                    remainingAttacks += 1;
+                }
+            }
+            if (remainingAttacks === 0) {
+                //force earth shaking event
+                earthShakingEvent();
+            }
         }
-
-
     }
     else {
         var  winningPlayerCount = gameVars.battleScreenInfo.battleWinner.length,

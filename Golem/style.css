@@ -80,9 +80,7 @@
     background-color: blue;
 }
 
-.not-attackable {
-    background-color: grey; 
-}
+
 
 .hide-item-class {
     display: none;
@@ -110,7 +108,13 @@
     outline: 2px solid lightgrey;
 }
 
+.not-attackable {
+    background-color: grey; 
+}
 
+.not-movable {
+    background-color: grey; 
+}
 
 .join-threat {
     border: 2px solid blue;

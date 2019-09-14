@@ -9,17 +9,285 @@ function setEndOfTurn() {
     //set next turn
 
     //go to intro
+    console.log("set end of turn");
+}
+
+function dropCheck() {
+    console.log("Check for drop or forced drop");
+    //force drop or add drop button
+
+
+
+}
+
+
+
+
+function moveComplete() {
+    //future version - continent owned bonus
+    //check for continent owned color
+
+
+    //remove drop button
+
+
+
+    //cleanup info
+    //cleanup battlescreen info
+    gameVars.battleScreenInfo.eliminatedDeck = "";
+    //clear map cancelMoveList
+    gameVars.mapInfo.cancelMoveList = [];
+
+    setEndOfTurn();
+}
+
+function moveDecksBetweenCounries(country1, country2) {
+    var fullCountry1 = findFullCountryWithCountry(country1),
+    fullCountry2 = findFullCountryWithCountry(country2),
+    tempDeck = {};
+
+    if (!!fullCountry2.deck) {
+        tempDeck = fullCountry1.deck;
+        fullCountry1.deck = fullCountry2.deck;
+        fullCountry2.deck = tempDeck;
+    }
+    else {
+        fullCountry2.deck = fullCountry1.deck;
+        delete fullCountry1.deck;
+    }
+}
+
+function isCountryMovable() {
+
+}
+
+
+
+function makeMove(country) {
+    var fullCountry = findFullCountryWithCountry(country),
+    countryBorders = fullCountry.borders;
+
+    console.log("move clicked");
+
+
+
+
+    //having a problem
+    //needs to check if able to move and check off move
+
+
+
+
+
+    //if country is owned by current player
+    if (gameVars.gameStatus.turn === findCountryPlayer(fullCountry)) {
+
+        //clear map select from all countries
+        removeAllClassFromMapbuttons("map-select");
+
+        //if click is next to previous click
+        if (isItemInArray(country, countryBorders)) {
+            //push to map select
+            gameVars.mapInfo.mapSelect.push(country);
+
+            //switch decks on two countries
+            moveDecksBetweenCounries(gameVars.mapInfo.mapSelect[0], gameVars.mapInfo.mapSelect[1]);
+
+            //rebuild map buttons
+            buildMapButtons();
+
+            //mark as move selected
+            addClass(country, "map-select");
+
+            //clear map select
+            gameVars.mapInfo.mapSelect = [];
+        }
+        else {
+            //clear map select
+            gameVars.mapInfo.mapSelect = [];
+
+            //push to map select
+            gameVars.mapInfo.mapSelect.push(country);
+    
+            //mark as move selected
+            addClass(country, "map-select");
+        }
+    }
+    else if (!fullCountry.deck && gameVars.mapInfo.mapSelect.length === 1) {
+
+        if (isItemInArray(country, countryBorders)) {
+            //push to map select
+            gameVars.mapInfo.mapSelect.push(country);
+
+            //switch decks on two countries
+            moveDecksBetweenCounries(gameVars.mapInfo.mapSelect[0], gameVars.mapInfo.mapSelect[1]);
+
+            //rebuild map buttons
+            buildMapButtons();
+
+            //mark as move selected
+            addClass(country, "map-select");
+
+            //clear map select
+            gameVars.mapInfo.mapSelect = [];
+        }
+
+        //second click should be able to click empty country
+
+
+
+    }
+}
+
+
+
+
+
+
+
+
+function earthShakingEvent() {
+    //when attack declined
+
+    //set to move
+    setToMove();
+
+    //show map
+    showMap();
+
+    //rebuild map buttons
+    buildMapButtons();
+}
+
+function declineAttack() {
+    var earthShakingEventConfirmed = confirm("Decline Attack?");
+
+    if (earthShakingEventConfirmed) {
+        earthShakingEvent();
+    }
+}
+
+function cancelMoves() {
+    //set country list to cancel move list
+    gameVars.mapInfo.countryList = gameVars.mapInfo.cancelMoveList;
+
+    //refresh map buttons
+    buildMapButtons();
+}
+
+function listOfContinentsPlayerControlsAndOwns(player) {
+    var allContinents = uniqueListOfContinents(),
+    playerControls = [],
+    playerOwns = [];
+
+    for (var i = 0; i < allContinents.length; i++) {
+        var currentContinent = allContinents[i],
+        currentContinentCountryCount = 0,
+        currentContinentPlayerCount = 0,
+        currentContinentOtherPlayerCount = 0;
+
+        for (var n = 0; n < gameVars.mapInfo.countryList.length; n++) {
+            var currentFullCountry = gameVars.mapInfo.countryList[n];
+
+            if (currentFullCountry.continent === currentContinent) {
+                currentContinentCountryCount += 1;
+
+                if (!!currentFullCountry.deck) {
+                    if (currentFullCountry.deck.deckPlayer === player) {
+                        currentContinentPlayerCount  += 1;
+                    }
+                    else {
+                        currentContinentOtherPlayerCount += 1;
+                    }
+                }
+            }
+        }
+        if (currentContinentOtherPlayerCount === 0 && currentContinentPlayerCount > 0) {
+            playerControls.push(currentContinent);
+        }
+        if (currentContinentPlayerCount === currentContinentCountryCount) {
+            playerOwns.push(currentContinent);
+        }
+    }
+    return [playerControls, playerOwns];
+}
+
+function uniqueListOfContinents() {
+    var continentList = [];
+
+    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
+        continentList.push(gameVars.mapInfo.countryList[i]);
+    }
+    return findUniqueValuesInArray(continentList);
+}
+
+function movesRemainingMessage() {
+    moveText = "";
+
+    for (var i = 0; i < gameVars.mapInfo.mapMoves.length; i++) {
+        var keyName = Object.keys(gameVars.mapInfo.mapMoves[i])[0],
+        keyValue = gameVars.mapInfo.mapMoves[i][keyName];
+
+        if (i > 0 ) {
+            moveText += ", ";
+        }
+        moveText += keyName + ": " + keyValue;
+    }
+    return moveText;
 }
 
 function setToMove() {
+    var continentMoves = listOfContinentsPlayerControlsAndOwns(gameVars.gameStatus.turn)[0],
+    playerMoves = [];
 
+    //remove decline attack button
+    removeElement("map-screen-toolbar", "decline-attack");
+
+    //clear map moves
+    gameVars.mapInfo.mapMoves = [];
+
+    //load reinforcement and continent moves to map moves
+    playerMoves.push({Any: adminSettings.continentMoves.moveAny})
+    for (var i = 0; i < continentMoves.length; i++) {
+        currentMoveContinent = continentMoves[i],
+        currentMoveContinentMoves = adminSettings.continentMoves["move" + currentMoveContinent];
+
+        playerMoves.push({currentMoveContinent: currentMoveContinentMoves})
+    }
+    gameVars.mapInfo.mapMoves = playerMoves
+
+    //backup country list for cancel move button
+    gameVars.mapInfo.cancelMoveList = gameVars.mapInfo.countryList;
+
+    //make cancel move button
+    addElement("map-screen-toolbar", "button", "Reset Map", "cancel-move", "map-button", cancelMoves);
+
+    //make move complete button
+    addElement("map-screen-toolbar", "button", "Move Complete", "complete-move", "map-button", moveComplete);
 
     //update map note and message
-
-
+    document.getElementById("map-message").innerHTML = findPlayerName(gameVars.gameStatus.turn) + " Choose Move";
+    document.getElementById("map-note").innerHTML = "Moves Remaining: " + movesRemainingMessage();
 
     gameVars.gameStatus.mode = "move";
-    console.log("change mode to move");
+}
+
+function returnNonAttackFromJoiners() {
+    //only do so if not attackable
+    for (var i = 0; i < gameVars.mapInfo.joinThreat.length; i++) {
+        if (isCountryAttackable(gameVars.mapInfo.joinThreat[i]) === false) {
+            addClass(gameVars.mapInfo.joinThreat[i], 'not-attackable');
+        }
+    }
+    gameVars.mapInfo.joinThreat = [];
+}
+
+function removeNonAttackFromJoiners() {
+    returnNonAttackFromJoiners();
+    for (var i = 0; i < gameVars.mapInfo.possibleBattle.length; i++) {
+        removeClass(gameVars.mapInfo.possibleBattle[i], 'not-attackable');
+        gameVars.mapInfo.joinThreat.push(gameVars.mapInfo.possibleBattle[i]);
+    }
 }
 
 function resetMapScreen() {
@@ -139,6 +407,8 @@ function selectDefender(country, countryPlayer, countryDeckName) {
 
     //update note with deck shown name
     document.getElementById("map-note").innerHTML += shownDeckName(countryPlayer, countryDeckName);
+
+    removeNonAttackFromJoiners();
 }
 
 function selectJoiner(country, countryPlayer, countryDeckName) {
@@ -171,7 +441,7 @@ function attackCountryClicked(country) {
 
         if (currentTurnPlayer === countryPlayer && alreadyAttacked === false) {
             selectAttacker(country, countryDeck, currentTurnPlayerName, countryDeckName);
-
+            removeNonAttackFromJoiners();
         }
         else if (isItemInArray(country, gameVars.mapInfo.possibleBattle)){
             for (var i = 0; i < gameVars.mapInfo.possibleBattle.length; i++) {
@@ -195,7 +465,11 @@ function mapCountryClick(country) {
         case "attack":
             attackCountryClicked(country);
         break;
-        case "placement" :
+        case "move":
+            makeMove(country);
+        break;
+        case "placement":
+            //future version - placement
             console.log(country + " clicked for placement mode")
         break;
         default: console.log("Mode not found in mapCountryClick");
@@ -293,17 +567,12 @@ function buildMapButtons() {
         removeElement("map-countries", currentCountry);
         addElement("map-countries", "svg", countryMapName(currentFullCountry), currentCountry, "country-button", mapCountryClick);
 
-        //check for player color
+        //all check for player color
         if (!!currentFullCountry.deck) {
             var currentPlayer = currentFullCountry.deck.deckPlayer;
 
             addClass(currentCountry, "player-color-" + currentPlayer);
         }
-
-
-
-
-
 
         //for attack mode only
         if (gameVars.gameStatus.mode === "attack") {
@@ -312,9 +581,29 @@ function buildMapButtons() {
                 addClass(currentCountry, "already-attacked");
             }
             //check for attackable
+            removeClass(currentCountry, "not-attackable");
             if (isCountryAttackable(currentCountry) === false) {
-                addClass(currentCountry, "not-attackable");   
+                addClass(currentCountry, "not-attackable");  
             }
+        }
+        else if (gameVars.gameStatus.mode === "move") {
+
+            //grey out countries that are not owned by current player
+            if (!!currentFullCountry.deck && currentFullCountry.deck.deckPlayer !== gameVars.gameStatus.turn) {
+                addClass(currentCountry, "not-movable");
+            }
+        }
+        else if (gameVars.gameStatus.mode === "drop") {
+
+
+
+
+
+            //grey out countries already dropped
+
+        }
+        else if (gameVars.gameStatus.mode === "placement") {
+            //look at in future version for map placement
         }
     }
 }
@@ -331,10 +620,16 @@ function beginAttack() {
         
         //build map buttons
         buildMapButtons();
-    
+   
+        //create skip attack button
+        addElement("map-screen-toolbar", "button", "Decline Attack", "decline-attack", "map-attack-button", declineAttack);
+
         //update message and note
         document.getElementById("map-message").innerHTML = currentTurnPlayerName + " Choose Your Attack";
         document.getElementById("map-note").innerHTML = "";
+
+        //drop check
+        dropCheck();
     }
 }
 

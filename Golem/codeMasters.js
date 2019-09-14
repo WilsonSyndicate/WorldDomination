@@ -1,4 +1,14 @@
 //Code Masters
+function playerCounrtyList(player) {
+    var countryList = [];
+
+    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
+        if (!!gameVars.mapInfo.countryList[i] && gameVars.mapInfo.countryList[i].deck.deckPlayer === player) {
+            countryList.push(gameVars.mapInfo.countryList[i].country);
+        }
+    }
+    return countryList;
+}
 
 function removeItemFromArray(itemToRemove, array) {
     var newArray = [];
@@ -18,35 +28,7 @@ function findFullPlayerWithPlayerNumber(playerNumber) {
         }
     }
 }
-/*
-function findPlayersNotCurrentPlayer() {
-    var currentPlayer = gameVars.gameStatus.turn,
-    playerList = [];
 
-    for (var i = 0; i < gameVars.gameStatus.turnOrder.length; i++) {
-        if (gameVars.gameStatus.turnOrder[i] === currentPlayer) {
-            playerList.push(gameVars.gameStatus.turnOrder[i]);
-        }
-    }
-    return playerList;
-}
-
-
-function findFullCountryWithPlayerNumberAndDeckName(deckPlayer, deckName) {
-    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
-        var currentCountry = gameVars.mapInfo.countryList[i];
-
-        if (!!currentCountry.deck) {
-            var currentCountryDeckPlayer = currentCountry.deck.deckPlayer,
-            currentCountryDeckName = currentCountry.deck.deckName;
-
-            if (currentCountryDeckPlayer === deckPlayer && currentCountryDeckName === deckName) {
-                return currentCountry;
-            }
-        }
-    }
-}
-*/
 function isItemInArray(item, array) {
     for (var i = 0; i < array.length; i++) {
         if (item === array[i]) {

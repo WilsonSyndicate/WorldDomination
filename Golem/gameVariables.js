@@ -1,4 +1,9 @@
+//empty countries on move should be grey and light to white when clicked next to
 
+
+//earth shaking event detector
+
+//battle confirmation button to show "(player name) wins"
 
 //supply drop
 //game ends
@@ -20,6 +25,15 @@ const adminSettings = {
         attackingHand: 0.9,
         attackingPower: 0.2,
         attackingToughness: 0.3
+    },
+    continentMoves: {
+        "moveAfrica": 3,
+        "moveSouth America": 2,
+        "moveNorth America": 5,
+        "moveAsia": 7,
+        "moveEurope": 5,
+        "moveAustralia": 2,
+        "moveAny": 1
     }
 };
 
@@ -47,10 +61,13 @@ var gameVars = {
         availableSupplyPoints: []
     },
     mapInfo: {
+        mapMoves: [],
         mapSelect: [],
         possibleBattle: [],
+        joinThreat: [],
         alreadyAttacked: [],
         possibleAttack: 0,
+        cancelMoveList: [],
         countryList: [
             {countryName: 'Afghanistan', country: 'afghanistan', continent: 'Asia', color: 'G', borders: ['ural', 'china','india','middle-east','ukraine']},
             {countryName: 'Alaska', country: 'alaska', continent: 'North America', color: 'W', borders: ['kamchatka', 'northwest-territory','alberta']},
