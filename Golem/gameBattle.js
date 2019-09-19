@@ -120,6 +120,9 @@ function attackChosen() {
         //update battle message and note
         document.getElementById("battle-message").innerHTML = countGames + " Battle Game for " + groundZero;
         document.getElementById("battle-note").innerHTML = "Click Winning Deck";
+
+        //remove supply drop button
+        removeElement("map-screen-toolbar", "supply-drop-button");
     }
 }
 
@@ -244,7 +247,15 @@ function eliminateDeck(deckPlayer, deckName) {
     delete winningDeckCountry.deck;
 
     //winner gets a supply drop card
-    findFullPlayerWithPlayerNumber(winningPlayerNumber).playerSupplyPoints += 1;
+    getSupplyCard(winningPlayerNumber);
+}
+
+function getSupplyCard(player) {
+    if (gameVars.globalGameOptions.supplyInfo.supplyDropCardsToDraw.length === 0) {
+        reshuffleSupplyDeck();
+    }
+    var nextSupplyCard = gameVars.globalGameOptions.supplyInfo.supplyDropCardsToDraw.pop();
+    findFullPlayerWithPlayerNumber(player).playerSupplyPoints.push(nextSupplyCard);
 }
 
 function markDeckAsWinner(deckPlayer, deckName) {
@@ -277,27 +288,13 @@ function clearBattleScreenInfomration() {
     }
 }
 
-function getNextTurn() {
-    for (var i = 0; i < gameVars.gameStatus.turnOrder.length; i++) {
-        var currentTurn = gameVars.gameStatus.turn,
-        lastTurn = gameVars.gameStatus.turnOrder[gameVars.gameStatus.turnOrder.length];
-
-        if (currentTurn === lastTurn) {
-            return gameVars.gameStatus.turnOrder[0];
-        }
-        else {
-            return gameVars.gameStatus.turnOrder[i + 1];
-        }
-    }
-}
-
 function battleWinner(winningPlayerButton) {
     var winningPlayerId = Number(winningPlayerButton.slice(14)),
     winningPlayerName = gameVars.playerInfo["player" + winningPlayerId].playerName,
     totalBattlePlayers = gameVars.battleScreenInfo.battlePlayersCount;
 
     if (gameVars.gameStatus.mode === "attack") {
-        var winnerConfirmed = confirm("Confirm Game Winner");
+        var winnerConfirmed = confirm(winningPlayerName + " wins!");
 
         if (winnerConfirmed) {
             var battleDefender = gameVars.battleScreenInfo.battleDecks[1],
@@ -361,9 +358,8 @@ function battleWinner(winningPlayerButton) {
                     remainingAttacks += 1;
                 }
             }
-            if (remainingAttacks === 0) {
-                //force earth shaking event
-                earthShakingEvent();
+            if (winningPlayerId !== gameVars.gameStatus.turn) {  
+                earthShakingEventCheck();
             }
         }
     }

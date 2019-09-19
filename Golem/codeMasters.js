@@ -1,9 +1,24 @@
 //Code Masters
+
+function getNextTurn() {
+    for (var i = 0; i < gameVars.gameStatus.turnOrder.length; i++) {
+        var currentTurn = gameVars.gameStatus.turn,
+        lastTurn = gameVars.gameStatus.turnOrder[gameVars.gameStatus.turnOrder.length - 1];
+
+        if (currentTurn === lastTurn) {
+            return gameVars.gameStatus.turnOrder[0];
+        }
+        else if (gameVars.gameStatus.turnOrder[i] === currentTurn) {
+            return gameVars.gameStatus.turnOrder[i + 1];
+        }
+    }
+}
+
 function playerCounrtyList(player) {
     var countryList = [];
 
     for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
-        if (!!gameVars.mapInfo.countryList[i] && gameVars.mapInfo.countryList[i].deck.deckPlayer === player) {
+        if (!!gameVars.mapInfo.countryList[i].deck && gameVars.mapInfo.countryList[i].deck.deckPlayer === player) {
             countryList.push(gameVars.mapInfo.countryList[i].country);
         }
     }
@@ -125,18 +140,18 @@ function showMap() {
     unhideId("map-screen");
 }
 
-function findCountryPlayer(fullCountry) {
-    if (!!fullCountry.deck) {
-        var deckPlayer = fullCountry.deck.deckPlayer,
-        deckName = fullCountry.deck.deckName;
-
-        return findDeckWithPlayerNumberAndName(deckPlayer, deckName);
+function findCountryPlayer(country) {
+    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
+        if (gameVars.mapInfo.countryList[i].country === country && !!gameVars.mapInfo.countryList[i].deck) {
+            return gameVars.mapInfo.countryList[i].deck.deckPlayer;
+        }
     }
 }
 
 function findUniqueValuesInArray(array) {
     var uniqueArray = [];
 
+    uniqueArray.push(array[0]);
     for (var i = 1; i < array.length; i++) {
         var currentArrayItem = array[i];
 

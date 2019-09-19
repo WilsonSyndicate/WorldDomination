@@ -1,18 +1,21 @@
-//empty countries on move should be grey and light to white when clicked next to
+//returnSupplyDropCard not working
+
+//drop select needs to lock countries clicked and reset needs to unlock
 
 
-//earth shaking event detector
+//end of game check after battle
+//player eliminated check after battle
 
-//battle confirmation button to show "(player name) wins"
 
-//supply drop
-//game ends
-
+//intro screen
 
 
 //future versions
 //placement setup
 //defense plane
+//continent moves
+//continent owned bonus
+//drop to be type specific
 
 //Admin Settings
 const adminSettings = {
@@ -49,8 +52,15 @@ var gameVars = {
     gameLog: [],
     globalGameOptions: {
         totalPlayers: 5,
-        numberOfSupplyPointTypes: 3,
-        numberOfRandomSupplyPoints: 2
+        supplyInfo: {
+            numberOfSupplyPointTypes: 3,//future version to use
+            numberOfRandomSupplyPoints: 2,
+            supplyDropCardsToDraw: [],
+            supplyDropCardsTurnedIn: [],
+            supplyDropQueue: [],
+            maxSupplyPerPerson: 5,
+            droppedPerSession: 3//do not change
+        }
     },
     gameStatus: {
         mode: "setup", //setup placement attack move
@@ -61,13 +71,14 @@ var gameVars = {
         availableSupplyPoints: []
     },
     mapInfo: {
-        mapMoves: [],
+        mapMoves: 0,
         mapSelect: [],
         possibleBattle: [],
         joinThreat: [],
         alreadyAttacked: [],
         possibleAttack: 0,
         cancelMoveList: [],
+        playableSupply: [],
         countryList: [
             {countryName: 'Afghanistan', country: 'afghanistan', continent: 'Asia', color: 'G', borders: ['ural', 'china','india','middle-east','ukraine']},
             {countryName: 'Alaska', country: 'alaska', continent: 'North America', color: 'W', borders: ['kamchatka', 'northwest-territory','alberta']},
@@ -116,7 +127,8 @@ var gameVars = {
     playerInfo: {
         player1: {
             playerName: "Player1",
-            playerSupplyPoints: 0,
+            playerDugout: 0,
+            playerSupplyPoints: [],
             playerDecklist: [
                 {deckName: "Everything Burns", deckColors: "RG"},
                 {deckName: "Evil Eye", deckColors: "B"},
@@ -228,7 +240,8 @@ var gameVars = {
         },
         player2: {
             playerName: "Player2",
-            playerSupplyPoints: 0,
+            playerDugout: 0,
+            playerSupplyPoints: [],
             playerDecklist: [
                 {deckName: "I Have Crabs", deckColors: "U"},
                 {deckName: "Northern Horde", deckColors: "R"},
@@ -361,7 +374,8 @@ var gameVars = {
         },
         player3: {
             playerName: "Player3",
-            playerSupplyPoints: 0,
+            playerDugout: 0,
+            playerSupplyPoints: [],
             playerDecklist: [
                 {deckName: "Big Blue", deckColors: "U"},
                 {deckName: "Big Green", deckColors: "G"},
@@ -524,7 +538,8 @@ var gameVars = {
         },
         player4: {
             playerName: "Player4",
-            playerSupplyPoints: 0,
+            playerDugout: 0,
+            playerSupplyPoints: [],
             playerDecklist: [
                 {deckName: "Wort", deckColors: "BR"},
                 {deckName: "Yamazaki Clan", deckColors: "UR"},
@@ -696,7 +711,8 @@ var gameVars = {
         },
         player5: {
             playerName: "Player5",
-            playerSupplyPoints: 0,
+            playerDugout: 0,
+            playerSupplyPoints: [],
             playerDecklist: [
                 {deckName: "Holy Relics", deckColors: "WB"},
                 {deckName: "Honden of The Myojin", deckColors: "WUBRG"},

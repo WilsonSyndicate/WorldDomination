@@ -116,6 +116,10 @@
     background-color: grey; 
 }
 
+.not-supplyable {
+    background-color: grey;
+}
+
 .join-threat {
     border: 2px solid blue;
     outline: 2px solid green;
@@ -220,7 +224,7 @@
 }
 
 #japan {
-    top: 415px;
+    top: 397px;
     left: 1340px;    
 }
 
@@ -260,7 +264,7 @@
 }
 
 #northwest-territory {
-    top: 228px;
+    top: 212px;
     left: 182px;    
 }
 

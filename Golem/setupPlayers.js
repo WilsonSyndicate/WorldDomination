@@ -22,6 +22,36 @@ function cleanupPlayerDeckLists() {
     }
 }
 
+function buildSupplyPointList() {
+    var supplyPointTypes = gameVars.globalGameOptions.supplyInfo.numberOfSupplyPointTypes,
+    randomSupplyPoints = gameVars.globalGameOptions.supplyInfo.numberOfRandomSupplyPoints,
+    randomCountryList = [],
+    supplyPointList = [],
+    currentSupplyType = 0;
+
+    //create random country list
+    for (var c = 0; c < gameVars.mapInfo.countryList.length; c++) {
+        randomCountryList.push(gameVars.mapInfo.countryList[c].country);
+    }
+    shuffleArray(randomCountryList);
+
+    //country supply points
+    for (var i = 0; i < randomCountryList.length; i++) {
+        currentSupplyType += 1;
+        supplyPointList.push({"supplyType": currentSupplyType, "supplyCountry": randomCountryList[i]});
+
+        if (currentSupplyType === supplyPointTypes) {
+            currentSupplyType = 0;
+        }
+    }
+    //random supply points
+    for (var r = 0; r < randomSupplyPoints; r++) {
+        supplyPointList.push({"supplyType": "wild", "supplyCountry": "none"});
+    }
+    gameVars.globalGameOptions.supplyInfo.supplyDropCardsToDraw = supplyPointList;
+    shuffleArray(gameVars.globalGameOptions.supplyInfo.supplyDropCardsToDraw);
+}
+
 function topOfPlacementSetup() {
     //clear all battle buttons and battle variables
     battleScreenCleanup();
@@ -55,7 +85,6 @@ function setupComplete() {
     //cleanup decklists
     cleanupPlayerDeckLists();
 
-
     if (randomSetup) {
         //set up map
         setupMapInformation();
@@ -67,7 +96,9 @@ function setupComplete() {
         //top of placement setup
         topOfPlacementSetup()
     }
-    
+
+    //build supply point list
+    buildSupplyPointList();
 }
 
 function toIniGame() {
