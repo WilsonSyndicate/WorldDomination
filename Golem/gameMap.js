@@ -3,7 +3,6 @@ function declineAttack() {
     var earthShakingEventConfirmed = confirm("Decline Attack?");
 
     if (earthShakingEventConfirmed) {
-        console.log("attack declined");
         earthShakingEvent();
         //remove confirm attack button
         removeElement("map-screen-toolbar", "confirm-attack");

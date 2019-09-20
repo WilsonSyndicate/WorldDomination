@@ -151,6 +151,7 @@ function findCountryPlayer(country) {
 function findUniqueValuesInArray(array) {
     var uniqueArray = [];
 
+    //remove duplicates
     uniqueArray.push(array[0]);
     for (var i = 1; i < array.length; i++) {
         var currentArrayItem = array[i];

@@ -1,25 +1,19 @@
 // drop map
 
-
-
 function returnSupplyDropCard(country) {
     var currentPlayer = gameVars.gameStatus.turn,
     currentPlayerSupply = gameVars.playerInfo["player" + currentPlayer].playerSupplyPoints;
 
-
-    //needs to find a card with corresponding country
+    //find a card with corresponding country
     for (var i = 0; i < currentPlayerSupply.length; i++) {
         if (currentPlayerSupply[i].supplyCountry === country) {
             //remove it from the current player hand
-            var supplyToMove = currentPlayerSupply[i].slice([i]);
+            var supplyToMove = currentPlayerSupply.splice([i], 1);
             //add it to the turned in set
-            gameVars.globalGameOptions.supplyInfo.supplyDropCardsTurnedIn.push(supplyToMove);
+            gameVars.globalGameOptions.supplyInfo.supplyDropCardsTurnedIn.push(supplyToMove[0]);
         }
     }
-
-    console.log(country + " supply card returned");
 }
-
 
 function dropDeckIntoGame(player, country) {
     var fullPlayer = gameVars.playerInfo["player" + player],
@@ -29,83 +23,55 @@ function dropDeckIntoGame(player, country) {
     newDeckName = deckToDrop.deckName;
 
     //drop deck associated with dugout
-    findFullCountryWithCountry(country).deck = {deckPlayer: newDeckPlayer, deckName: newDeckName};
-    
+    findFullCountryWithCountry(country).deck = {deckPlayer: newDeckPlayer, deckName: newDeckName}; 
     //increase player dugout by 1
     fullPlayer.playerDugout += 1;
-
-
-    console.log("add dugout deck into game");
-
-
     //return deck name
     return newDeckName
 }
 
 function dropWildCard() {
     //only if queue is less than3
-    if (gameVars.globalGameOptions.supplyInfo.supplyDropQueue < 3) {
-
+    if (gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length < 3) {
     //count wild cards used
     var wildCardsPlayed = countWildSupply(gameVars.globalGameOptions.supplyInfo.supplyDropQueue);
-    
     //remove button for corresponding count
     removeElement("map-screen-toolbar", "wild-drop" + wildCardsPlayed);
-    
-    //add to queue list
-    gameVars.globalGameOptions.supplyInfo.supplyDropQueue.push({supplyType: "wild", supplyCountry: "none"});
-
-
-    console.log("play wild card");
+    //mark as chosen
+    chooseSupplyDrop("none");
     }
 }
 
 function reshuffleSupplyDeck() {
-    var countriesToAdd = [],
-    newSupplyDropDeck = [],
-    supplyPointTypes = gameVars.globalGameOptions.supplyInfo.numberOfSupplyPointTypes,
-    currentSupplyType = 0;
-
+    //move each turned in supply to supply to draw
     for (var i = 0; i < gameVars.globalGameOptions.supplyInfo.supplyDropCardsTurnedIn.length; i++) {
-        countriesToAdd.push(gameVars.globalGameOptions.supplyInfo.supplyDropCardsTurnedIn.supplyCountry);
-    }
-    //clear turned in deck
-    gameVars.globalGameOptions.supplyInfo.supplyDropCardsTurnedIn = [];
-    //build new draw pile
-    for (var d = 0; d < countriesToAdd.length; d++) {
-        if (countriesToAdd[d] === "none") {
-            newSupplyDropDeck.push({"supplyType": "wild", "supplyCountry": "none"});
-        }
-        else {
-            currentSupplyType += 1;
-            newSupplyDropDeck.push({"supplyType": currentSupplyType, "supplyCountry": countriesToAdd[d]});
-    
-            if (currentSupplyType === supplyPointTypes) {
-                currentSupplyType = 0;
-            }
-        }
-    }
-    shuffleArray(newSupplyDropDeck);
-    gameVars.globalGameOptions.supplyInfo.supplyDropCardsToDraw = newSupplyDropDeck;
+        var supplyToMove = gameVars.globalGameOptions.supplyInfo.supplyDropCardsTurnedIn.splice([i], 1);
 
-    console.log("supply deck reshuffled");
+        gameVars.globalGameOptions.supplyInfo.supplyDropCardsToDraw.push(supplyToMove[0]);
+    }
+    //shuffle cards to draw
+    shuffleArray(gameVars.globalGameOptions.supplyInfo.supplyDropCardsToDraw);
 }
 
 function makeSupplyDrop() {
+    var supplyDropConfirmation = confirm("Supply Drop to These Countries?");
+
+    if (supplyDropConfirmation) {
     //do this for each country in queue
     for (var i = 0; i < gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length; i++) {
         var country = gameVars.globalGameOptions.supplyInfo.supplyDropQueue[i],
-        fullCountry = findFullCountryWithCountry(country),
         currentPlayerName = findPlayerName(gameVars.gameStatus.turn),
-        logText = "Supply Drop by " + currentPlayerName +" on " + fullCountry.countryName;
-
+        logText = "Supply Drop by " + currentPlayerName,
+        fullCountry = findFullCountryWithCountry(country);
+        
         //wild drop
         if (country === "none") {
-            logText += "Wild Card Dropped";
+            logText += " Wild Card Dropped";
         }
         else {
             //country drop
             if (!!fullCountry.deck) {
+                logText += " on " + fullCountry.countryName;
                 if (gameVars.gameStatus.turn === fullCountry.deck.deckPlayer) {
                     //drop 2 bonuses
                     findFullDeckWithPlayerAndName(fullCountry.deck.deckPlayer, fullCountry.deck.deckName).deckBonuses += 2;
@@ -145,7 +111,6 @@ function makeSupplyDrop() {
                 }
             }
         }
-        console.log(country + " is supply drop country");
         //put supply card in supplyDropCardsTurnedIn
         returnSupplyDropCard(country);
         //update Log
@@ -158,7 +123,7 @@ function makeSupplyDrop() {
     gameVars.gameStatus.mode = "attack";
     //go back to choose attack
     beginAttack();
-    console.log("supply dropped and returned to attack");
+    }
 }
 
 function removeAllWildCardButtons() {
@@ -185,19 +150,26 @@ function clearDropSelect() {
 }
 
 function chooseSupplyDrop(country) {
-    if (isSupplyable(country) && gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length < 3) {
-        if (gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length === 0) {
-            addElement("map-screen-toolbar", "button", "Clear Selected Drops", "drop-select-cancel", "map-button", clearDropSelect);
-        }
-        //add class map select
-        addClass(country, "map-select");
-        //add country to queue
-        gameVars.globalGameOptions.supplyInfo.supplyDropQueue.push(country);
-        //map note
-        document.getElementById("map-note").innerHTML = 3 - gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length;
-        //create make drop button after 3 drops
-        if (gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length === 3) {
-            addElement("map-screen-toolbar", "button", "Make Supply Drop", "make-drop", "map-button", makeSupplyDrop);
+    var isAlreadyClicked = isItemInArray(country, gameVars.globalGameOptions.supplyInfo.supplyDropQueue);
+
+    //check for already clicked
+    if (isAlreadyClicked === false || country === "none") {
+        if (isSupplyable(country) && gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length < 3) {
+            if (gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length === 0) {
+                addElement("map-screen-toolbar", "button", "Clear Selected Drops", "drop-select-cancel", "map-button", clearDropSelect);
+            }
+            if (country !== "none") {
+                //add class map select
+                addClass(country, "map-select");
+            }
+            //add country to queue
+            gameVars.globalGameOptions.supplyInfo.supplyDropQueue.push(country);
+            //map note
+            document.getElementById("map-note").innerHTML = 3 - gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length;
+            //create make drop button after 3 drops
+            if (gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length === 3) {
+                addElement("map-screen-toolbar", "button", "Make Supply Drop", "make-drop", "map-button", makeSupplyDrop);
+            }
         }
     }
 } 
@@ -246,8 +218,6 @@ function goToSupplyDrop() {
     buildWildCardButtons();
     //rebuild map buttons
     buildMapButtons();
-
-    console.log("go to drop");
 }
 
 function selectSupplyDrop() {

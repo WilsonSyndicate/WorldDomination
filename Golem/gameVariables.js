@@ -1,13 +1,9 @@
-//returnSupplyDropCard not working
-
-//drop select needs to lock countries clicked and reset needs to unlock
 
 
 //end of game check after battle
 //player eliminated check after battle
 
-
-//intro screen
+//battle mods
 
 
 //future versions
@@ -15,7 +11,7 @@
 //defense plane
 //continent moves
 //continent owned bonus
-//drop to be type specific
+//drop type specific
 
 //Admin Settings
 const adminSettings = {
@@ -28,6 +24,21 @@ const adminSettings = {
         attackingHand: 0.9,
         attackingPower: 0.2,
         attackingToughness: 0.3
+    },
+    gameBonuses: {
+        "Life": 13,
+        "Opening & Max Hand": 1,
+        "Casting Cost": -1,
+        "Power & Toughness": [1, 1],
+        "Card from Hand Into Play": 1
+    },
+    gamePenalties: {
+        "Life": -7,
+        "Opening & Max Hand": -1,
+        "Casting Cost": 1,
+        "Power & Toughness": [-2, 0],
+        "Counter a Spell": 1,
+        "Exile top": 10
     },
     continentMoves: {
         "moveAfrica": 3,
