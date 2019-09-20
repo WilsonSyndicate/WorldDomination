@@ -3,51 +3,85 @@
 
 
 
-function countBattleLife(battleDeckRef) {
-    return ["Life: ", 20];
+function countBattleLife(bonuses, penalties) {
+    var lifeTotal = 20;
+
+    for (var b = 0; b < bonuses.length; b++) {
+        if (bonuses[b][0] === "life") {
+            lifeTotal += adminSettings.gameBonuses.Life;
+        }
+    }
+    for (var p = 0; p < penalties.length; p++) {
+        if (penalties[p][0] === "life") {
+            lifeTotal += adminSettings.gameBonuses.Life;
+        }
+    }
+    return ["Beginning Life Total: ", lifeTotal];
 }
 
-function countBattleHand(battleDeckRef) {
-    return ["Hand: ", 7];
+function countBattleHand(bonuses, penalties) {
+    var handTotal = 7;
+
+    for (var b = 0; b < bonuses.length; b++) {
+        if (bonuses[b][0] === "hand") {
+            handTotal += adminSettings.gameBonuses.hand;
+        }
+    }
+    for (var p = 0; p < penalties.length; p++) {
+        if (penalties[p][0] === "hand") {
+            handTotal += adminSettings.gameBonuses.hand;
+        }
+    }
+    return ["Opening & Max Hand Size: ", handTotal];
 }
 
-function countBattlePower(battleDeckRef) {
+function countBattlePower(bonuses, penalties) {
     return "";
 }
 
-function countBattleToughness(battleDeckRef) {
+function countBattleToughness(bonuses, penalties) {
     return "";
 }
+
+function countOtherbonuses(bonuses) {
+    return "";
+}
+
+function countOtherPenalties(penalties) {
+    return "";
+}
+
+
+
+
 
 function battleVanguard(battleDeckRef) {
+    //future version
     return "";
 }
 
 function battleDefensePlane(battleDeckRef) {
+    //future version
     return "";
 }
 
 function countCountrySupport(battleDeckRef) {
+    //future version
     return "";
 }
 
 function continentBonuses(battleDeckRef) {
+    //future version
     return "";
 }
 
 function battleHero(battleDeckRef) {
+    //future version
     return "";
 }
 
 function battleConspiracy(battleDeckRef) {
-    return "";
-}
-
-function countBattleBonuses(battleDeckRef) {
-    return "";
-}
-
-function countBattlePenalties(battleDeckRef) {
+    //future version
     return "";
 }
 
@@ -123,7 +157,7 @@ function battleScreenCleanup() {
     removeElement("battle-screen-toolbar", "reset-winners");
     removeElement("battle-screen-toolbar", "confirm-winners");
     //clear deck info and buttons
-    clearBattleScreenInfomration();
+    clearBattleScreenInformation();
     //clear battle variables
     gameVars.battleScreenInfo.battlePlayersCount = [];
     gameVars.battleScreenInfo.battleDecks = [];
@@ -272,7 +306,7 @@ function markDeckAsLoser(deckPlayer, deckName, defenderPlayer) {
     }
 }
 
-function clearBattleScreenInfomration() {
+function clearBattleScreenInformation() {
     for (var i = 0; i < gameVars.battleScreenInfo.battleDecks.length; i++) {
         removeElement("battle-information", "battle-player" + i);
     }
@@ -347,7 +381,7 @@ function battleWinner(winningPlayerButton) {
                 }
             }
             // clear battle screen infomration
-            clearBattleScreenInfomration();
+            clearBattleScreenInformation();
             //log end of battle
             logNote = ["Battle Game Complete"];
             logNote.push(logTempNote);
@@ -384,7 +418,48 @@ function battleWinner(winningPlayerButton) {
             addElement("battle-screen-toolbar", "button", "Cancel", "reset-winners", "noClass", resetWinners);
         }
     }
+}
 
+function findDeckPenalties(deckPlayer, deckName) {
+    if (gameVars.gameStatus.mode === "setup") {
+        return [];
+    }
+    else {
+        var deckRef = findDeckRef(deckPlayer, deckName),
+        penaltyCount = gameVars.playerInfo["player" + deckPlayer].playerDecklist[deckRef].deckPenalties,
+        penaltyList = [];
+
+        for (var i = 0; i < penaltyCount; i++) {
+            var currentPenaltyRoll = getRandomInt(adminSettings.gamePenalties.length);
+
+            penaltyList.push(adminSettings.gamePenalties[currentPenaltyRoll]);
+        }
+        //push penalty total to battle screen info
+        gameVars.battleScreenInfo.battlePenalties.push(penaltyList);
+
+        return penaltyList;
+    }
+}
+
+function findDeckBonuses(deckPlayer, deckName) {
+    if (gameVars.gameStatus.mode === "setup") {
+        return [];
+    }
+    else {
+        var deckRef = findDeckRef(deckPlayer, deckName),
+        bonusCount = gameVars.playerInfo["player" + deckPlayer].playerDecklist[deckRef].findDeckBonuses,
+        bonusList = [];
+    
+        for (var i = 0; i < bonusCount; i++) {
+            var currentBonusRoll = getRandomInt(adminSettings.gameBonuses.length);
+    
+            bonusList.push(adminSettings.gameBonuses[currentBonusRoll]);
+        }
+        //push bonus total to battle screen info
+        gameVars.battleScreenInfo.battleBonuses.push(bonusList);
+    
+        return bonusList;
+    }
 }
 
 function displayBattleInfo(battleDeckRef) {
@@ -395,19 +470,21 @@ function displayBattleInfo(battleDeckRef) {
     battleText = [
         currentPlayerName + " playing " + currentDeckName + " (" + currentDeckColor + ")"
     ],
+    penalties = findDeckPenalties(currentPlayer, currentDeckName),
+    bonuses = findDeckBonuses(currentPlayer, currentDeckName),
     gameMods = [
-        countBattleLife(battleDeckRef),
-        countBattleHand(battleDeckRef),
-        countBattlePower(battleDeckRef),
-        countBattleToughness(battleDeckRef),
+        countBattleLife(bonuses, penalties),
+        countBattleHand(bonuses, penalties),
+        countBattlePower(bonuses, penalties),
+        countBattleToughness(bonuses, penalties),
+        countOtherbonuses(bonuses),
+        countOtherPenalties(penalties),
         battleVanguard(battleDeckRef),
         battleDefensePlane(battleDeckRef),
         countCountrySupport(battleDeckRef),
         continentBonuses(battleDeckRef),
         battleHero(battleDeckRef),
-        battleConspiracy(battleDeckRef),
-        countBattleBonuses(battleDeckRef),
-        countBattlePenalties(battleDeckRef)
+        battleConspiracy(battleDeckRef)
     ];
     //add player and deck name (color)
     addElement("battle-information", "div", battleText, "battle-player" + battleDeckRef, "battle-player");

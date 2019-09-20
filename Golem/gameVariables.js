@@ -12,6 +12,9 @@
 //continent moves
 //continent owned bonus
 //drop type specific
+//country support
+//continent bonus
+//hero and conspiracy
 
 //Admin Settings
 const adminSettings = {
@@ -26,15 +29,16 @@ const adminSettings = {
         attackingToughness: 0.3
     },
     gameBonuses: {
-        "Life": 13,
-        "Opening & Max Hand": 1,
+        "life": 13,
+        "hand": 1,
         "Casting Cost": -1,
         "Power & Toughness": [1, 1],
-        "Card from Hand Into Play": 1
+        "Card from Hand Into Play": 1,
+        "Tutor for Basic Land & Into Play": 1
     },
     gamePenalties: {
         "Life": -7,
-        "Opening & Max Hand": -1,
+        "Opening & Max Hand Size": -1,
         "Casting Cost": 1,
         "Power & Toughness": [-2, 0],
         "Counter a Spell": 1,
@@ -57,6 +61,8 @@ var gameVars = {
         groundZero: "",
         battlePlayersCount: [],
         battleDecks: [],
+        battleBonuses: [],
+        battlePenalties: [],
         battleWinner: [],
         eliminatedDeck: {}
     },
