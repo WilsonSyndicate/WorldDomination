@@ -14,6 +14,17 @@ function getNextTurn() {
     }
 }
 
+function countItemsInArray(item, array) {
+    var count = 0;
+
+    for (var i = 0; i < array.length; i++) {
+        if (array[i] === item) {
+            count += 1;
+        }
+    }
+    return count;
+}
+
 function playerCounrtyList(player) {
     var countryList = [];
 
@@ -96,7 +107,7 @@ function shownDeckName(deckPlayer, deckName) {
     var fullPlayerInfo = gameVars.playerInfo["player" + deckPlayer];
 
     if (fullPlayerInfo.playerDecklist[findDeckRef(deckPlayer, deckName)].deckName === deckName) {
-        var currentPlayerName = fullPlayerInfo.playerDecklist[findDeckRef(deckPlayer, deckName)].deckUniqueId.deckPlayer,
+        var currentPlayerName = findPlayerName(deckPlayer),
         currentDeckName = fullPlayerInfo.playerDecklist[findDeckRef(deckPlayer, deckName)].deckName;
 
         if (fullPlayerInfo.playerDecklist[findDeckRef(deckPlayer, deckName)].deckHidden === true) {
@@ -130,6 +141,7 @@ function showIntro() {
     hideId("map-screen");
     gameVars.gameStatus.focus = "intro";
     unhideId("intro-screen");
+    updateIntroScreen();
 }
 
 function showMap() {

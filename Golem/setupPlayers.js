@@ -1,5 +1,103 @@
 //Player Setup
 
+function introScreenText(currentCountry) {
+    if (!!currentCountry.deck) {
+        var currentDeck = findFullDeckWithPlayerAndName(currentCountry.deck.deckPlayer, currentCountry.deck.deckName),
+        deckText = findPlayerName(findCountryPlayer(currentCountry.country));
+
+        //deck name checked for hidden
+        if (currentDeck.deckHidden === false) {
+            deckText += " playing " + currentDeck.deckName + "(" + currentDeck.deckColors + ")";
+        }
+        //battles played
+        if (currentDeck.deckGamesPlayed > 0) {
+            if (currentDeck.deckGamesPlayed === 1) {
+                deckText += ", " + currentDeck.deckGamesPlayed + " Game Played";
+            }
+            else {
+                deckText += ", " + currentDeck.deckGamesPlayed + " Games Played";
+            }
+        }
+        //bonuses
+        if (currentDeck.deckBonuses > 0) {
+            if (currentDeck.deckBonuses === 1) {
+                deckText += ", " + currentDeck.deckBonuses + " Bonus";
+            }
+            else {
+                deckText += ", " + currentDeck.deckBonuses + " Bonuses";
+            }
+        }
+        //penalties
+        if (currentDeck.deckPenalties > 0) {
+            if (currentDeck.deckPenalties === 1) {
+                deckText += ", " + currentDeck.deckPenalties + " Penalty";
+            }
+            else {
+                deckText += ", " + currentDeck.deckPenalties + " Penalties";
+            }
+        }
+        //future version
+        //add here for future game mod versions like defense plane, hero, conspiracy, vanguards, etc
+    }
+    else {
+        var deckText = "-Empty-";
+    }
+    return deckText;
+}
+
+function updateIntroScreen() {
+    //show country list with player, deck, bonuses and penalties
+    var countryList = [];
+
+    for (var c = 0; c < gameVars.mapInfo.countryList.length; c++) {
+        countryList.push({countryName: gameVars.mapInfo.countryList[c].countryName, countryText: introScreenText(gameVars.mapInfo.countryList[c])}); 
+    }
+    //create table with above info
+    var tableBody = document.getElementById("intro-information"), //reference for body
+    tbl = document.createElement("table"), //table element
+    tblBody = document.createElement("tbody"), //tbody element)
+    tblHeader = document.createElement("thead");
+
+    var tblHeaderValues = ["Country", "Known Information"],
+    tblHeaderRow = document.createElement("tr");
+    
+    //remove previous list
+    removeElement("intro-information", "known-info");
+
+    tblHeader.appendChild(tblHeaderRow);
+    for (var h = 0; h < tblHeaderValues.length; h++) {
+        var headerValue = tblHeaderValues[h],
+        headerCell = document.createElement("th"),
+        headerText = document.createTextNode(headerValue);
+       
+        headerCell.appendChild(headerText);
+        tblHeaderRow.appendChild(headerCell);
+    }
+
+    //creates all cells
+    for (var i = 0; i < countryList.length; i++) { 
+        
+        //creates a table row
+        var row = document.createElement("tr"); 
+
+        //create a td element and text node, make the text node the contents of td and put td at the end of table row
+        for (var j = 0; j < tblHeaderValues.length; j++) { 
+            var currentCountry = countryList[i],
+            values = Object.values(currentCountry),
+            cell = document.createElement("td"),
+            cellText = document.createTextNode(values[j]);
+
+            cell.appendChild(cellText);    
+            row.appendChild(cell);        
+        }
+        tblBody.appendChild(row);
+    }
+    tbl.id = "known-info";
+    tbl.appendChild(tblHeader);
+    tbl.appendChild(tblBody);
+    tableBody.appendChild(tbl);
+}
+
 function cleanupPlayerDeckLists() {
     for (var i = 0; i < gameVars.gameStatus.turnOrder.length; i++) {
         var currentPlayer = gameVars.gameStatus.turnOrder[i]
@@ -75,15 +173,20 @@ function setupComplete() {
         logText.push([currentBattlePlayer, currentBattleDeck]);
     }
     updateLog(logText)
-
     //update turn order
     gameVars.gameStatus.turnOrder = gameVars.battleScreenInfo.battleWinner;
-
     //update turn
     gameVars.gameStatus.turn = gameVars.battleScreenInfo.battleWinner[0];
-    
+    //update tool bar color
+    updateToolbarColors(gameVars.gameStatus.turn);
     //cleanup decklists
     cleanupPlayerDeckLists();
+
+    //future version
+    //setup hero
+
+    //future version
+    //setup conspiracy
 
     if (randomSetup) {
         //set up map
@@ -206,9 +309,9 @@ function changeCurrentSetupPlayer() {
 
     //update background
     for (var i = 1; i < 6; i++) {
-        removeClass("pre-game-screen", "player-color-" + i);
+        removeClass("setup-toolbar", "player-color-" + i);
     }
-    addClass("pre-game-screen", "player-color-" + currentPlayerNumber);
+    addClass("setup-toolbar", "player-color-" + currentPlayerNumber);
     
     //shuffledecklists
     shuffleAllDecklists();

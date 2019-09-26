@@ -16,6 +16,17 @@ function earthShakingEvent() {
     buildMapButtons();
 }
 
+function updateToolbarColors(player) {
+    for (var i = 1; i <= gameVars.globalGameOptions.totalPlayers; i++) {
+        removeClass("map-screen-toolbar", "not-attackable" + i);
+        removeClass("battle-screen-toolbar", "not-attackable" + i);
+        removeClass("intro-screen-toolbar", "not-attackable" + i);
+    }
+    addClass("map-screen-toolbar", "player-color-" +player);
+    addClass("battle-screen-toolbar", "player-color-" +player);
+    addClass("intro-screen-toolbar", "player-color-" +player);
+}
+
 function setEndOfTurn() {
     //set mode
     gameVars.gameStatus.mode = "attack"
@@ -23,6 +34,8 @@ function setEndOfTurn() {
     gameVars.gameStatus.turn = getNextTurn();
     //go to intro
     showIntro();
+    //update toolbar colors
+    updateToolbarColors(gameVars.gameStatus.turn)
 }
 
 function moveComplete() {
@@ -69,7 +82,7 @@ function countMapMoves() {
     var continentMoves = listOfContinentsPlayerControlsAndOwns(gameVars.gameStatus.turn)[0],
     playerMoves = adminSettings.continentMoves.moveAny;
 
-    if (continentMoves.length >0) {
+    if (continentMoves.length > 0) {
         for (var i = 0; i < continentMoves.length; i++) {
             var currentMoveContinent = "move" + continentMoves[i],
             currentMoveContinentMoves = adminSettings.continentMoves[currentMoveContinent];
@@ -187,6 +200,7 @@ function makeMove(country) {
             addClass(country, "map-select");
         }
     }
+    document.getElementById("map-note").innerHTML = "Moves Remaining: " + gameVars.mapInfo.mapMoves;
 }
 
 function listOfContinentsPlayerControlsAndOwns(player) {
@@ -230,7 +244,7 @@ function uniqueListOfContinents() {
     var continentList = [];
 
     for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
-        continentList.push(gameVars.mapInfo.countryList[i]);
+        continentList.push(gameVars.mapInfo.countryList[i].continent);
     }
     return findUniqueValuesInArray(continentList);
 }

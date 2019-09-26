@@ -1,19 +1,29 @@
 
 
 
+function endOfGame(winningPlayer) {
+    var winningName = findPlayerName(winningPlayer);
 
+    showIntro();
+
+    gameVars.gameStatus.mode = "end";
+
+    document.getElementById("intro-screen-toolbar").innerHTML = winningName + " wins!";
+
+
+}
 
 function countBattleLife(bonuses, penalties) {
     var lifeTotal = 20;
 
     for (var b = 0; b < bonuses.length; b++) {
-        if (bonuses[b][0] === "life") {
-            lifeTotal += adminSettings.gameBonuses.Life;
+        if (bonuses[b] === 0) {
+            lifeTotal += adminSettings.gameBonuses[0].life;
         }
     }
     for (var p = 0; p < penalties.length; p++) {
-        if (penalties[p][0] === "life") {
-            lifeTotal += adminSettings.gameBonuses.Life;
+        if (penalties[p] === 0) {
+            lifeTotal += adminSettings.gamePenalties[0].life;
         }
     }
     return ["Beginning Life Total: ", lifeTotal];
@@ -23,37 +33,68 @@ function countBattleHand(bonuses, penalties) {
     var handTotal = 7;
 
     for (var b = 0; b < bonuses.length; b++) {
-        if (bonuses[b][0] === "hand") {
-            handTotal += adminSettings.gameBonuses.hand;
+        if (bonuses[b] === 1) {
+            handTotal += adminSettings.gameBonuses[1].hand;
         }
     }
     for (var p = 0; p < penalties.length; p++) {
-        if (penalties[p][0] === "hand") {
-            handTotal += adminSettings.gameBonuses.hand;
+        if (penalties[p] === 1) {
+            handTotal += adminSettings.gamePenalties[1].hand;
         }
     }
     return ["Opening & Max Hand Size: ", handTotal];
 }
 
 function countBattlePower(bonuses, penalties) {
-    return "";
+    var creaturePower = 0;
+    
+    for (var b = 0; b < bonuses.length; b++) {
+        if (bonuses[b] === 2) {
+            creaturePower += adminSettings.gameBonuses[2].creatureMods[0];
+        }
+    }
+    for (var p = 0; p < penalties.length; p++) {
+        if (penalties[p] === 2) {
+            creaturePower += adminSettings.gamePenalties[2].creatureMods[0];
+        }
+    }
+    if (creaturePower >= 0) {
+        creaturePower = "+" + creaturePower;
+    }
+    return creaturePower;
 }
 
 function countBattleToughness(bonuses, penalties) {
-    return "";
+    var creatureToughness = 0;
+    
+    for (var b = 0; b < bonuses.length; b++) {
+        if (bonuses[b][0] === "creatureMods") {
+            creatureToughness += adminSettings.gameBonuses.creatureMods[1];
+        }
+    }
+    for (var p = 0; p < penalties.length; p++) {
+        if (penalties[p][0] === "creatureMods") {
+            creatureToughness += adminSettings.gamePenalties.creatureMods[1];
+        }
+    }
+    if (creatureToughness >= 0) {
+        creatureToughness = "+" + creatureToughness;
+    }
+    return creatureToughness;
 }
 
-function countOtherbonuses(bonuses) {
-    return "";
+function countBattlePowerAndToughness(bonuses, penalties) {
+    var powerCalc = countBattlePower(bonuses, penalties),
+    toughnessCalc = countBattleToughness(bonuses, penalties),
+    creatureMod = powerCalc + "/" + toughnessCalc;
+
+    if (creatureMod === "+0/+0") {
+        return "";
+    }
+    else {
+        return ["Your Creatures Get: ", creatureMod]
+    }
 }
-
-function countOtherPenalties(penalties) {
-    return "";
-}
-
-
-
-
 
 function battleVanguard(battleDeckRef) {
     //future version
@@ -163,6 +204,8 @@ function battleScreenCleanup() {
     gameVars.battleScreenInfo.battleDecks = [];
     gameVars.battleScreenInfo.battleWinner = [];
     gameVars.battleScreenInfo.groundZero = "";
+    gameVars.battleScreenInfo.battleBonuses = [];
+    gameVars.battleScreenInfo.battlePenalties = [];
 }
 
 function findBattleDeckNameWithPlayer(currentBattlePlayer) {
@@ -331,15 +374,30 @@ function eliminatedPlayerCheck(winningDeck, defendingDeck) {
             //check for end of game
             if (playersInGame.length === 1) {
                 //end of game
-                console.log(winningDeck.deckPlayer + " wins the game");
+                endOfGame(winningDeck.deckPlayer);
             }
             //player eliminated
-            console.log(defendingDeck.deckPlayer + " has been eliminated");
-
-
-
-
+            //transfer supply
+            supplyCardsFromTo(defendingDeck.deckPlayer, winningDeck.deckPlayer);
+            //remove from turn and count
+            removeFromTurnOrder(defendingDeck.deckPlayer);
         }
+    }
+}
+
+function removeFromTurnOrder(player) {
+    for (var i = 0; i < gameVars.gameStatus.turnOrder.length; i++) {
+        if (gameVars.gameStatus.turnOrder[i] === player) {
+            gameVars.gameStatus.turnOrder.splice([i], 1);
+        }
+    }
+}
+
+function supplyCardsFromTo(playerFrom, playerTo) {
+    for (var i = 0; i < gameVars.playerInfo["player" + playerFrom].playerSupplyPoints.length; i++) {
+        var supplyToMove = gameVars.playerInfo["player" + playerFrom].playerSupplyPoints.splice([i], 1);
+
+        gameVars.playerInfo["player" + playerTo].playerSupplyPoints.push(supplyToMove[0]);
     }
 }
 
@@ -396,6 +454,8 @@ function battleWinner(winningPlayerButton) {
             gameVars.battleScreenInfo.battlePlayersCount = 0;
             gameVars.battleScreenInfo.battleWinner = [];
             gameVars.battleScreenInfo.groundZero = "";
+            gameVars.battleScreenInfo.battleBonuses = [];
+            gameVars.battleScreenInfo.battlePenalties = [];
             showMap();
             buildMapButtons();
             if (winningPlayerId !== gameVars.gameStatus.turn) {  
@@ -432,11 +492,10 @@ function findDeckPenalties(deckPlayer, deckName) {
         for (var i = 0; i < penaltyCount; i++) {
             var currentPenaltyRoll = getRandomInt(adminSettings.gamePenalties.length);
 
-            penaltyList.push(adminSettings.gamePenalties[currentPenaltyRoll]);
+            penaltyList.push(currentPenaltyRoll);
         }
         //push penalty total to battle screen info
         gameVars.battleScreenInfo.battlePenalties.push(penaltyList);
-
         return penaltyList;
     }
 }
@@ -447,17 +506,16 @@ function findDeckBonuses(deckPlayer, deckName) {
     }
     else {
         var deckRef = findDeckRef(deckPlayer, deckName),
-        bonusCount = gameVars.playerInfo["player" + deckPlayer].playerDecklist[deckRef].findDeckBonuses,
+        bonusCount = gameVars.playerInfo["player" + deckPlayer].playerDecklist[deckRef].deckBonuses,
         bonusList = [];
     
         for (var i = 0; i < bonusCount; i++) {
             var currentBonusRoll = getRandomInt(adminSettings.gameBonuses.length);
     
-            bonusList.push(adminSettings.gameBonuses[currentBonusRoll]);
+            bonusList.push(currentBonusRoll);
         }
         //push bonus total to battle screen info
         gameVars.battleScreenInfo.battleBonuses.push(bonusList);
-    
         return bonusList;
     }
 }
@@ -475,10 +533,7 @@ function displayBattleInfo(battleDeckRef) {
     gameMods = [
         countBattleLife(bonuses, penalties),
         countBattleHand(bonuses, penalties),
-        countBattlePower(bonuses, penalties),
-        countBattleToughness(bonuses, penalties),
-        countOtherbonuses(bonuses),
-        countOtherPenalties(penalties),
+        countBattlePowerAndToughness(bonuses, penalties),
         battleVanguard(battleDeckRef),
         battleDefensePlane(battleDeckRef),
         countCountrySupport(battleDeckRef),

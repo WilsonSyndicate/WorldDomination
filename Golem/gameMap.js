@@ -292,6 +292,9 @@ function buildMapButtons() {
             var currentPlayer = currentFullCountry.deck.deckPlayer;
 
             addClass(currentCountry, "player-color-" + currentPlayer);
+            if (currentFullCountry.deck.deckPlayer === gameVars.gameStatus.turn) {
+                addClass(currentCountry, "current-player");
+            }
         }
         //for attack mode only
         if (gameVars.gameStatus.mode === "attack") {
@@ -331,7 +334,7 @@ function beginAttack() {
     if (gameVars.gameStatus.mode === "setup") {
         showPregame();
     }
-    else {
+    else if (gameVars.gameStatus.mode === "attack") {
         showMap();
         
         //build map buttons
@@ -349,10 +352,9 @@ function beginAttack() {
 
         //ignore drop check if recent log shows drop
         if (gameVars.gameLog[gameVars.gameLog.length - 1][1].substr(0, 11) !== "Supply Drop") {
-        //drop check and forced drop check
-        supplyDropCheck();
+            //drop check and forced drop check
+            supplyDropCheck();
         }
-
     }
 }
 

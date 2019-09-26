@@ -1,20 +1,18 @@
 
-
-//end of game check after battle
-//player eliminated check after battle
-
-//battle mods
+//player info
 
 
 //future versions
+//country support
 //placement setup
 //defense plane
 //continent moves
 //continent owned bonus
 //drop type specific
-//country support
 //continent bonus
 //hero and conspiracy
+//more bonuses and penalties
+//last deck is two headed giant
 
 //Admin Settings
 const adminSettings = {
@@ -28,22 +26,16 @@ const adminSettings = {
         attackingPower: 0.2,
         attackingToughness: 0.3
     },
-    gameBonuses: {
-        "life": 13,
-        "hand": 1,
-        "Casting Cost": -1,
-        "Power & Toughness": [1, 1],
-        "Card from Hand Into Play": 1,
-        "Tutor for Basic Land & Into Play": 1
-    },
-    gamePenalties: {
-        "Life": -7,
-        "Opening & Max Hand Size": -1,
-        "Casting Cost": 1,
-        "Power & Toughness": [-2, 0],
-        "Counter a Spell": 1,
-        "Exile top": 10
-    },
+    gameBonuses: [
+        {"life": 13},
+        {"hand": 1},
+        {"creatureMods": [1, 1]}
+    ],
+    gamePenalties: [
+        {"life": -7},
+        {"hand": -1},
+        {"creatureMods": [-2, 0]}
+    ],
     continentMoves: {
         "moveAfrica": 3,
         "moveSouth America": 2,

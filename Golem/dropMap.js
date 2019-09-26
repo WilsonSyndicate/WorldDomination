@@ -1,5 +1,4 @@
 // drop map
-
 function returnSupplyDropCard(country) {
     var currentPlayer = gameVars.gameStatus.turn,
     currentPlayerSupply = gameVars.playerInfo["player" + currentPlayer].playerSupplyPoints;
@@ -34,7 +33,7 @@ function dropWildCard() {
     //only if queue is less than3
     if (gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length < 3) {
     //count wild cards used
-    var wildCardsPlayed = countWildSupply(gameVars.globalGameOptions.supplyInfo.supplyDropQueue);
+    var wildCardsPlayed = countItemsInArray("none", gameVars.globalGameOptions.supplyInfo.supplyDropQueue);
     //remove button for corresponding count
     removeElement("map-screen-toolbar", "wild-drop" + wildCardsPlayed);
     //mark as chosen
@@ -57,79 +56,79 @@ function makeSupplyDrop() {
     var supplyDropConfirmation = confirm("Supply Drop to These Countries?");
 
     if (supplyDropConfirmation) {
-    //do this for each country in queue
-    for (var i = 0; i < gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length; i++) {
-        var country = gameVars.globalGameOptions.supplyInfo.supplyDropQueue[i],
-        currentPlayerName = findPlayerName(gameVars.gameStatus.turn),
-        logText = "Supply Drop by " + currentPlayerName,
-        fullCountry = findFullCountryWithCountry(country);
-        
-        //wild drop
-        if (country === "none") {
-            logText += " Wild Card Dropped";
-        }
-        else {
-            //country drop
-            if (!!fullCountry.deck) {
-                logText += " on " + fullCountry.countryName;
-                if (gameVars.gameStatus.turn === fullCountry.deck.deckPlayer) {
-                    //drop 2 bonuses
-                    findFullDeckWithPlayerAndName(fullCountry.deck.deckPlayer, fullCountry.deck.deckName).deckBonuses += 2;
-                    //add log text
-                    logText += ": 2 bonuses for " + findPlayerName(fullCountry.deck.deckPlayer) + "'s " + fullCountry.deck.deckName;
-                }
-                else {
-                    //drop 2 penalties
-                    findFullDeckWithPlayerAndName(fullCountry.deck.deckPlayer, fullCountry.deck.deckName).deckPenalties += 2;
-                    //add log text
-                    logText += ": 2 penalties for " + findPlayerName(fullCountry.deck.deckPlayer) + "'s " + fullCountry.deck.deckName;
-                }
+        //do this for each country in queue
+        for (var i = 0; i < gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length; i++) {
+            var country = gameVars.globalGameOptions.supplyInfo.supplyDropQueue[i],
+            currentPlayerName = findPlayerName(gameVars.gameStatus.turn),
+            logText = "Supply Drop by " + currentPlayerName,
+            fullCountry = findFullCountryWithCountry(country);
+            
+            //wild drop
+            if (country === "none") {
+                logText += " Wild Card Dropped";
             }
             else {
-                //drop deck
-                var newDeckName = dropDeckIntoGame(gameVars.gameStatus.turn, country);
-                //add log text
-                logText += ": " + findPlayerName(fullCountry.deck.deckPlayer) + " drops " + newDeckName + " into game";
-            }
-            //border drop
-            for (var b = 0; b < fullCountry.borders.length; b++) {
-                var borderFullCountry = findFullCountryWithCountry(fullCountry.borders[b]);
-
-                if (!!borderFullCountry.deck) {
-                    if (gameVars.gameStatus.turn === borderFullCountry.deck.deckPlayer) {
-                        //drop bonus
-                        findFullDeckWithPlayerAndName(fullCountry.deck.deckPlayer, fullCountry.deck.deckName).deckBonuses += 1;
+                //country drop
+                if (!!fullCountry.deck) {
+                    logText += " on " + fullCountry.countryName;
+                    if (gameVars.gameStatus.turn === fullCountry.deck.deckPlayer) {
+                        //drop 2 bonuses
+                        findFullDeckWithPlayerAndName(fullCountry.deck.deckPlayer, fullCountry.deck.deckName).deckBonuses += 2;
                         //add log text
-                        logText += ": 1 bonus for " + findPlayerName(borderFullCountry.deck.deckPlayer) + "'s " + borderFullCountry.deck.deckName;
+                        logText += ": 2 bonuses for " + findPlayerName(fullCountry.deck.deckPlayer) + "'s " + fullCountry.deck.deckName;
                     }
                     else {
-                        //drop penalty
-                        findFullDeckWithPlayerAndName(fullCountry.deck.deckPlayer, fullCountry.deck.deckName).deckPenalties += 1;
+                        //drop 2 penalties
+                        findFullDeckWithPlayerAndName(fullCountry.deck.deckPlayer, fullCountry.deck.deckName).deckPenalties += 2;
                         //add log text
-                        logText += ": 1 penalty for " + findPlayerName(borderFullCountry.deck.deckPlayer) + "'s " + borderFullCountry.deck.deckName;
+                        logText += ": 2 penalties for " + findPlayerName(fullCountry.deck.deckPlayer) + "'s " + fullCountry.deck.deckName;
+                    }
+                }
+                else {
+                    //drop deck
+                    var newDeckName = dropDeckIntoGame(gameVars.gameStatus.turn, country);
+                    //add log text
+                    logText += ": " + findPlayerName(fullCountry.deck.deckPlayer) + " drops " + newDeckName + " into game";
+                }
+                //border drop
+                for (var b = 0; b < fullCountry.borders.length; b++) {
+                    var borderFullCountry = findFullCountryWithCountry(fullCountry.borders[b]);
+
+                    if (!!borderFullCountry.deck) {
+                        if (gameVars.gameStatus.turn === borderFullCountry.deck.deckPlayer) {
+                            //drop bonus
+                            findFullDeckWithPlayerAndName(fullCountry.deck.deckPlayer, fullCountry.deck.deckName).deckBonuses += 1;
+                            //add log text
+                            logText += ": 1 bonus for " + findPlayerName(borderFullCountry.deck.deckPlayer) + "'s " + borderFullCountry.deck.deckName;
+                        }
+                        else {
+                            //drop penalty
+                            findFullDeckWithPlayerAndName(fullCountry.deck.deckPlayer, fullCountry.deck.deckName).deckPenalties += 1;
+                            //add log text
+                            logText += ": 1 penalty for " + findPlayerName(borderFullCountry.deck.deckPlayer) + "'s " + borderFullCountry.deck.deckName;
+                        }
                     }
                 }
             }
-        }
-        //put supply card in supplyDropCardsTurnedIn
-        returnSupplyDropCard(country);
-        //update Log
-        updateLog([logText]);
-    }
+            //put supply card in supplyDropCardsTurnedIn
+            returnSupplyDropCard(country);
 
-    //clear drop
-    clearDropSelect();
-    //change mode
-    gameVars.gameStatus.mode = "attack";
-    //go back to choose attack
-    beginAttack();
+            //update Log
+            updateLog([logText]);
+        }
+        //clear drop
+        clearDropSelect();
+        //change mode
+        gameVars.gameStatus.mode = "attack";
+        //go back to choose attack
+        beginAttack();
     }
 }
 
 function removeAllWildCardButtons() {
-    for (var i = 0; i < gameVars.globalGameOptions.supplyInfo.numberOfRandomSupplyPoints; i++) {
-        removeElement("map-screen-toolbar", "wild-drop" + i);
-    }
+    console.log("buttons removed");
+    removeElement("map-screen-toolbar", "wild-drop0");
+    removeElement("map-screen-toolbar", "wild-drop1");
 }
 
 function clearDropSelect() {
@@ -145,8 +144,6 @@ function clearDropSelect() {
     removeAllWildCardButtons();
     //remove make drop button
     removeElement("map-screen-toolbar", "make-drop");
-    //add wild card buttons
-    buildWildCardButtons();
 }
 
 function chooseSupplyDrop(country) {
@@ -255,6 +252,7 @@ function supplyDropAvailable(currentSupplyHand) {
     countTypes = countSupplyTypes(currentSupplyHand),
     supplyNeeded = gameVars.globalGameOptions.supplyInfo.droppedPerSession;
 
+    /*
     if (currentSupplyHand.length >= supplyNeeded && countWild >= 1) {
         return true;
     }
@@ -264,7 +262,9 @@ function supplyDropAvailable(currentSupplyHand) {
     else if (currentSupplyHand.length >= supplyNeeded && countTypes === 1) {
         return true;
     }
-    else if (currentSupplyHand.length >= supplyNeeded) {
+    */
+
+    if (currentSupplyHand.length >= supplyNeeded) {
         //future version
         //remove this when drop is type specific
         return true;
@@ -286,6 +286,6 @@ function supplyDropCheck() {
     }
     else if (supplyDropReady === true) {
         //add drop button
-        addElement("map-screen-toolbar", "button", "Supply Drop", "supply-drop-button", "map-buton", selectToSupplyDrop);
+        addElement("map-screen-toolbar", "button", "Supply Drop", "supply-drop-button", "map-buton", selectSupplyDrop);
     }
 }
