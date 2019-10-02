@@ -1,5 +1,8 @@
+//importing fonts
 
-//player info
+
+
+//supply drop button not working
 
 
 //future versions

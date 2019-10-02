@@ -1,48 +1,151 @@
 //Player Setup
 
-function introScreenText(currentCountry) {
+function findIntroLogText(currentLogEntry) {
+    if (currentLogEntry[1].search("Begins") !== -1) {
+        if (currentLogEntry[1].search("Initiation") !== -1) {
+            return currentLogEntry[1];
+        }
+        else {
+            return findPlayerName(currentLogEntry[2]) + " attacks ";
+        }
+    }
+    else if (currentLogEntry[1].search("Complete") !== -1) {
+
+        //having trouble with this
+
+        
+        return "Game ends with " + findPlayerName(currentLogEntry[2][0][0]) + "' " + currentLogEntry[2][0][1] + " as the winner";
+
+
+
+
+
+    }
+    else if (currentLogEntry[1].search("Drop") !== -1) {
+        return "Supply Drop";
+    }
+
+
+
+
+    
+}
+
+function showLogInfo() {
+    if (gameVars.gameLog.length > 0) {
+        var logTextToShow = [];
+
+        for (var i = 0; i < gameVars.gameLog.length; i++) {
+            logTextToShow.push({
+                logEntry: stringToDate(gameVars.gameLog[i][0])[1] + " " + stringToDate(gameVars.gameLog[i][0])[2] + ", " + stringToDate(gameVars.gameLog[i][0])[3],
+                logText: findIntroLogText(gameVars.gameLog[i])
+            });
+        }
+
+
+        //create table with above info
+        var tableBody = document.getElementById("log-information"), //reference for body
+        tbl = document.createElement("table"), //table element
+        tblBody = document.createElement("tbody"), //tbody element)
+        tblHeader = document.createElement("thead");
+
+        var tblHeaderValues = ["Date", "Log"],
+        tblHeaderRow = document.createElement("tr");
+
+        //remove previous list
+        removeElement("log-information", "log-info");
+        tblHeader.appendChild(tblHeaderRow);
+        for (var h = 0; h < tblHeaderValues.length; h++) {
+            var headerValue = tblHeaderValues[h],
+            headerCell = document.createElement("th"),
+            headerText = document.createTextNode(headerValue);
+            headerCell.appendChild(headerText);
+            tblHeaderRow.appendChild(headerCell);
+        }
+
+        //creates all cells
+        for (var i = 0; i < logTextToShow.length; i++) { 
+            
+            //creates a table row
+            var row = document.createElement("tr"); 
+
+            //create a td element and text node, make the text node the contents of td and put td at the end of table row
+            for (var j = 0; j < tblHeaderValues.length; j++) { 
+                var currentCountry = logTextToShow[i],
+                values = Object.values(currentCountry),
+                cell = document.createElement("td"),
+                cellText = document.createTextNode(values[j]);
+
+                cell.appendChild(cellText);    
+                row.appendChild(cell);        
+            }
+            tblBody.appendChild(row);
+        }
+        tbl.id = "log-info";
+        tbl.appendChild(tblHeader);
+        tbl.appendChild(tblBody);
+        tableBody.appendChild(tbl);
+        //add class for bootstrap
+        document.getElementById("log-info").classList.add("table-striped");
+
+
+
+
+
+
+
+
+
+
+
+    }
+}
+
+function introScreenName(currentCountry) {
     if (!!currentCountry.deck) {
         var currentDeck = findFullDeckWithPlayerAndName(currentCountry.deck.deckPlayer, currentCountry.deck.deckName),
-        deckText = findPlayerName(findCountryPlayer(currentCountry.country));
+        playerName = findPlayerName(findCountryPlayer(currentCountry.country));
+        
+        if (currentDeck.deckHidden) return playerName;
+        return playerName + " playing " + currentCountry.deck.deckName;
+    }
+    return "-Empty-";
+}
+function introScreenColor(currentCountry) {
+    if (!!currentCountry.deck) {
+        var currentDeck = findFullDeckWithPlayerAndName(currentCountry.deck.deckPlayer, currentCountry.deck.deckName);
 
-        //deck name checked for hidden
-        if (currentDeck.deckHidden === false) {
-            deckText += " playing " + currentDeck.deckName + "(" + currentDeck.deckColors + ")";
-        }
-        //battles played
-        if (currentDeck.deckGamesPlayed > 0) {
-            if (currentDeck.deckGamesPlayed === 1) {
-                deckText += ", " + currentDeck.deckGamesPlayed + " Game Played";
-            }
-            else {
-                deckText += ", " + currentDeck.deckGamesPlayed + " Games Played";
-            }
-        }
-        //bonuses
-        if (currentDeck.deckBonuses > 0) {
-            if (currentDeck.deckBonuses === 1) {
-                deckText += ", " + currentDeck.deckBonuses + " Bonus";
-            }
-            else {
-                deckText += ", " + currentDeck.deckBonuses + " Bonuses";
-            }
-        }
-        //penalties
-        if (currentDeck.deckPenalties > 0) {
-            if (currentDeck.deckPenalties === 1) {
-                deckText += ", " + currentDeck.deckPenalties + " Penalty";
-            }
-            else {
-                deckText += ", " + currentDeck.deckPenalties + " Penalties";
-            }
-        }
-        //future version
-        //add here for future game mod versions like defense plane, hero, conspiracy, vanguards, etc
+        if (currentDeck.deckHidden) return "";
+        return "(" + currentDeck.deckColors + ")";
     }
-    else {
-        var deckText = "-Empty-";
+    return "";
+}
+function introScreenGames(currentCountry) {
+    if (!!currentCountry.deck) {
+        var currentDeck = findFullDeckWithPlayerAndName(currentCountry.deck.deckPlayer, currentCountry.deck.deckName);
+        
+        if (currentDeck.deckGamesPlayed === 0) return "";
+        return currentDeck.deckGamesPlayed;
     }
-    return deckText;
+    return "";
+}
+function introScreenBonus(currentCountry) {
+    if (!!currentCountry.deck) {
+        var currentDeck = findFullDeckWithPlayerAndName(currentCountry.deck.deckPlayer, currentCountry.deck.deckName);
+        
+        if (currentDeck.deckBonuses === 0) return "";
+        return currentDeck.deckBonuses;
+    }
+    return "";
+}
+function introScreenPenalty(currentCountry) {
+    if (!!currentCountry.deck) {
+        var currentDeck = findFullDeckWithPlayerAndName(currentCountry.deck.deckPlayer, currentCountry.deck.deckName);
+        
+        if (currentDeck.deckPenalties === 0) return "";
+        return currentDeck.deckPenalties;
+    }
+    return "";
 }
 
 function updateIntroScreen() {
@@ -50,26 +153,34 @@ function updateIntroScreen() {
     var countryList = [];
 
     for (var c = 0; c < gameVars.mapInfo.countryList.length; c++) {
-        countryList.push({countryName: gameVars.mapInfo.countryList[c].countryName, countryText: introScreenText(gameVars.mapInfo.countryList[c])}); 
+        countryList.push({
+            countryName: gameVars.mapInfo.countryList[c].countryName, 
+            deckName: introScreenName(gameVars.mapInfo.countryList[c]),
+            deckColor: introScreenColor(gameVars.mapInfo.countryList[c]),
+            deckGames: introScreenGames(gameVars.mapInfo.countryList[c]),
+            deckBonuses: introScreenBonus(gameVars.mapInfo.countryList[c]),
+            deckPenalties: introScreenPenalty(gameVars.mapInfo.countryList[c])
+        }); 
     }
+    //future version 
+    //add defense plane, hero, conspiracy, etc
+
     //create table with above info
     var tableBody = document.getElementById("intro-information"), //reference for body
     tbl = document.createElement("table"), //table element
     tblBody = document.createElement("tbody"), //tbody element)
     tblHeader = document.createElement("thead");
 
-    var tblHeaderValues = ["Country", "Known Information"],
+    var tblHeaderValues = ["Country", "Deck", "Color", "Games", "Bonuses", "Penalties"],
     tblHeaderRow = document.createElement("tr");
-    
+
     //remove previous list
     removeElement("intro-information", "known-info");
-
     tblHeader.appendChild(tblHeaderRow);
     for (var h = 0; h < tblHeaderValues.length; h++) {
         var headerValue = tblHeaderValues[h],
         headerCell = document.createElement("th"),
         headerText = document.createTextNode(headerValue);
-       
         headerCell.appendChild(headerText);
         tblHeaderRow.appendChild(headerCell);
     }
@@ -96,6 +207,10 @@ function updateIntroScreen() {
     tbl.appendChild(tblHeader);
     tbl.appendChild(tblBody);
     tableBody.appendChild(tbl);
+    //add class for bootstrap
+    document.getElementById("known-info").classList.add("table-hover");
+    //display log information
+    showLogInfo();
 }
 
 function cleanupPlayerDeckLists() {
@@ -163,15 +278,17 @@ function topOfPlacementSetup() {
 
 function setupComplete() {
     var logText = ["Initiation Game Complete"],
-    randomSetup = true;//change when placement setup enabled
+    battleDecks = [],
+    randomSetup = true;//change when placement setup enabled on future version
 
     //log end of game, add winner decks in order
     for (var i = 0; i < gameVars.battleScreenInfo.battleWinner.length; i++) {
         var currentBattlePlayer = gameVars.battleScreenInfo.battleWinner[i],
         currentBattleDeck = findBattleDeckNameWithPlayer(currentBattlePlayer);
 
-        logText.push([currentBattlePlayer, currentBattleDeck]);
+        battleDecks.push([currentBattlePlayer, currentBattleDeck]);
     }
+    logText.push(battleDecks);
     updateLog(logText)
     //update turn order
     gameVars.gameStatus.turnOrder = gameVars.battleScreenInfo.battleWinner;
@@ -199,7 +316,6 @@ function setupComplete() {
         //top of placement setup
         topOfPlacementSetup()
     }
-
     //build supply point list
     buildSupplyPointList();
 }
@@ -208,28 +324,24 @@ function toIniGame() {
     var toIniGame = confirm("Save this information and proceed to Initiation Game?");
 
     if (toIniGame === true) {
-
         //shuffledecklists
         shuffleAllDecklists();
-
+        //show battle info
         showBattle();
-
         //load initiation decks as battle decks
         for (var i = 1; i <= gameVars.globalGameOptions.totalPlayers; i++) {
             var currentPlayer = i,
             currentIniDeck = gameVars.playerInfo["player" + i].playerDecklist[0];
 
+            gameVars.playerInfo["player" + i].playerDecklist[0].deckHidden = false;
             gameVars.battleScreenInfo.battleDecks.push({deckPlayer: currentPlayer, deckName: currentIniDeck.deckName});
         }
-
         //update battle players count
         gameVars.battleScreenInfo.battlePlayersCount = gameVars.battleScreenInfo.battleDecks.length;
-
         //show battle screen info for initiation
         for (var j = 0; j < gameVars.battleScreenInfo.battlePlayersCount; j++) {
             displayBattleInfo(j);
         }
-
         //log beginning of initiation game
         updateLog(["Initiation Game Begins"]);
     }
@@ -279,6 +391,8 @@ function refreshDeckListShown(decklistCount, deckList) {
     tbl.appendChild(tblHeader);
     tbl.appendChild(tblBody);
     tableBody.appendChild(tbl);
+    //add class for bootstrap
+    document.getElementById("setup-player-decklist-table").classList.add("table-striped");
 }
 
 function shuffleAllDecklists() {
@@ -299,22 +413,27 @@ function changeCurrentSetupPlayer() {
 
     //show current player name
     updateDOMElement("display-name", currentPlayerName);
-
     //show current player deck count
     document.getElementById("potential-decklist").innerHTML = "Potential Decklist (" + decklistCount + ")";
-
     //show current player decklist
     orderArray(decklistToShow, "deckName");
     refreshDeckListShown(decklistCount, decklistToShow);
-
     //update background
     for (var i = 1; i < 6; i++) {
         removeClass("setup-toolbar", "player-color-" + i);
     }
     addClass("setup-toolbar", "player-color-" + currentPlayerNumber);
-    
+    //change name change button color
+    removeAllNameChangeButtonPlayerColors();
+    document.getElementById("button-change-name").classList.add("player-color-" + document.getElementById("update-setup-player").value);
     //shuffledecklists
     shuffleAllDecklists();
+}
+
+function removeAllNameChangeButtonPlayerColors() {
+    for (var i = 1; i <= gameVars.globalGameOptions.totalPlayers; i++) {
+        removeClass("button-change-name", "player-color-" + i);
+    }
 }
 
 function changeNumberOfPlayers() {
@@ -322,16 +441,13 @@ function changeNumberOfPlayers() {
 
     //update variable
     gameVars.globalGameOptions.totalPlayers = newNumberOfPlayers;
-
     //set max player number
     document.getElementById("update-setup-player").max = newNumberOfPlayers;
-
     //turn to max if past
     if (document.getElementById("update-setup-player").value > newNumberOfPlayers) {
         document.getElementById("update-setup-player").value = newNumberOfPlayers;
         changeCurrentSetupPlayer();
     }
-    
     //shuffledecklists
     shuffleAllDecklists();
 }
@@ -345,7 +461,6 @@ function setupPlayerName() {
         gameVars.playerInfo["player" + currentPlayerNumber].playerName = changePlayerNameTo;
     }
     updateDOMElement("display-name", changePlayerNameTo);
-
     //shuffledecklists
     shuffleAllDecklists();
 }

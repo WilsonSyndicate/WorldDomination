@@ -2,7 +2,9 @@
 <html lang="en-US">
 
 <head>
+    <meta charset="utf-8">
     <title>World Domination</title>
+    <link rel="stylesheet" href="bootstrap-4.3.1-dist/css/bootstrap.css">
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -13,7 +15,7 @@
         <div id="player-setup">
             <h2>Player Setup</h2>
             <div id="setup-toolbar" class="toolbar">
-                <button id="complete-setup-button" onclick="toIniGame()">Complete Setup</button>
+                <button id="complete-setup-button" class="btn btn-info" onclick="toIniGame()">Complete Setup</button>
                 <div id="player-count-label">Choose Number of Players</div>
                 <input type="number" id="update-player-count" min=2 max=5 value=5 onchange="changeNumberOfPlayers()">
                 <div id="current-setup-player">Current Setup Player</div>
@@ -21,7 +23,7 @@
             </div>
             <div id="player-information">
                 <h3 id="display-name">Player 1</h3>
-                <button id="button-change-name" onclick="setupPlayerName()">Change Name</button>
+                <button id="button-change-name" class="btn" onclick="setupPlayerName()">Change Name</button>
     
                 <div id="player-decklist">
                     <h2 id="potential-decklist">Potential Decklist</h2>
@@ -37,6 +39,7 @@
             <h3 id="intro-message"></h3>
             <h4 id="intro-note"></h4>
         </div>
+        <div id="log-information"></div>
         <div id="intro-information"></div>
     </div>
 
@@ -52,8 +55,9 @@
     <div id="map-screen">
         <div id="map-screen-toolbar" class="toolbar">
             <h2 id="map-title">World Map</h2>
-            <h3 id="map-message">map-essage</h3>
-            <h4 id="map-note">map-ote</h4>
+            <h3 id="map-message"></h3>
+            <h4 id="map-note"></h4>
+            <p id="country-information"></p>
         </div>
         <div id="map-countries"></div>
     </div>

@@ -1,11 +1,21 @@
 //Game Map
 function declineAttack() {
-    var earthShakingEventConfirmed = confirm("Decline Attack?");
+    if (gameVars.mapInfo.mapSelect.length === 0) {
+        var earthShakingEventConfirmed = confirm("Decline Attack?");
 
-    if (earthShakingEventConfirmed) {
-        earthShakingEvent();
-        //remove confirm attack button
-        removeElement("map-screen-toolbar", "confirm-attack");
+        if (earthShakingEventConfirmed) {
+            earthShakingEvent();
+            //remove confirm attack button
+            removeElement("map-screen-toolbar", "confirm-attack");
+        }
+    }
+    else {
+        //clear map select
+        gameVars.mapInfo.mapSelect = [];
+        //rename button
+        document.getElementById("decline-attack").innerHTML = "Decline Attack";
+        //rebuild map
+        buildMapButtons();
     }
 }
 
@@ -35,8 +45,8 @@ function resetMapScreen() {
     removeAllClassFromMapbuttons("map-defend");
     removeAllClassFromMapbuttons("map-join");
     removeAllClassFromMapbuttons("already-attacked");
-    //remove button to accept attack
-    removeElement("map-screen-toolbar", "confirm-attack");
+    //disable confirm attack button
+    disableId("confirm-attack");
     //clear map select
     gameVars.mapInfo.mapSelect = [];
 }
@@ -90,6 +100,28 @@ function isPlayerOnCountry(player, country) {
     return false;
 }
 
+function markAllMapCountriesNotBorderingCountry(country, classToAdd) {
+    var countryBorders = findFullCountryWithCountry(country).borders;
+
+    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
+        if (gameVars.mapInfo.countryList[i].country !== country && !isItemInArray(gameVars.mapInfo.countryList[i].country, countryBorders)) {
+            addClass(gameVars.mapInfo.countryList[i].country, classToAdd);
+        }
+    }
+}
+
+function markAllCountriesBorderingWithSamePlayer(country, classToAdd) {
+    var fullCountry = findFullCountryWithCountry(country);
+
+    for (var i = 0; i < fullCountry.borders.length; i++) {
+        var fullBorderCountry = findFullCountryWithCountry(fullCountry.borders[i]);
+
+        if (!!fullBorderCountry.deck && fullBorderCountry.deck.deckPlayer === fullCountry.deck.deckPlayer) {
+            addClass(fullBorderCountry.country, classToAdd);
+        }
+    }
+}
+
 function selectAttacker(country, countryDeck, currentTurnPlayerName, countryDeckName) {
     //remove all attack classes
     removeAllClassFromMapbuttons("attack-threat");
@@ -97,8 +129,9 @@ function selectAttacker(country, countryDeck, currentTurnPlayerName, countryDeck
     removeAllClassFromMapbuttons("map-attack");
     removeAllClassFromMapbuttons("map-defend");
     removeAllClassFromMapbuttons("map-join");
-    //remove button to accept attack
-    removeElement("map-screen-toolbar", "confirm-attack");
+    removeAllClassFromMapbuttons("out-of-range");
+    //disable confirm attack
+    disableId("confirm-attack");
     //clear ground zero
     gameVars.battleScreenInfo.groundZero = "";
     //make mapSelect = deck on country clicked
@@ -108,19 +141,26 @@ function selectAttacker(country, countryDeck, currentTurnPlayerName, countryDeck
     //add bordering countries with deck and not same player as on map select as possible battle and highlight as possible attack
     gameVars.mapInfo.possibleBattle = [];
     markToSurroundingPossibleBattle(country, "attack-threat");
+    //mark out of range
+    markAllMapCountriesNotBorderingCountry(country, "out-of-range");
+    //mark borders with same player as out of range
+    markAllCountriesBorderingWithSamePlayer(country, "out-of-range")
     //update map message and note with countryDeckName
     document.getElementById("map-message").innerHTML = currentTurnPlayerName + " Choose Country To Attack";
     document.getElementById("map-note").innerHTML = countryDeckName + " attacks ";
+    //update deline attack button
+    document.getElementById("decline-attack").innerHTML = "Reset Map";
 }
 
 function selectDefender(country, countryPlayer, countryDeckName) {
-    //add button to accept attack
-    addElement("map-screen-toolbar", "button", "Confirm Attack", "confirm-attack", "attack-button", attackChosen);
+    //enable confirm attack button
+    undisableId("confirm-attack");
     //highlight as defender
     addClass(country, "map-defend");
     //remove attack and join threat class
     removeAllClassFromMapbuttons("attack-threat");
     removeAllClassFromMapbuttons("join-threat");
+    removeAllClassFromMapbuttons("out-of-range");
     //set ground zero
     gameVars.battleScreenInfo.groundZero = country;
     //push to mapSelect
@@ -128,10 +168,24 @@ function selectDefender(country, countryPlayer, countryDeckName) {
     //add bordering countries with deck and not same player as on map select as possible battle and highlight as possible joiner
     gameVars.mapInfo.possibleBattle = [];
     markToSurroundingPossibleBattle(country, "join-threat");
+    //mark out of range
+    markAllMapCountriesNotBorderingCountry(country, "out-of-range");
+    //mark bordering countries with same player
+    markAllCountriesBorderingWithSamePlayer(country, "out-of-range");
     //update note with deck shown name
     document.getElementById("map-note").innerHTML += shownDeckName(countryPlayer, countryDeckName);
     //unlock joiners
     removeNonAttackFromJoiners();
+}
+
+function markOtherJoinersWithSamePlayer(player, classToAdd) {
+    for (var i = 0; i < gameVars.mapInfo.joinThreat.length; i++) {
+        var currentPlayer = findCountryPlayer(gameVars.mapInfo.joinThreat[i]);
+
+        if (currentPlayer === player) {
+            addClass(gameVars.mapInfo.joinThreat[i], classToAdd);
+        }
+    }
 }
 
 function selectJoiner(country, countryPlayer, countryDeckName) {
@@ -144,6 +198,10 @@ function selectJoiner(country, countryPlayer, countryDeckName) {
     //add bordering countries with deck and not same player as on map select as possible battle and highlight as possible joiner
     gameVars.mapInfo.possibleBattle = [];
     markToSurroundingPossibleBattle(gameVars.battleScreenInfo.groundZero, "join-threat");
+    //mark out of range
+    markOtherJoinersWithSamePlayer(countryPlayer, "out-of-range");
+    //remove out of range
+    removeClass(country, "out-of-range");
     //update note with deck shown name
     document.getElementById("map-note").innerHTML += " with " + shownDeckName(countryPlayer, countryDeckName);
 }
@@ -175,6 +233,44 @@ function attackCountryClicked(country) {
                 }
             }   
         }
+    }
+}
+
+function mapCountryHover(country) {
+    var countryName = findFullCountryWithCountry(country).countryName;
+
+    //country name
+    document.getElementById("country-information").innerHTML = countryName;
+    //player name
+    if (!!findFullCountryWithCountry(country).deck) {
+        var countryPlayer = findFullCountryWithCountry(country).deck.deckPlayer,
+        playerName = gameVars.playerInfo["player" + countryPlayer].playerName,
+        deckId = findDeckRef(countryPlayer, findFullCountryWithCountry(country).deck.deckName),
+        isHidden = gameVars.playerInfo["player" + countryPlayer].playerDecklist[deckId].deckHidden,
+        deckName = findFullCountryWithCountry(country).deck.deckName,
+        deckColors = gameVars.playerInfo["player" + countryPlayer].playerDecklist[deckId].deckColors,
+        deckBonuses = gameVars.playerInfo["player" + countryPlayer].playerDecklist[deckId].deckBonuses,
+        deckPenalties = gameVars.playerInfo["player" + countryPlayer].playerDecklist[deckId].deckPenalties;
+
+        document.getElementById("country-information").innerHTML += "<br>" + playerName;
+        //player deck if not hidden
+        if (isHidden === false) {
+            document.getElementById("country-information").innerHTML += "<br>" + deckName + " (" + deckColors + ")";
+        }
+        if (deckBonuses === 1) {
+            document.getElementById("country-information").innerHTML += "<br>" + "One Bonus";
+        }
+        if (deckBonuses > 1) {
+            document.getElementById("country-information").innerHTML += "<br>" + deckBonuses + " Bonuses";
+        }
+        if (deckPenalties === 1) {
+            document.getElementById("country-information").innerHTML += "<br>" + "One Penalty";
+        }
+        if (deckPenalties > 1) {
+            document.getElementById("country-information").innerHTML += "<br>" + deckPenalties + " Penalties";
+        }
+        //future version
+        //add hero, conspiracy, defense plane, vanguards, support bonus, etc
     }
 }
 
@@ -210,14 +306,14 @@ function countryMapName(currentCountry) {
         isHidden = findDeckWithPlayerNumberAndName(currentPlayerNumber, curentDeckName).deckHidden;  
 
         if (isHidden) {
-            return currentCountryName + "(" + currentPlayerName + ")";
+            return "<span>" + currentCountryName + "</span><br/><span>" + currentPlayerName + "</span>";
         }
         else {
-            return currentCountryName + "(" + currentPlayerName + " playing " + curentDeckName + ")";
+            return "<span>" + currentCountryName + "</span><br/><span>" + curentDeckName + "</span>";
         }
     }
     else {
-        return currentCountryName;
+        return "<span>" + currentCountryName + "</span>";
     }
 }
 
@@ -239,13 +335,11 @@ function isCountryAttackable(country) {
                 var countryBorderFullCountry = findFullCountryWithCountry(currentBorderCountry);
 
                 currentCountryBorders.push(currentBorderCountry);
-
                 if (!!countryBorderFullCountry.deck) {
                     var countryBorderPlayer = countryBorderFullCountry.deck.deckPlayer;
 
                     currentCountryBorderPlayers.push(countryBorderPlayer);
                 }
-                
             }
         }
         //does surrounding country have a different player
@@ -286,7 +380,7 @@ function buildMapButtons() {
 
         //refresh each country button
         removeElement("map-countries", currentCountry);
-        addElement("map-countries", "svg", countryMapName(currentFullCountry), currentCountry, "country-button", mapCountryClick);
+        addElement("map-countries", "svg", countryMapName(currentFullCountry), currentCountry, "country-button", mapCountryClick, mapCountryHover);
         //all check for player color
         if (!!currentFullCountry.deck) {
             var currentPlayer = currentFullCountry.deck.deckPlayer;
@@ -319,6 +413,9 @@ function buildMapButtons() {
             if (!isSupplyable(currentCountry)) {
                 addClass(currentCountry, "not-supplyable");
             }
+            else {
+                addClass(currentCountry, "is-supplyable");
+            }
         }
         else if (gameVars.gameStatus.mode === "placement") {
             //future version
@@ -336,20 +433,18 @@ function beginAttack() {
     }
     else if (gameVars.gameStatus.mode === "attack") {
         showMap();
-        
         //build map buttons
         buildMapButtons();
-   
         //create skip attack button
-        addElement("map-screen-toolbar", "button", "Decline Attack", "decline-attack", "map-attack-button", declineAttack);
-
+        addElement("map-screen-toolbar", "button", "Decline Attack", "decline-attack", "map-button", declineAttack);
+        //create confirm attack button and disable
+        addElement("map-screen-toolbar", "button", "Confirm Attack", "confirm-attack", "map-button", attackChosen);
+        disableId("confirm-attack");
         //update message and note
         document.getElementById("map-message").innerHTML = currentTurnPlayerName + " Choose Your Attack";
         document.getElementById("map-note").innerHTML = "";
-
         //earth shaking event check
         earthShakingEventCheck();
-
         //ignore drop check if recent log shows drop
         if (gameVars.gameLog[gameVars.gameLog.length - 1][1].substr(0, 11) !== "Supply Drop") {
             //drop check and forced drop check

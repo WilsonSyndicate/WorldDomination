@@ -1,401 +1,219 @@
-﻿/*Country Base Style*/
+﻿
+/*Player Colors*/
+:root {
+    --player-1-color: var(--cyan);
+    --player-1-inactive: rgba(23, 162, 184, 0.25);
+    --player-2-color: var(--red);
+    --player-2-inactive: rgba(220, 53, 69, 0.25);
+    --player-3-color: var(--green);
+    --player-3-inactive: rgba(40, 167, 69, 0.25);
+    --player-4-color: var(--yellow);
+    --player-4-inactive: rgba(255, 193, 7, 0.25);
+    --player-5-color: var(--purple);
+    --player-5-inactive: rgba(111, 66, 193, 0.25);
+    --threat-possible: var(--orange);
+    --selected: yellow;
+}
+
+/*Country Base Style*/
 .country-button {
     position: absolute;
-    border: 1px solid black;
-    background-color: lightgrey;
+    background-color: rgba(211, 211, 211, 0.25);    
+    width: 140px;
+}
+.is-supplyable {
+    background-color: gray;
+    border: 1px solid yellow;
+}
+.drop-threat {
+    border: 2px solid orange;
 }
 .map-select {
-    border: 2px solid yellow;
-    outline: 2px solid yellow;
-}
-
-
-/*Country Player Styles*/
-/*Player 1*/
-.player-color-1 {
-    background-color: dodgerblue;
-}
-.player-color-1.map-attack {
-    background-color: lightblue;
-    border: 2px solid gold;
-}
-.not-attackable.player-color-1 {
-    background-color: darkgray;
-    border: 2px solid dodgerblue;
-}
-.attack-threat.player-color-1 {
-    background-color: lightblue;
-    border: 1px solid orange;
-}
-.join-threat.player-color-1 {
-    background-color: lightblue;
-    border: 1px solid orange;
-}
-.map-defend.player-color-1 {
-    background-color: lightblue;
-    outline: 2px solid gold;
-}
-.map-join.player-color-1 {
-    background-color: lightblue;
-    outline: 2px solid gold;
-}
-
-/*Player 2*/
-.player-color-2 {
-    background-color: limegreen;
-}
-.player-color-2.map-attack {
-    background-color: lightgreen;
-    border: 2px solid gold;
-}
-.not-attackable.player-color-2 {
-    background-color: darkgray;
-    border: 2px solid limegreen;
-}
-.attack-threat.player-color-2 {
-    background-color: lightgreen;
-    border: 1px solid orange;
-}
-.join-threat.player-color-2 {
-    background-color: lightgreen;
-    border: 1px solid orange;
-}
-.map-defend.player-color-2 {
-    background-color: lightgreen;
-    outline: 2px solid gold;
-}
-.map-join.player-color-2 {
-    background-color: lightgreen;
-    outline: 2px solid gold;
-}
-
-/*Player 3*/
-.player-color-3 {
-    background-color: brown;
-}
-.player-color-3.map-attack {
-    background-color: tan;
-    border: 2px solid gold;
-}
-.not-attackable.player-color-3 {
-    background-color: darkgray;
-    border: 2px solid brown;
-}
-.attack-threat.player-color-3 {
-    background-color: tan;
-    border: 1px solid orange;
-}
-.join-threat.player-color-3 {
-    background-color: tan;
-    border: 1px solid orange;
-}
-.map-defend.player-color-3 {
-    background-color: tan;
-    outline: 2px solid gold;
-}
-.map-join.player-color-3 {
-    background-color: tan;
-    outline: 2px solid gold;
-}
-
-/*Player 4*/
-.player-color-4 {
-    background-color: red;
-}
-.player-color-4.map-attack {
-    background-color: pink;
-    border: 2px solid gold;
-}
-.not-attackable.player-color-4 {
-    background-color: darkgray;
-}
-.attack-threat.player-color-4 {
-    background-color: pink;
-    border: 1px solid orange;
-}
-.join-threat.player-color-4 {
-    background-color: pink;
-    border: 1px solid orange;
-}
-.map-defend.player-color-4 {
-    background-color: pink;
-    outline: 2px solid gold;
-}
-.map-join.player-color-4 {
-    background-color: pink;
-    outline: 2px solid gold;
-}
-
-
-/*Player 5*/
-.player-color-5 {
-    background-color: purple;
-}
-.player-color-5.map-attack {
-    background-color: violet;
-    border: 2px solid gold;
-}
-.not-attackable.player-color-5 {
-    background-color: darkgray;
-    border: 2px solid purple;
-}
-.attack-threat.player-color-5 {
-    background-color: violet;
-    border: 1px solid orange;
-}
-.join-threat.player-color-5 {
-    background-color: violet;
-    border: 1px solid orange;
-}
-.map-defend.player-color-5 {
-    background-color: violet;
-    outline: 2px solid gold;
-}
-.map-join.player-color-5 {
-    background-color: violet;
-    outline: 2px solid gold;
-}
-
-
-
-
-/*Old Player stuff*/
-
-.map-select1 {
-    background-color: gold;
-}
-.map-attack1 {
-    background-color: lightblue;
-    outline: 2px solid gold;
-}
-.map-defend1 {
-    background-color: lightblue;
-    outline: 2px solid gold;
-}
-.map-join1 {
-    background-color: lightblue;
-}
-.attack-threat1 {
-    background-color: lightblue;
-}
-.join-threat1 {
-    background-color: lightblue;
-}
-.already-attacked1 {
-    border: 2px solid lightblue;
-    outline: 1px solid black;
-    background-color: lightgray;
-}
-.not-attackable1 {
-    background-color: blue; 
-}
-.not-attackable1.current-turn1 {
-    border: 2px solid lightblue;
-    outline: 1px solid black;
-    background-color: lightgray; 
-}
-.not-movable1 {
-    border: 2px solid lightblue;
-    outline: 1px solid black;
-    background-color: lightgray; 
-}
-.not-supplyable1 {
-    border: 2px solid lightblue;
-    outline: 1px solid black;
-    background-color: lightgray;
-}
-
-
-.map-select2 {
-    background-color: gold;
-}
-.map-attack2 {
-    background-color: lightgreen;
-    outline: 2px solid gold;
-}
-.map-defend2 {
-    background-color: lightgreen;
-    outline: 2px solid gold;
-}
-.map-join2 {
-    background-color: lightgreen;
-}
-.attack-threat2 {
-    background-color: lightgreen;
-}
-.join-threat2 {
-    background-color: lightgreen;
-}
-.already-attacked2 {
-    border: 2px solid lightgreen;
-    outline: 1px solid black;
-    background-color: lightgray;
-}
-.not-attackable2 {
-    background-color: green;
-}
-.not-attackable2.current-turn {
-    border: 2px solid lightgreen;
-    outline: 1px solid black;
-    background-color: lightgray; 
-}
-.not-movable2 {
-    border: 2px solid lightgreen;
-    outline: 1px solid black;
-    background-color: lightgray;
-}
-.not-supplyable2 {
-    border: 2px solid lightgreen;
-    outline: 1px solid black;
-    background-color: lightgray;
-}
-
-/*Player 3*/
-
-.current-turn3 {
-    background-color: green;
-}
-.map-select3 {
-    border: 2px solid lightgreen;
-    outline: 4px solid gold;
-}
-.map-attack3 {
-    background-color: lightgreen;
-    outline: 2px solid yellow;
-}
-.map-defend3 {
-    background-color: lightgreen;
-    outline: 2px solid yellow;
-}
-.map-join3 {
-    background-color: lightgreen;
-    outline: 2px solid yellow;
-}
-.attack-threat3 {
-    outline: 2px solid yellow;
-}
-.join-threat3 {
-    border: 2px solid yellow;
-}
-.already-attacked3 {
-    background-color: green;
-}
-.not-attackable3 {
-    background-color: green; 
-}
-.not-movable3 {
-    background-color: green; 
-}
-.not-supplyable3 {
-    background-color: green;
-}
-
-/*Player 4*/
-
-.current-turn4 {
-    background-color: green;
-}
-.map-select4 {
-    border: 2px solid lightgreen;
-    outline: 4px solid gold;
-}
-.map-attack4 {
-    background-color: lightgreen;
-    outline: 2px solid yellow;
-}
-.map-defend4 {
-    background-color: lightgreen;
-    outline: 2px solid yellow;
-}
-.map-join4 {
-    background-color: lightgreen;
-    outline: 2px solid yellow;
-}
-.attack-threat4 {
-    outline: 2px solid yellow;
-}
-.join-threat4 {
-    border: 2px solid yellow;
-}
-.already-attacked4 {
-    background-color: orange;
-}
-.not-attackable4 {
-    background-color: orange; 
-}
-.not-movable4 {
-    background-color: orange; 
-}
-.not-supplyable4 {
-    background-color: orange;
-}
-
-/*Player 5*/
-
-.current-turn5 {
-    background-color: green;
-}
-.map-select5 {
-    border: 2px solid lightgreen;
-    outline: 4px solid gold;
-}
-.map-attack5 {
-    background-color: lightgreen;
-    outline: 2px solid yellow;
-}
-.map-defend5 {
-    background-color: lightgreen;
-    outline: 2px solid yellow;
-}
-.map-join5 {
-    background-color: lightgreen;
-    outline: 2px solid yellow;
-}
-
-.attack-threat5 {
-    outline: 2px solid yellow;
-}
-.join-threat5 {
-    border: 2px solid yellow;
-}
-.already-attacked5 {
-    background-color: violet;
-}
-.not-attackable5 {
-    background-color: violet; 
-}
-.not-movable5 {
-    background-color: violet; 
-}
-.not-supplyable5 {
-    background-color: violet;
-}
-
-/*Toolbar Styles*/
-.toolbar {
     border: 2px solid red;
 }
 
 
-/*Screen Styles*/
-#intro-screen {
-    background-color: darkgrey;
-    width: 1000px;
-    height: 700px;
+/*Player 1*/
+.not-attackable.player-color-1, 
+.out-of-range.player-color-1 {
+    background-color: var(--player-1-inactive);
 }
-#battle-screen {
-    border: 2px solid pink;
-    background-image: url('art/battle-screen-1.jpg');
-    background-repeat: no-repeat;
+.player-color-1, 
+.btn.player-color-1,
+.player-color-1.current-player, 
+.player-color-1.map-attack, 
+.attack-threat.player-color-1, 
+.join-threat.player-color-1, 
+.map-defend.player-color-1,
+.map-join.player-color-1 {
+    background-color: var(--player-1-color);
 }
-#map-screen {
-    border: 2px solid purple;
-    background-image: url('art/world-map-1.png');
-    background-repeat: no-repeat;
-    background-size: contain;
-    width: 1500px;
-    height: 1038px;
+.already-attacked.player-color-1, 
+.not-movable.player-color-1, 
+.not-supplyable.player-color-1 {
+    background-color: var(--player-1-inactive);
 }
+
+/*Player 2*/
+.not-attackable.player-color-2, 
+.out-of-range.player-color-2 {
+    background-color: var(--player-2-inactive);
+}
+.player-color-2, 
+.btn.player-color-2,
+.player-color-2.current-player, 
+.player-color-2.map-attack, 
+.attack-threat.player-color-2, 
+.join-threat.player-color-2, 
+.map-defend.player-color-2,
+.map-join.player-color-2 {
+    background-color: var(--player-2-color);
+}
+.already-attacked.player-color-2, 
+.not-movable.player-color-2, 
+.not-supplyable.player-color-2 {
+    background-color: var(--player-2-inactive);
+}
+
+/*Player 3*/
+.not-attackable.player-color-3, 
+.out-of-range.player-color-3 {
+    background-color: var(--player-3-inactive);
+}
+.player-color-3, 
+.player-color-3.current-player, 
+.player-color-3.map-attack, 
+.attack-threat.player-color-3, 
+.join-threat.player-color-3, 
+.map-defend.player-color-3,
+.map-join.player-color-3 {
+    background-color: var(--player-3-color);
+}
+.already-attacked.player-color-3, 
+.not-movable.player-color-3, 
+.not-supplyable.player-color-3 {
+    background-color: var(--player-3-inactive);
+}
+
+/*Player 4*/
+.not-attackable.player-color-4, 
+.out-of-range.player-color-4 {
+    background-color: var(--player-4-inactive);
+}
+.player-color-4, 
+.player-color-4.current-player, 
+.player-color-4.map-attack, 
+.attack-threat.player-color-4, 
+.join-threat.player-color-4, 
+.map-defend.player-color-4,
+.map-join.player-color-4, 
+.not-movable.player-color-4 {
+    background-color: var(--player-4-color);
+}
+.already-attacked.player-color-4, 
+.not-movable.player-color-4, 
+.not-supplyable.player-color-4 {
+    background-color: var(--player-4-inactive);
+}
+
+/*Player 5*/
+.not-attackable.player-color-5, 
+.out-of-range.player-color-5 {
+    background-color: var(--player-5-inactive);
+}
+.player-color-5, 
+.player-color-5.current-player, 
+.player-color-5.map-attack, 
+.attack-threat.player-color-5, 
+.join-threat.player-color-5, 
+.map-defend.player-color-5,
+.map-join.player-color-5 {
+    background-color: var(--player-5-color);
+}
+.already-attacked.player-color-5, 
+.not-movable.player-color-5, 
+.not-supplyable.player-color-5 {
+    background-color: var(--player-5-inactive);
+}
+
+/*Country Border Styles*/
+.map-attack, 
+.map-defend, 
+.map-join{
+    border: 3px solid var(--selected);
+}
+.attack-threat, 
+.join-threat {
+    border: 3px solid var(--threat-possible);
+}
+
+/*Button Styles*/
+#reset-winners, 
+#complete-setup-button, 
+#cancel-move, 
+#decline-attack, 
+#drop-select-cancel {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+#confirm-winners {
+    position: absolute;
+    top: 10px;
+    right: 75px;
+}
+#confirm-attack {
+    position: absolute;
+    top: 10px;
+    right: 135px;
+}
+#supply-drop-button {
+    position: absolute;
+    top: 10px;
+    right: 264px;
+}
+#complete-move {
+    position: absolute;
+    top: 10px;
+    right: 107px;
+}
+#make-drop {
+    position: absolute;
+    top: 10px;
+    right: 178px;
+}
+#wild-drop0 {
+    position: absolute;
+    top: 10px;
+    right: 330px;
+
+}
+#wild-drop1 {
+    position: absolute;
+    top: 10px;
+    right: 451px;
+}
+
+
+
+
+
+
+/*Toolbar Styles*/
+.toolbar {
+    height: 150px;
+    border: 2px solid red;
+}
+#country-information {
+    outline: 2px solid yellow;
+    position: absolute;
+    top: 57px;
+    left: 675px;
+    width: 400px;
+    height: 81px;
+
+}
+
 
 
 /*Area Styles*/
@@ -411,173 +229,193 @@
 }
 
 
+/*Screen Styles*/
+
+#battle-information {
+    border: 2px solid black;
+    background-image: url('art/battle-screen-1.jpg');
+    background-repeat: no-repeat;
+}
+#map-countries {
+    border: 2px solid black;
+    background-image: url('art/world-map-1.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    width: 1500px;
+    height: 1038px;
+}
+
+
+
 /*Country Positions*/
+
+
 #afghanistan {
-    top: 457px;
+    top: 607px;
     left: 963px;
 }
 #alaska {
-    top: 257px;
+    top: 407px;
     Left: 36px;
 }
 #alberta {
-    top: 340px;
+    top: 473px;
     left: 184px;
 }
 #argentina {
-    top: 909px;
+    top: 1059px;
     left: 332px;
 }
 #brazil {
-    top: 708px;
-    left: 410px;    
+    top: 858px;
+    left: 410px;
 }
 #central-america {
-    top: 552px;
-    left: 189px;    
+    top: 702px;
+    left: 189px;
 }
 #china {
-    top: 516px;
-    left: 1118px;    
+    top: 666px;
+    left: 1118px;
 }
 #congo {
-    top: 819px;
+    top: 969px;
     left: 748px;
 }
 #east-africa {
-    top: 747px;
+    top: 897px;
     left: 847px;
 }
 #eastern-australia {
-    top: 912px;
+    top: 1062px;
     left: 1344px;
 }
 #eastern-usa {
-    top: 450px;
-    left: 304px;    
+    top: 600px;
+    left: 304px;
 }
 #egypt {
-    top: 644px;
+    top: 794px;
     Left: 770px;
 }
 #great-britan {
-    top: 378px;
+    top: 528px;
     left: 560px;    
 }
 #greenland {
-    top: 191px;
+    top: 341px;
     left: 454px;    
 }
 #iceland {
-    top: 279px;
+    top: 429px;
     left: 588px;    
 }
 #india {
-    top: 591px;
+    top: 741px;
     left: 1043px;    
 }
 #indonesia {
-    top: 799px;
+    top: 949px;
     left: 1174px;
 }
 #irkutsk {
-    top: 340px;
+    top: 490px;
     left: 1152px;    
 }
 #japan {
-    top: 397px;
+    top: 547px;
     left: 1340px;    
 }
 #kamchatka {
-    top: 252px;
+    top: 402px;
     left: 1279px;    
 }
 #madagascar {
-    top: 940px;
+    top: 1090px;
     left: 944px;
 }
 #middle-east {
-    top: 556px;
+    top: 706px;
     left: 842px;    
 }
 #mongolia {
-    top: 419px;
+    top: 569px;
     left: 1164px;    
 }
 #new-guinea {
-    top: 766px;
+    top: 916px;
     left: 1346px;
 }
 #north-africa {
-    top: 670px;
+    top: 830px;
     left: 618px;
 }
 #northern-europe {
-    top: 409px;
+    top: 559px;
     left: 698px;    
 }
 #northwest-territory {
-    top: 212px;
+    top: 362px;
     left: 182px;    
 }
 #ontario {
-    top: 286px;
+    top: 441px;
     left: 306px;    
 }
 #peru {
-    top: 740px;
+    top: 890px;
     left: 306px;    
 }
 #quebec {
-    top: 318px;
+    top: 502px;
     left: 406px;    
 }
 #scandanavia {
-    top: 241px;
+    top: 391px;
     left: 710px;    
 }
 #siam {
-    top: 655px;
+    top: 805px;
     left: 1184px;    
 }
 #siberia {
-    top: 236px;
+    top: 321px;
     left: 1047px;    
 }
 #south-africa {
-    top: 975px;
+    top: 1125px;
     left: 751px;
 }
 #southern-europe {
-    top: 499px;
+    top: 649px;
     left: 708px;    
 }
 #ukraine {
-    top: 271px;
+    top: 421px;
     left: 848px;    
 }
 #ural {
-    top: 316px;
+    top: 466px;
     left: 998px;    
 }
 #veneseulea {
-    top: 631px;
+    top: 781px;
     left: 328px;    
 }
 #western-australia {
-    top: 955px;
+    top: 1105px;
     left: 1246px;
 }
 #western-europe {
-    top: 526px;
+    top: 676px;
     left: 588px;    
 }
 #western-usa {
-    top: 418px;
+    top: 568px;
     left: 188px;    
 }
 #yakutsk {
-    top: 208px;
+    top: 358px;
     left: 1188px;    
 }
 

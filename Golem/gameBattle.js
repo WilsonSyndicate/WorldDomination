@@ -263,6 +263,7 @@ function resetWinners() {
         undisableId("battle-winner-" + p);
     }
     gameVars.battleScreenInfo.battleWinner = [];
+    document.getElementById("battle-note").innerHTML = "Click order of winners for turn order";
 }
 
 function showWinningButtonText(winningPlace, totalBattlePlayers) {
@@ -321,8 +322,6 @@ function getSupplyCard(player) {
     var nextSupplyCard = gameVars.globalGameOptions.supplyInfo.supplyDropCardsToDraw.pop();
     findFullPlayerWithPlayerNumber(player).playerSupplyPoints.push(nextSupplyCard);
     shuffleArray(gameVars.globalGameOptions.supplyInfo.supplyDropCardsToDraw);
-
-    return nextSupplyCard;//added to check
 }
 
 function markDeckAsWinner(deckPlayer, deckName) {
@@ -465,6 +464,7 @@ function battleWinner(winningPlayerButton) {
             eliminatedPlayerCheck(winningDeck, battleDefender);
         }
     }
+    //if mode is setup
     else {
         var  winningPlayerCount = gameVars.battleScreenInfo.battleWinner.length,
         winningPlace = winningPlayerCount + 1,
@@ -474,8 +474,17 @@ function battleWinner(winningPlayerButton) {
         gameVars.battleScreenInfo.battleWinner.push(winningPlayerId);
         winningPlayerCount = gameVars.battleScreenInfo.battleWinner.length;
         document.getElementById(winningPlayerButton).innerHTML = winningButtonText;
-        if (winningPlayerCount === 1 && gameVars.gameStatus.mode === "setup") {
+        if (winningPlayerCount === 1) {
             addElement("battle-screen-toolbar", "button", "Cancel", "reset-winners", "noClass", resetWinners);
+            document.getElementById("battle-note").innerHTML = winningPlayerName + " goes first";
+        }
+        else {
+            if (winningPlayerCount === gameVars.globalGameOptions.totalPlayers) {
+                document.getElementById("battle-note").innerHTML += ", " + winningPlayerName + " goes last.";
+            }
+            else {
+                document.getElementById("battle-note").innerHTML += ", " + winningPlayerName + " goes " + numberSuffix(winningPlayerCount);
+            }
         }
     }
 }

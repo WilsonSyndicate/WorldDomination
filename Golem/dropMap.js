@@ -29,13 +29,13 @@ function dropDeckIntoGame(player, country) {
     return newDeckName
 }
 
-function dropWildCard() {
+function dropWildCard(card) {
     //only if queue is less than3
     if (gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length < 3) {
     //count wild cards used
     var wildCardsPlayed = countItemsInArray("none", gameVars.globalGameOptions.supplyInfo.supplyDropQueue);
     //remove button for corresponding count
-    removeElement("map-screen-toolbar", "wild-drop" + wildCardsPlayed);
+    removeElement("map-screen-toolbar", card);
     //mark as chosen
     chooseSupplyDrop("none");
     }
@@ -118,6 +118,10 @@ function makeSupplyDrop() {
         }
         //clear drop
         clearDropSelect();
+        //remove drop buttons
+        removeElement("map-screen-toolbar", "drop-select-cancel");
+        removeElement("map-screen-toolbar", "make-drop");
+        removeAllWildCardButtons();
         //change mode
         gameVars.gameStatus.mode = "attack";
         //go back to choose attack
@@ -126,24 +130,49 @@ function makeSupplyDrop() {
 }
 
 function removeAllWildCardButtons() {
-    console.log("buttons removed");
     removeElement("map-screen-toolbar", "wild-drop0");
     removeElement("map-screen-toolbar", "wild-drop1");
 }
 
 function clearDropSelect() {
-    //clear queue
-    gameVars.globalGameOptions.supplyInfo.supplyDropQueue = [];
-    //remove map select class
-    removeAllClassFromMapbuttons("map-select");
-    //map note
-    document.getElementById("map-note").innerHTML = 3 - gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length;
-    //remove clear drop button
-    removeElement("map-screen-toolbar", "drop-select-cancel");
-    //remove all wild card buttons
-    removeAllWildCardButtons();
-    //remove make drop button
-    removeElement("map-screen-toolbar", "make-drop");
+    if (gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length === 0) {
+        var confirmCancelDrop = confirm("Cancel Supply Drop?");
+
+        if (confirmCancelDrop) {
+            //clear queue
+            gameVars.globalGameOptions.supplyInfo.supplyDropQueue = [];
+            //remove map select class
+            removeAllClassFromMapbuttons("map-select");
+            //remove drop threats
+            removeAllClassFromMapbuttons("drop-threat");
+            //remove drop buttons
+            removeElement("map-screen-toolbar", "drop-select-cancel");
+            removeElement("map-screen-toolbar", "make-drop");
+            removeAllWildCardButtons();
+            //change mode
+            gameVars.gameStatus.mode = "attack";
+            //go back to choose attack
+            beginAttack();
+        }
+    }
+    else {
+        //clear queue
+        gameVars.globalGameOptions.supplyInfo.supplyDropQueue === [];
+        //remove map select class
+        removeAllClassFromMapbuttons("map-select");
+        //remove drop threats
+        removeAllClassFromMapbuttons("drop-threat");
+        //map note
+        document.getElementById("map-note").innerHTML = 3 - gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length;
+        //update cancel button
+        document.getElementById("drop-select-cancel").innerHTML = "Cancel Supply Drop";
+        //remove all wild card buttons
+        removeAllWildCardButtons();
+        //disable make drop button
+        disableId("make-drop");
+        //make wild drop button for each wild card
+        buildWildCardButtons();
+    }
 }
 
 function chooseSupplyDrop(country) {
@@ -153,11 +182,15 @@ function chooseSupplyDrop(country) {
     if (isAlreadyClicked === false || country === "none") {
         if (isSupplyable(country) && gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length < 3) {
             if (gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length === 0) {
-                addElement("map-screen-toolbar", "button", "Clear Selected Drops", "drop-select-cancel", "map-button", clearDropSelect);
+                //update cancel button
+                document.getElementById("drop-select-cancel").innerHTML = "Clear Selected Drops";
             }
             if (country !== "none") {
                 //add class map select
                 addClass(country, "map-select");
+                for (var i = 0; i < findFullCountryWithCountry(country).borders.length; i++) {
+                    addClass(findFullCountryWithCountry(country).borders[i], "drop-threat");
+                }
             }
             //add country to queue
             gameVars.globalGameOptions.supplyInfo.supplyDropQueue.push(country);
@@ -165,7 +198,8 @@ function chooseSupplyDrop(country) {
             document.getElementById("map-note").innerHTML = 3 - gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length;
             //create make drop button after 3 drops
             if (gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length === 3) {
-                addElement("map-screen-toolbar", "button", "Make Supply Drop", "make-drop", "map-button", makeSupplyDrop);
+                //enable make drop button
+                undisableId("make-drop");
             }
         }
     }
@@ -204,13 +238,19 @@ function goToSupplyDrop() {
     //update message and note
     document.getElementById("map-message").innerHTML = findPlayerName(gameVars.gameStatus.turn) + " Choose Supply Drop";
     document.getElementById("map-note").innerHTML = 3 - gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length;
-
     //remove suply drop button
     removeElement("map-screen-toolbar", "supply-drop-button");
     //remove deline attack button
     removeElement("map-screen-toolbar", "decline-attack");
+    //remove confirm attack
+    removeElement("map-screen-toolbar", "confirm-attack");
     //change mode
     gameVars.gameStatus.mode = "drop";
+    //make cancel drop button
+    addElement("map-screen-toolbar", "button", "Cancel Supply Drop", "drop-select-cancel", "map-button", clearDropSelect);
+    //make confirm drop button and disable
+    addElement("map-screen-toolbar", "button", "Make Supply Drop", "make-drop", "map-button", makeSupplyDrop);
+    disableId("make-drop");
     //make wild drop button for each wild card
     buildWildCardButtons();
     //rebuild map buttons
@@ -218,7 +258,7 @@ function goToSupplyDrop() {
 }
 
 function selectSupplyDrop() {
-    var confirmDrop = alert(findPlayerName(gameVars.gameStatus.turn) + " Must Go to Supply Drop");
+    var confirmDrop = confirm(findPlayerName(gameVars.gameStatus.turn) + " Go to Supply Drop?");
 
     if (confirmDrop) {
         goToSupplyDrop();
@@ -252,7 +292,7 @@ function supplyDropAvailable(currentSupplyHand) {
     countTypes = countSupplyTypes(currentSupplyHand),
     supplyNeeded = gameVars.globalGameOptions.supplyInfo.droppedPerSession;
 
-    /*
+    /*future version to check supply types
     if (currentSupplyHand.length >= supplyNeeded && countWild >= 1) {
         return true;
     }
@@ -285,7 +325,7 @@ function supplyDropCheck() {
         goToSupplyDrop();
     }
     else if (supplyDropReady === true) {
-        //add drop button
-        addElement("map-screen-toolbar", "button", "Supply Drop", "supply-drop-button", "map-buton", selectSupplyDrop);
+        //create supply drop button
+        addElement("map-screen-toolbar", "button", "Supply Drop", "supply-drop-button", "map-button", selectSupplyDrop);
     }
 }

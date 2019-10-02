@@ -1,4 +1,21 @@
 //Code Masters
+function stringToDate(string) {
+    var newDate = Date(string),
+    parts = newDate.split(' '),
+    findTimeZone = [];
+
+    //WeekDay = parts[0],
+    //Month = parts[1],
+    //Day = parts[2],
+    //Year = parts[3],
+    //Time = parts[4],
+    //TimeZoneDiff = parts[5],
+
+    for (var i = 6; i <= parts.length; i++) {
+        findTimeZone.push(parts[i]);
+    }
+    return [parts[0], parts[1], parts[2], parts[3], parts[4], parts[5], findTimeZone];
+}
 
 function getNextTurn() {
     for (var i = 0; i < gameVars.gameStatus.turnOrder.length; i++) {
@@ -237,26 +254,43 @@ function findPlayerName(playerNumber) {
     return gameVars.playerInfo["player" + playerNumber].playerName;
 }
 
-function addElement(addToId, elementType, elementContent, idToInclude, classToInclude, clickFunctionToInclude) {
-    var newElement = document.createElement(elementType),//create a new element
-    newContent = document.createTextNode(elementContent);//create content
-    
+function addElement(addToId, elementType, elementContent, idToInclude, classToInclude, clickFunctionToInclude, hoverFunctionToInclude, offHoverFunctionToInclude) {
+    var newElement = document.createElement(elementType);//create a new element
+
+    //add class
     if (!!classToInclude && classToInclude !== "noClass") {
         newElement.classList.add(classToInclude);
     }
-    
+    //add functions
     if (!!idToInclude && idToInclude !== "noId") {
         newElement.id = idToInclude;
+
         if (!!clickFunctionToInclude && clickFunctionToInclude !== "noFunction") {
             newElement.onclick = function() { clickFunctionToInclude(idToInclude); };
         }
-    }
-    //add text node to new element
-    newElement.appendChild(newContent);
+        if (!!hoverFunctionToInclude && hoverFunctionToInclude !== "noHover") {
+            newElement.onmouseover = function() { hoverFunctionToInclude(idToInclude); };
+        }
+        if (!!offHoverFunctionToInclude && offHoverFunctionToInclude !== "noOffHover") {
+            newElement.onmouseout = function() { offHoverFunctionToInclude(idToInclude); };
+        }
 
+    }
+    //add text
+    if (elementContent.indexOf("<") !== 0 && elementContent !== "noContent") {
+        //create content node
+        newContent = document.createTextNode(elementContent);
+        //add text node to new element
+        newElement.appendChild(newContent);
+    }
     //add new element and contents to DOM
     var currentElement = document.getElementById(addToId);
     currentElement.appendChild(newElement);
+    //add html text
+    if (elementContent.indexOf("<") === 0) {
+        //create innerHTML text
+        document.getElementById(idToInclude).innerHTML = elementContent;
+    }
 }
 
 function removeElement(parentId, elementId) {
@@ -287,8 +321,11 @@ function updateLog(text) {
     for (var i = 0; i < text.length; i++) {
         logText.push(text[i]);
     }
-    if (logLength > 1 && lastLog[1].search("Begins") > 0) {
+    if (logLength > 0 && lastLog[1].search("Begins") !== -1) {
         logText.push("Game Duration: " + formatDuration(Date.parse(Date()) - lastLog[0]));
+    }
+    if (logLength > 0 && logText[1].search("Begins") !== -1) {
+        logText.push(gameVars.gameStatus.turn);
     }
     gameVars.gameLog.push(logText);
 }
