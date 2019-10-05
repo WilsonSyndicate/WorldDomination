@@ -6,29 +6,27 @@ function findIntroLogText(currentLogEntry) {
             return currentLogEntry[1];
         }
         else {
-            return findPlayerName(currentLogEntry[2]) + " attacks ";
+            var attackLogName = findPlayerName(currentLogEntry[2]),
+            attackLogDeckName = currentLogEntry[3][0].deckName;
+
+            return attackLogName + " attacks with " + attackLogDeckName;
         }
     }
     else if (currentLogEntry[1].search("Complete") !== -1) {
 
-        //having trouble with this
+        if (currentLogEntry[1].search("Initiation") !== -1) {
+            var completedLogName = findPlayerName(currentLogEntry[2][0][0]),
+            completedLogEntry = currentLogEntry[2][0][1];
 
-        
-        return "Game ends with " + findPlayerName(currentLogEntry[2][0][0]) + "' " + currentLogEntry[2][0][1] + " as the winner";
-
-
-
-
-
+            return completedLogName + " playing " + completedLogEntry + " wins the Initiation Game!";
+        }
+        else {
+            return currentLogEntry[2][0]
+        }
     }
     else if (currentLogEntry[1].search("Drop") !== -1) {
         return "Supply Drop";
     }
-
-
-
-
-    
 }
 
 function showLogInfo() {

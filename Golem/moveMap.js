@@ -118,8 +118,6 @@ function moveDecksBetweenCounries(country1, country2) {
     fullCountry2 = findFullCountryWithCountry(country2),
     tempDeck = {};
 
-    //undisable cancel move button
-    undisableId("cancel-move");
     if (!!fullCountry2.deck) {
         tempDeck = fullCountry1.deck;
         fullCountry1.deck = fullCountry2.deck;
@@ -139,19 +137,14 @@ function availableCountryMove() {
     return false;
 }
 
-
-//this needs to be fixed
-
-//check for country owned by current player
-//check for moves available
-//check for border range
-
 //if clicking on another country with same player, reset map select
 function makeFirstClickMove(country) {
     //push to map select
     gameVars.mapInfo.mapSelect.push(country);
     //mark as move selected
     addClass(country, "map-select");
+    //undisable cancel move button
+    undisableId("cancel-move");
 }
 
 function makeSecondClickMove(country) {
@@ -285,33 +278,13 @@ function isMovable(country) {
         }
     }
     else if (!!fullCountry.deck === false) {
-        return true;
-    }
-    return false;
+        for (var c = 0; c < fullCountry.borders.length; c++) {
+            var borderFullCountry = findFullCountryWithCountry(fullCountry.borders[c]);
 
-
-    /*
-    for (var i = 0; i < fullCountry.borders.length; i++) {
-        var borderFullCountry = findFullCountryWithCountry(fullCountry.borders[i]);
-
-        if (!!fullCountry.deck) {
-            var countryPlayer = fullCountry.deck.deckPlayer;
-
-            if (countryPlayer === currentTurn) {
-                if (!!borderFullCountry.deck && borderFullCountry.deck.deckPlayer === currentTurn) {
-                    return true;
-                }
-                else if (!!borderFullCountry.deck === false) {
-                    return true;
-                }
-            }
-        }
-        else {
             if (!!borderFullCountry.deck && borderFullCountry.deck.deckPlayer === currentTurn) {
                 return true;
             }
         }
     }
     return false;
-    */
 }

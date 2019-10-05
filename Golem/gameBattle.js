@@ -322,6 +322,9 @@ function getSupplyCard(player) {
     var nextSupplyCard = gameVars.globalGameOptions.supplyInfo.supplyDropCardsToDraw.pop();
     findFullPlayerWithPlayerNumber(player).playerSupplyPoints.push(nextSupplyCard);
     shuffleArray(gameVars.globalGameOptions.supplyInfo.supplyDropCardsToDraw);
+
+    //for testing
+    return nextSupplyCard;
 }
 
 function markDeckAsWinner(deckPlayer, deckName) {
@@ -425,7 +428,7 @@ function battleWinner(winningPlayerButton) {
             }
             //update battle winners
             markDeckAsWinner(winningDeck.deckPlayer, winningDeck.deckName);
-            logTempNote.push(winningPlayerName + " playing " + winningDeck.deckName + " won");
+            logTempNote.push(winningPlayerName + " playing " + winningDeck.deckName + " wins");
             //update battle losers
             for (var i = 0; i < losingDecks.length; i++) {
                 markDeckAsLoser(losingDecks[i].deckPlayer, losingDecks[i].deckName, battleDefender.deckPlayer);
@@ -554,6 +557,8 @@ function displayBattleInfo(battleDeckRef) {
     addElement("battle-information", "div", battleText, "battle-player" + battleDeckRef, "battle-player");
     //create buttons
     addElement("battle-player" + battleDeckRef, "button", currentPlayerName, "battle-winner-" + currentPlayer, "player-color-" + currentPlayer, battleWinner);
+    //add btn class to button
+    addClass("battle-winner-" + currentPlayer, "btn");
     //for each battle player show player, deck, life, cards
     for (var d = 0; d < gameMods.length; d++) {
         if (gameMods[d] !== "") {

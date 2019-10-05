@@ -126,12 +126,31 @@ function makeSupplyDrop() {
         gameVars.gameStatus.mode = "attack";
         //go back to choose attack
         beginAttack();
+        //alert user
+        alert("Supply Drop Finished, proceed to Attack");
     }
 }
 
 function removeAllWildCardButtons() {
     removeElement("map-screen-toolbar", "wild-drop0");
     removeElement("map-screen-toolbar", "wild-drop1");
+}
+
+
+function maxSupplyCheck() {
+    var currentTurn = gameVars.gameStatus.turn,
+    currentPlayerSupplyCount = gameVars.playerInfo["player" + currentTurn].playerSupplyPoints.length;
+
+    if (currentPlayerSupplyCount >= gameVars.globalGameOptions.supplyInfo.maxSupplyPerPerson) {
+        //change button note
+        document.getElementById("drop-select-cancel").innerHTML = "Unable to Cancel";
+        //disable cancel drop
+        disableId("drop-select-cancel");
+    }
+    else {
+        //enable cancel drop
+        undisableId("drop-select-cancel");
+    }
 }
 
 function clearDropSelect() {
@@ -157,15 +176,17 @@ function clearDropSelect() {
     }
     else {
         //clear queue
-        gameVars.globalGameOptions.supplyInfo.supplyDropQueue === [];
+        gameVars.globalGameOptions.supplyInfo.supplyDropQueue = [];
         //remove map select class
         removeAllClassFromMapbuttons("map-select");
         //remove drop threats
         removeAllClassFromMapbuttons("drop-threat");
         //map note
-        document.getElementById("map-note").innerHTML = 3 - gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length;
+        document.getElementById("map-note").innerHTML = "Drops Remaining: ".concat(3 - gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length);
         //update cancel button
         document.getElementById("drop-select-cancel").innerHTML = "Cancel Supply Drop";
+        //check for max to disable cancel
+        maxSupplyCheck();
         //remove all wild card buttons
         removeAllWildCardButtons();
         //disable make drop button
@@ -184,6 +205,7 @@ function chooseSupplyDrop(country) {
             if (gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length === 0) {
                 //update cancel button
                 document.getElementById("drop-select-cancel").innerHTML = "Clear Selected Drops";
+                undisableId("drop-select-cancel");
             }
             if (country !== "none") {
                 //add class map select
@@ -195,7 +217,7 @@ function chooseSupplyDrop(country) {
             //add country to queue
             gameVars.globalGameOptions.supplyInfo.supplyDropQueue.push(country);
             //map note
-            document.getElementById("map-note").innerHTML = 3 - gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length;
+            document.getElementById("map-note").innerHTML = "Drops Remaining: ".concat(3 - gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length);
             //create make drop button after 3 drops
             if (gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length === 3) {
                 //enable make drop button
@@ -237,7 +259,7 @@ function buildWildCardButtons() {
 function goToSupplyDrop() {
     //update message and note
     document.getElementById("map-message").innerHTML = findPlayerName(gameVars.gameStatus.turn) + " Choose Supply Drop";
-    document.getElementById("map-note").innerHTML = 3 - gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length;
+    document.getElementById("map-note").innerHTML = "Drops Remaining: ".concat(3 - gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length);
     //remove suply drop button
     removeElement("map-screen-toolbar", "supply-drop-button");
     //remove deline attack button
@@ -248,6 +270,11 @@ function goToSupplyDrop() {
     gameVars.gameStatus.mode = "drop";
     //make cancel drop button
     addElement("map-screen-toolbar", "button", "Cancel Supply Drop", "drop-select-cancel", "map-button", clearDropSelect);
+
+    //check for max to disable cancel
+    maxSupplyCheck();
+
+
     //make confirm drop button and disable
     addElement("map-screen-toolbar", "button", "Make Supply Drop", "make-drop", "map-button", makeSupplyDrop);
     disableId("make-drop");

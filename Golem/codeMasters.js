@@ -254,42 +254,103 @@ function findPlayerName(playerNumber) {
     return gameVars.playerInfo["player" + playerNumber].playerName;
 }
 
-function addElement(addToId, elementType, elementContent, idToInclude, classToInclude, clickFunctionToInclude, hoverFunctionToInclude, offHoverFunctionToInclude) {
-    var newElement = document.createElement(elementType);//create a new element
+function addMapElement(addToId, elementType, elementContent, idToInclude, classToInclude, clickFunctionToInclude, hoverFunctionToInclude, offHoverFunctionToInclude) {
+    var newElement = document.createElementNS("http://www.w3.org/2000/svg", elementType),//create a new svg element    
+    countryShape = document.createElementNS("http://www.w3.org/2000/svg", "circle");//inner shape area
 
     //add class
     if (!!classToInclude && classToInclude !== "noClass") {
-        newElement.classList.add(classToInclude);
-    }
-    //add functions
+        newElement.classList.add(classToInclude + "-space");
+        }
     if (!!idToInclude && idToInclude !== "noId") {
-        newElement.id = idToInclude;
-
-        if (!!clickFunctionToInclude && clickFunctionToInclude !== "noFunction") {
-            newElement.onclick = function() { clickFunctionToInclude(idToInclude); };
-        }
-        if (!!hoverFunctionToInclude && hoverFunctionToInclude !== "noHover") {
-            newElement.onmouseover = function() { hoverFunctionToInclude(idToInclude); };
-        }
-        if (!!offHoverFunctionToInclude && offHoverFunctionToInclude !== "noOffHover") {
-            newElement.onmouseout = function() { offHoverFunctionToInclude(idToInclude); };
-        }
-
+        newElement.id = idToInclude + "-space";
     }
-    //add text
-    if (elementContent.indexOf("<") !== 0 && elementContent !== "noContent") {
-        //create content node
-        newContent = document.createTextNode(elementContent);
-        //add text node to new element
-        newElement.appendChild(newContent);
-    }
+    //svg area, will be different for each country
+    newElement.setAttributeNS(null, "width", 150);
+    newElement.setAttributeNS(null, "height", 150);
     //add new element and contents to DOM
     var currentElement = document.getElementById(addToId);
     currentElement.appendChild(newElement);
-    //add html text
-    if (elementContent.indexOf("<") === 0) {
-        //create innerHTML text
-        document.getElementById(idToInclude).innerHTML = elementContent;
+    //specific country shape
+    countryShape.setAttributeNS(null, "cx", 75);
+    countryShape.setAttributeNS(null, "cy", 75);
+    countryShape.setAttributeNS(null, "r", 69);
+    //add class
+    if (!!classToInclude && classToInclude !== "noClass") {
+        countryShape.classList.add(classToInclude);
+        }
+    //add functions
+    if (!!idToInclude && idToInclude !== "noId") {
+        countryShape.id = idToInclude;
+
+        if (!!clickFunctionToInclude && clickFunctionToInclude !== "noFunction") {
+            countryShape.onclick = function() { clickFunctionToInclude(countryShape.id); };
+        }
+        if (!!hoverFunctionToInclude && hoverFunctionToInclude !== "noHover") {
+            countryShape.onmouseover = function() { hoverFunctionToInclude(countryShape.id); };
+        }
+        if (!!offHoverFunctionToInclude && offHoverFunctionToInclude !== "noOffHover") {
+            countryShape.onmouseout = function() { offHoverFunctionToInclude(countryShape.id); };
+        }
+    }
+    //append shape to svg
+    newElement.appendChild(countryShape);
+    
+    //add text, help from: https://stackoverflow.com/questions/9281199/adding-text-to-svg-document-in-javascript
+    if (!!elementContent && elementContent !== "noContent") {
+        var newText = document.createElementNS("http://www.w3.org/2000/svg","text"),
+
+        textNode = document.createTextNode(elementContent);
+        newText.setAttributeNS(null,"pointer-events","none");
+        newText.setAttributeNS(null,"x","50%");
+        newText.setAttributeNS(null,"y","50%");
+        newText.setAttributeNS(null,"text-anchor","middle");
+        newText.setAttributeNS(null,"dominant-baseline","center");
+        newText.appendChild(textNode);
+        newElement.appendChild(newText);
+    }
+}
+
+function addElement(addToId, elementType, elementContent, idToInclude, classToInclude, clickFunctionToInclude, hoverFunctionToInclude, offHoverFunctionToInclude) {
+    if (elementType === "svg") {
+        addMapElement(addToId, elementType, elementContent, idToInclude, classToInclude, clickFunctionToInclude, hoverFunctionToInclude, offHoverFunctionToInclude);
+    }
+    else {
+        var newElement = document.createElement(elementType);//create a new element
+
+        //add class
+        if (!!classToInclude && classToInclude !== "noClass") {
+            newElement.classList.add(classToInclude);
+        }
+        //add functions
+        if (!!idToInclude && idToInclude !== "noId") {
+            newElement.id = idToInclude;
+
+            if (!!clickFunctionToInclude && clickFunctionToInclude !== "noFunction") {
+                newElement.onclick = function() { clickFunctionToInclude(idToInclude); };
+            }
+            if (!!hoverFunctionToInclude && hoverFunctionToInclude !== "noHover") {
+                newElement.onmouseover = function() { hoverFunctionToInclude(idToInclude); };
+            }
+            if (!!offHoverFunctionToInclude && offHoverFunctionToInclude !== "noOffHover") {
+                newElement.onmouseout = function() { offHoverFunctionToInclude(idToInclude); };
+            }
+        }
+        //add text
+        if (elementContent.indexOf("<") !== 0 && elementContent !== "noContent") {
+            //create content node
+            newContent = document.createTextNode(elementContent);
+            //add text node to new element
+            newElement.appendChild(newContent);
+        }
+        //add new element and contents to DOM
+        var currentElement = document.getElementById(addToId);
+        currentElement.appendChild(newElement);
+        //add html text
+        if (elementContent.indexOf("<") === 0) {
+            //create innerHTML text
+            document.getElementById(idToInclude).innerHTML = elementContent;
+        }
     }
 }
 
@@ -326,6 +387,7 @@ function updateLog(text) {
     }
     if (logLength > 0 && logText[1].search("Begins") !== -1) {
         logText.push(gameVars.gameStatus.turn);
+        logText.push(gameVars.battleScreenInfo.battleDecks);
     }
     gameVars.gameLog.push(logText);
 }

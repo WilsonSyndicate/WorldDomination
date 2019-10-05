@@ -16,135 +16,124 @@
 }
 
 /*Country Base Style*/
-.country-button {
+.country-button-space {
     position: absolute;
-    background-color: rgba(211, 211, 211, 0.25);    
-    width: 140px;
 }
 .is-supplyable {
-    background-color: gray;
-    border: 1px solid yellow;
+    stroke: yellow;
+    stroke-width: 2;
 }
 .drop-threat {
-    border: 2px solid orange;
-}
-.map-select {
-    border: 2px solid red;
+    stroke: orange;
+    stroke-width: 2;
 }
 
-
+/*Other Button Colors*/
 /*Player 1*/
-.not-attackable.player-color-1, 
-.out-of-range.player-color-1 {
-    background-color: var(--player-1-inactive);
-}
-.player-color-1, 
 .btn.player-color-1,
-.player-color-1.current-player, 
-.player-color-1.map-attack, 
-.attack-threat.player-color-1, 
-.join-threat.player-color-1, 
-.map-defend.player-color-1,
-.map-join.player-color-1 {
+.toolbar.player-color-1 {
     background-color: var(--player-1-color);
 }
-.already-attacked.player-color-1, 
-.not-movable.player-color-1, 
+/*Player 2*/
+.btn.player-color-2,
+.toolbar.player-color-2 {
+    background-color: var(--player-2-color);
+}
+/*Player 3*/
+.btn.player-color-3,
+.toolbar.player-color-3 {
+    background-color: var(--player-3-color);
+}
+/*Player 4*/
+.btn.player-color-4,
+.toolbar.player-color-4 {
+    background-color: var(--player-4-color);
+}
+/*Player 5*/
+.btn.player-color-5,
+.toolbar.player-color-5 {
+    background-color: var(--player-5-color);
+}
+
+
+/*Country Button Colors*/
+.country-button {  
+    fill: var(--gray);
+}
+.country-button.not-attackable,
+.country-button.not-movable,
+.country-button.not-supplyable {
+    fill: rgba(128, 128, 128, 0.25); 
+}
+/*Player 1*/
+.country-button.player-color-1 {
+    fill: var(--player-1-color);
+}
+.not-attackable.player-color-1, 
+.out-of-range.player-color-1,
+.not-movable.player-color-1,
+.already-attacked.player-color-1,
 .not-supplyable.player-color-1 {
-    background-color: var(--player-1-inactive);
+    fill: var(--player-1-inactive);
 }
 
 /*Player 2*/
+.country-button.player-color-2 {
+    fill: var(--player-2-color);
+}
 .not-attackable.player-color-2, 
-.out-of-range.player-color-2 {
-    background-color: var(--player-2-inactive);
-}
-.player-color-2, 
-.btn.player-color-2,
-.player-color-2.current-player, 
-.player-color-2.map-attack, 
-.attack-threat.player-color-2, 
-.join-threat.player-color-2, 
-.map-defend.player-color-2,
-.map-join.player-color-2 {
-    background-color: var(--player-2-color);
-}
-.already-attacked.player-color-2, 
-.not-movable.player-color-2, 
+.out-of-range.player-color-2,
+.not-movable.player-color-2,
+.already-attacked.player-color-2,
 .not-supplyable.player-color-2 {
-    background-color: var(--player-2-inactive);
+    fill: var(--player-2-inactive);
 }
 
 /*Player 3*/
+.country-button.player-color-3 {
+    fill: var(--player-3-color);
+}
 .not-attackable.player-color-3, 
-.out-of-range.player-color-3 {
-    background-color: var(--player-3-inactive);
-}
-.player-color-3, 
-.player-color-3.current-player, 
-.player-color-3.map-attack, 
-.attack-threat.player-color-3, 
-.join-threat.player-color-3, 
-.map-defend.player-color-3,
-.map-join.player-color-3 {
-    background-color: var(--player-3-color);
-}
-.already-attacked.player-color-3, 
-.not-movable.player-color-3, 
+.out-of-range.player-color-3,
+.not-movable.player-color-3,
+.already-attacked.player-color-3,
 .not-supplyable.player-color-3 {
-    background-color: var(--player-3-inactive);
+    fill: var(--player-3-inactive);
 }
 
 /*Player 4*/
+.country-button.player-color-4 {
+    fill: var(--player-4-color);
+}
 .not-attackable.player-color-4, 
-.out-of-range.player-color-4 {
-    background-color: var(--player-4-inactive);
-}
-.player-color-4, 
-.player-color-4.current-player, 
-.player-color-4.map-attack, 
-.attack-threat.player-color-4, 
-.join-threat.player-color-4, 
-.map-defend.player-color-4,
-.map-join.player-color-4, 
-.not-movable.player-color-4 {
-    background-color: var(--player-4-color);
-}
-.already-attacked.player-color-4, 
-.not-movable.player-color-4, 
+.out-of-range.player-color-4,
+.not-movable.player-color-4,
+.already-attacked.player-color-4,
 .not-supplyable.player-color-4 {
-    background-color: var(--player-4-inactive);
+    fill: var(--player-4-inactive);
 }
 
 /*Player 5*/
+.country-button.player-color-5 {
+    fill: var(--player-5-color);
+}
 .not-attackable.player-color-5, 
-.out-of-range.player-color-5 {
-    background-color: var(--player-5-inactive);
-}
-.player-color-5, 
-.player-color-5.current-player, 
-.player-color-5.map-attack, 
-.attack-threat.player-color-5, 
-.join-threat.player-color-5, 
-.map-defend.player-color-5,
-.map-join.player-color-5 {
-    background-color: var(--player-5-color);
-}
-.already-attacked.player-color-5, 
-.not-movable.player-color-5, 
+.out-of-range.player-color-5,
+.not-movable.player-color-5,
+.already-attacked.player-color-5,
 .not-supplyable.player-color-5 {
-    background-color: var(--player-5-inactive);
+    fill: var(--player-5-inactive);
 }
+
+
 
 /*Country Border Styles*/
 .map-attack, 
 .map-defend, 
-.map-join{
-    border: 3px solid var(--selected);
-}
-.attack-threat, 
-.join-threat {
-    border: 3px solid var(--threat-possible);
+.map-join,
+.map-select{
+    stroke: var(--selected);
+    stroke-width: 3;
 }
 
 /*Button Styles*/
@@ -193,8 +182,6 @@
     top: 10px;
     right: 451px;
 }
-
-
 
 
 
@@ -250,171 +237,171 @@
 /*Country Positions*/
 
 
-#afghanistan {
+#afghanistan-space {
     top: 607px;
     left: 963px;
 }
-#alaska {
-    top: 407px;
-    Left: 36px;
+#alaska-space {
+    top: 302px;
+    Left: 15px;
 }
-#alberta {
-    top: 473px;
-    left: 184px;
+#alberta-space {
+    top: 382px;
+    left: 144px;
 }
-#argentina {
-    top: 1059px;
-    left: 332px;
+#argentina-space {
+    top: 979px;
+    left: 315px;
 }
-#brazil {
-    top: 858px;
-    left: 410px;
+#brazil-space {
+    top: 799px;
+    left: 429px;
 }
-#central-america {
-    top: 702px;
+#central-america-space {
+    top: 635px;
     left: 189px;
 }
-#china {
+#china-space {
     top: 666px;
     left: 1118px;
 }
-#congo {
+#congo-space {
     top: 969px;
     left: 748px;
 }
-#east-africa {
+#east-africa-space {
     top: 897px;
     left: 847px;
 }
-#eastern-australia {
+#eastern-australia-space {
     top: 1062px;
     left: 1344px;
 }
-#eastern-usa {
-    top: 600px;
+#eastern-usa-space {
+    top: 527px;
     left: 304px;
 }
-#egypt {
+#egypt-space {
     top: 794px;
     Left: 770px;
 }
-#great-britan {
+#great-britan-space {
     top: 528px;
     left: 560px;    
 }
-#greenland {
-    top: 341px;
+#greenland-space {
+    top: 242px;
     left: 454px;    
 }
-#iceland {
+#iceland-space {
     top: 429px;
     left: 588px;    
 }
-#india {
+#india-space {
     top: 741px;
     left: 1043px;    
 }
-#indonesia {
+#indonesia-space {
     top: 949px;
     left: 1174px;
 }
-#irkutsk {
+#irkutsk-space {
     top: 490px;
     left: 1152px;    
 }
-#japan {
+#japan-space {
     top: 547px;
     left: 1340px;    
 }
-#kamchatka {
+#kamchatka-space {
     top: 402px;
     left: 1279px;    
 }
-#madagascar {
+#madagascar-space {
     top: 1090px;
     left: 944px;
 }
-#middle-east {
+#middle-east-space {
     top: 706px;
     left: 842px;    
 }
-#mongolia {
+#mongolia-space {
     top: 569px;
     left: 1164px;    
 }
-#new-guinea {
+#new-guinea-space {
     top: 916px;
     left: 1346px;
 }
-#north-africa {
+#north-africa-space {
     top: 830px;
     left: 618px;
 }
-#northern-europe {
+#northern-europe-space {
     top: 559px;
     left: 698px;    
 }
-#northwest-territory {
-    top: 362px;
-    left: 182px;    
+#northwest-territory-space {
+    top: 260px;
+    left: 202px;    
 }
-#ontario {
-    top: 441px;
-    left: 306px;    
+#ontario-space {
+    top: 389px;
+    left: 280px;    
 }
-#peru {
-    top: 890px;
-    left: 306px;    
+#peru-space {
+    top: 812px;
+    left: 283px;    
 }
-#quebec {
-    top: 502px;
-    left: 406px;    
+#quebec-space {
+    top: 404px;
+    left: 416px;    
 }
-#scandanavia {
+#scandanavia-space {
     top: 391px;
     left: 710px;    
 }
-#siam {
+#siam-space {
     top: 805px;
     left: 1184px;    
 }
-#siberia {
+#siberia-space {
     top: 321px;
     left: 1047px;    
 }
-#south-africa {
+#south-africa-space {
     top: 1125px;
     left: 751px;
 }
-#southern-europe {
+#southern-europe-space {
     top: 649px;
     left: 708px;    
 }
-#ukraine {
+#ukraine-space {
     top: 421px;
     left: 848px;    
 }
-#ural {
+#ural-space {
     top: 466px;
     left: 998px;    
 }
-#veneseulea {
-    top: 781px;
+#veneseulea-space {
+    top: 685px;
     left: 328px;    
 }
-#western-australia {
+#western-australia-space {
     top: 1105px;
     left: 1246px;
 }
-#western-europe {
+#western-europe-space {
     top: 676px;
     left: 588px;    
 }
-#western-usa {
-    top: 568px;
-    left: 188px;    
+#western-usa-space {
+    top: 502px;
+    left: 167px;    
 }
-#yakutsk {
+#yakutsk-space {
     top: 358px;
     left: 1188px;    
 }

@@ -12,10 +12,14 @@ function declineAttack() {
     else {
         //clear map select
         gameVars.mapInfo.mapSelect = [];
+        //clear join threats
+        gameVars.mapInfo.joinThreat = [];
         //rename button
         document.getElementById("decline-attack").innerHTML = "Decline Attack";
         //rebuild map
         buildMapButtons();
+        //update note
+        document.getElementById("map-note").innerHTML = findPlayerName(gameVars.gameStatus.turn) + " Choose Attack";
     }
 }
 
@@ -49,6 +53,8 @@ function resetMapScreen() {
     disableId("confirm-attack");
     //clear map select
     gameVars.mapInfo.mapSelect = [];
+    //update reset map button
+    document.getElementById("decline-attack").innerHTML = "Decline Attack";
 }
 
 function removeAllClassFromMapbuttons(classToRemove) {
@@ -122,6 +128,18 @@ function markAllCountriesBorderingWithSamePlayer(country, classToAdd) {
     }
 }
 
+function markAllOtherCountriesBorderingWithGivenPlayer(country, player, classToAdd) {
+    var fullCountry = findFullCountryWithCountry(country);
+
+    for (var i = 0; i < fullCountry.borders.length; i++) {
+        var fullBorderCountry = findFullCountryWithCountry(fullCountry.borders[i]);
+
+        if (!!fullBorderCountry.deck && fullBorderCountry.deck.deckPlayer === player && fullBorderCountry.deck.deckName !== gameVars.mapInfo.mapSelect[0].deckName) {
+            addClass(fullBorderCountry.country, classToAdd);
+        }
+    }
+}
+
 function selectAttacker(country, countryDeck, currentTurnPlayerName, countryDeckName) {
     //remove all attack classes
     removeAllClassFromMapbuttons("attack-threat");
@@ -170,7 +188,9 @@ function selectDefender(country, countryPlayer, countryDeckName) {
     markToSurroundingPossibleBattle(country, "join-threat");
     //mark out of range
     markAllMapCountriesNotBorderingCountry(country, "out-of-range");
-    //mark bordering countries with same player
+    //mark bordering countries with current player
+    markAllOtherCountriesBorderingWithGivenPlayer(country, gameVars.gameStatus.turn, "out-of-range");
+    //mark all bordering countries with same player
     markAllCountriesBorderingWithSamePlayer(country, "out-of-range");
     //update note with deck shown name
     document.getElementById("map-note").innerHTML += shownDeckName(countryPlayer, countryDeckName);
@@ -306,14 +326,14 @@ function countryMapName(currentCountry) {
         isHidden = findDeckWithPlayerNumberAndName(currentPlayerNumber, curentDeckName).deckHidden;  
 
         if (isHidden) {
-            return "<span>" + currentCountryName + "</span><br/><span>" + currentPlayerName + "</span>";
+            return currentPlayerName;
         }
         else {
-            return "<span>" + currentCountryName + "</span><br/><span>" + curentDeckName + "</span>";
+            return curentDeckName;
         }
     }
     else {
-        return "<span>" + currentCountryName + "</span>";
+        return currentCountryName;
     }
 }
 
@@ -367,6 +387,7 @@ function isCountryAttackable(country) {
         }
         return true;
     }
+    return false;
 }
 
 function buildMapButtons() {    
@@ -379,7 +400,7 @@ function buildMapButtons() {
         alreadyAttacked = isItemInArray(currentCountry, gameVars.mapInfo.alreadyAttacked);
 
         //refresh each country button
-        removeElement("map-countries", currentCountry);
+        removeElement("map-countries", currentCountry + "-space");
         addElement("map-countries", "svg", countryMapName(currentFullCountry), currentCountry, "country-button", mapCountryClick, mapCountryHover);
         //all check for player color
         if (!!currentFullCountry.deck) {

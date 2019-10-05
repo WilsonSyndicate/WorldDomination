@@ -1,8 +1,8 @@
 //importing fonts
 
+//disable cancel supply drop if 5 or more cards
 
 
-//supply drop button not working
 
 
 //future versions
@@ -16,6 +16,7 @@
 //hero and conspiracy
 //more bonuses and penalties
 //last deck is two headed giant
+//initiative game evey turn
 
 //Admin Settings
 const adminSettings = {
@@ -141,6 +142,8 @@ var gameVars = {
             playerName: "Player1",
             playerDugout: 0,
             playerSupplyPoints: [],
+            primaryColor: "rgb(23, 162, 184)",
+            secondaryColor: "rgba(23, 162, 184, 0.25)",
             playerDecklist: [
                 {deckName: "Everything Burns", deckColors: "RG"},
                 {deckName: "Evil Eye", deckColors: "B"},
@@ -254,6 +257,8 @@ var gameVars = {
             playerName: "Player2",
             playerDugout: 0,
             playerSupplyPoints: [],
+            primaryColor: "rgb(220, 53, 69)",
+            secondaryColor: "rgba(220, 53, 69, 0.25)",
             playerDecklist: [
                 {deckName: "I Have Crabs", deckColors: "U"},
                 {deckName: "Northern Horde", deckColors: "R"},
@@ -388,6 +393,8 @@ var gameVars = {
             playerName: "Player3",
             playerDugout: 0,
             playerSupplyPoints: [],
+            primaryColor: "rgb(40, 167, 69)",
+            secondaryColor: "rgba(40, 167, 69, 0.25)",
             playerDecklist: [
                 {deckName: "Big Blue", deckColors: "U"},
                 {deckName: "Big Green", deckColors: "G"},
@@ -552,6 +559,8 @@ var gameVars = {
             playerName: "Player4",
             playerDugout: 0,
             playerSupplyPoints: [],
+            primaryColor: "rgb(255, 193, 7)",
+            secondaryColor: "rgba(255, 193, 7, 0.25)",
             playerDecklist: [
                 {deckName: "Wort", deckColors: "BR"},
                 {deckName: "Yamazaki Clan", deckColors: "UR"},
@@ -725,6 +734,8 @@ var gameVars = {
             playerName: "Player5",
             playerDugout: 0,
             playerSupplyPoints: [],
+            primaryColor: "rgb(111, 66, 193)",
+            secondaryColor: "rgba(111, 66, 193, 0.25)",
             playerDecklist: [
                 {deckName: "Holy Relics", deckColors: "WB"},
                 {deckName: "Honden of The Myojin", deckColors: "WUBRG"},
