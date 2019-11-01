@@ -2,17 +2,18 @@
 /*Player Colors*/
 :root {
     --player-1-color: var(--cyan);
-    --player-1-inactive: rgba(23, 162, 184, 0.25);
+    --player-1-inactive: rgb(232, 250, 252);
     --player-2-color: var(--red);
-    --player-2-inactive: rgba(220, 53, 69, 0.25);
+    --player-2-inactive: rgb(251, 233, 235);
     --player-3-color: var(--green);
-    --player-3-inactive: rgba(40, 167, 69, 0.25);
+    --player-3-inactive: rgb(234, 250, 238);
     --player-4-color: var(--yellow);
-    --player-4-inactive: rgba(255, 193, 7, 0.25);
+    --player-4-inactive: rgb(255, 249, 230);
     --player-5-color: var(--purple);
-    --player-5-inactive: rgba(111, 66, 193, 0.25);
+    --player-5-inactive: rgb(240, 236, 249);
     --threat-possible: var(--orange);
     --selected: yellow;
+    --shadow: rgba(77, 77, 77, 0.25);
 }
 
 /*Country Base Style*/
@@ -28,31 +29,66 @@
     stroke-width: 2;
 }
 
-/*Other Button Colors*/
+/*Other Button and Text Colors*/
 /*Player 1*/
 .btn.player-color-1,
 .toolbar.player-color-1 {
     background-color: var(--player-1-color);
+}
+.player-1-battle-info {
+    font-weight: bold;
+    border: 2px solid black;
+    border-radius: 15px;
+    background-color: rgba(255, 255, 255, 0.25);
+    width: 40%;
 }
 /*Player 2*/
 .btn.player-color-2,
 .toolbar.player-color-2 {
     background-color: var(--player-2-color);
 }
+.player-2-battle-info {
+    font-weight: bold;
+    border: 2px solid black;
+    border-radius: 15px;
+    background-color: rgba(255, 255, 255, 0.25);
+    width: 40%;
+}
 /*Player 3*/
 .btn.player-color-3,
 .toolbar.player-color-3 {
     background-color: var(--player-3-color);
+}
+.player-3-battle-info {
+    font-weight: bold;
+    border: 2px solid black;
+    border-radius: 15px;
+    background-color: rgba(255, 255, 255, 0.25);
+    width: 40%;
 }
 /*Player 4*/
 .btn.player-color-4,
 .toolbar.player-color-4 {
     background-color: var(--player-4-color);
 }
+.player-4-battle-info {
+    font-weight: bold;
+    border: 2px solid black;
+    border-radius: 15px;
+    background-color: rgba(255, 255, 255, 0.25);
+    width: 40%;
+}
 /*Player 5*/
 .btn.player-color-5,
 .toolbar.player-color-5 {
     background-color: var(--player-5-color);
+}
+.player-5-battle-info {
+    font-weight: bold;
+    border: 2px solid black;
+    border-radius: 15px;
+    background-color: rgba(255, 255, 255, 0.25);
+    width: 40%;
 }
 
 
@@ -185,225 +221,628 @@
 
 
 
+/*Screen Styles*/
+/*For Setup*/
+#player-information {
+    background-color: rgba(245, 222, 179, 0.25);
+    width: 100%;
+    height: auto;
+    position: relative;
+    top: 150px;
+    left: 0;
+    z-index: -1;
+    border-color: black;
+    border-style: solid;
+    border-width: 0px 2px 2px 2px;
+    text-align: center;
+}
+#setup-player-decklist-table {
+    width: 75%;
+}
+#potential-decklist {
+    padding: 25px;
+}
+
+/*For Status Page*/
+#intro-information-title {
+    position: relative;
+    top: -40px;
+    text-align: center;
+}
+#intro-information {
+    position:relative;
+    width: 50%;
+    height: 1150px;
+    top: 150px;
+    border-color: black;
+    border-style: solid;
+    border-width: 0px 1px 2px 2px;
+    padding: 75px 10px;
+    background-color: rgba(245, 222, 179, 0.25);
+}
+#known-info {
+    width: 100%;
+}
+#log-information-title {
+    position: relative;
+    top: -40px;
+    text-align: center;
+}
+#log-information {
+    position: relative;
+    float: right;
+    width: 50%;
+    height: 1150px;
+    top: 150px;
+    border-color: black;
+    border-style: solid;
+    border-width: 0px 2px 2px 1px;
+    padding: 75px 10px;
+    background-color: rgba(245, 222, 179, 0.25);
+    overflow: auto;
+}
+#log-info {
+    width: 100%;
+}
+
+/*For Battle Screen*/
+#battle-screen {
+    background-image: url('art/battle-screen-1.jpg');
+    background-size: cover;
+    background-attachment: fixed;
+    min-height: 100%;
+    width: 100%;
+    height: auto;
+    position: fixed;
+}
+#battle-information {
+    min-height: 100%;
+    width: 100%;
+    height: auto;
+    position: fixed;
+    top: 150px;
+    left: 0;
+    border-color: black;
+    border-style: solid;
+    border-width: 0px 2px 2px 2px;
+    text-align: center;
+}
+.battle-player {
+    padding: 10px 20px 10px 20px;
+    font-weight: bold;
+}
+#battle-player0 {
+    margin: 25px;
+    position: absolute;
+    left: 0px;
+}
+#battle-player1 {
+    margin: 25px;
+    position: absolute;
+    right: 0px;
+}
+#battle-player2 {
+    margin: 25px;
+    position: absolute;
+    left: 0px;
+    top: 325px;
+}
+#battle-player3 {
+    margin: 25px;
+    position: absolute;
+    right: 0px;
+    top: 325px;
+    
+}
+#battle-player4 {
+    margin: auto;
+    position: relative;
+    top: 187px;
+}
 
 /*Toolbar Styles*/
 .toolbar {
+    position: fixed;
+    border: 2px solid black;
+    width: 100%;
     height: 150px;
-    border: 2px solid red;
+    padding: 10px 20px 10px 20px;
+    z-index: 1;
 }
 #country-information {
-    outline: 2px solid yellow;
-    position: absolute;
-    top: 57px;
-    left: 675px;
-    width: 400px;
-    height: 81px;
+    position: static;
+    margin: auto;
+    text-align: center;
+    transform: translate(0px, -66px);
+    font-weight: bold;
+    width: 50%;
+}
 
+#battle-screen-toolbar,
+#intro-screen-toolbar {
+    background-color: rgba(139, 69, 19, 1);
+}
+#player-count-label {
+    position: fixed;
+    top: 60px;
+    left: 24px;
+}
+#update-player-count{
+    position: fixed;
+    top: 59px;
+    left: 230px;  
+}
+#current-setup-player {
+    position: fixed;
+    top: 100px;
+    left: 24px;
+}
+#update-setup-player{
+    position: fixed;
+    top: 100px;
+    left: 230px;
+}
+#current-player-info {
+    text-align: center;
 }
 
 
 
-/*Area Styles*/
-.battle-player {
-    border: 2px solid yellow;
-}
-.deck-library-table-class {
-    color: red;
-    text-align: left;
-}
-#pre-game-screen {
-    border: 2px solid blue;
+.win-button {
+    width: 100%;
+    padding: 5px;
 }
 
+.battle-button {
+    position: fixed;
+    right: 18px;
+    padding: 5px;
+}
 
-/*Screen Styles*/
-
-#battle-information {
-    border: 2px solid black;
-    background-image: url('art/battle-screen-1.jpg');
-    background-repeat: no-repeat;
+#world-map {
+    margin: auto;
+    width: 100%;
+    max-height: 100%;
+    border-left: 2px solid black;
+    border-right: 2px solid black;
+    border-bottom: 2px solid black;
 }
 #map-countries {
-    border: 2px solid black;
-    background-image: url('art/world-map-1.png');
+    position: absolute;
+    top: 150px;
+    left: 200px;
+    /*background-image: url('art/world-map-1.png');*/
     background-repeat: no-repeat;
     background-size: contain;
-    width: 1500px;
-    height: 1038px;
+    width: 1250px;
+    height: 850px;
+    transform: scale(1.0, 1.0);
 }
-
+.country-text {
+}
 
 
 /*Country Positions*/
-
-
 #afghanistan-space {
-    top: 607px;
-    left: 963px;
+    top: 99px;
+    left: 626px;
+    overflow: visible;
+    width: 400px;
+    height: 426px;
+    transform: scale(0.38); 
+}
+#afghanistan-text {
+    transform: matrix(2.631579, 0, 0, 2.631579, -313, -314);
 }
 #alaska-space {
-    top: 302px;
-    Left: 15px;
+    top: -57px;
+    left: -105px;
+    width: 400px;
+    height: 410px;
+    transform: scale(0.33);
+}
+#alaska-text {
+    transform: matrix(3.030303, 0, 0, 3.030303, -453, -420);
 }
 #alberta-space {
-    top: 382px;
-    left: 144px;
+    top: 37px;
+    left: -11px;
+    width: 400px;
+    height: 327px;
+    transform: scale(0.33);
+}
+#alberta-text {
+    transform: matrix(3.030303, 0, 0, 3.030303, -388, -361);
 }
 #argentina-space {
-    top: 979px;
-    left: 315px;
+    top: 292px;
+    left: 133px;
+    width: 400px;
+    height: 816px;
+    transform: scale(0.3); 
+}
+#argentina-text {
+    transform: matrix(3.333333, 0, 0, 3.333333, -480, -1050);
 }
 #brazil-space {
-    top: 799px;
-    left: 429px;
+    top: 370px;
+    left: 170px;
+    width: 400px;
+    height: 403px;
+    transform: scale(0.55); 
+}
+#brazil-text {
+    transform: matrix(1.818182, 0, 0, 1.818182, -147, -223);
 }
 #central-america-space {
-    top: 635px;
-    left: 189px;
+    top: 169px;
+    left: 9px;
+    width: 400px;
+    height: 476px;
+    transform: scale(0.33);
+}
+#central-america-text {
+    transform: matrix(3.030303, 0, 0, 3.030303, -370, -469);
 }
 #china-space {
-    top: 666px;
-    left: 1118px;
+    top: 165px;
+    left: 773px;
+    width: 400px;
+    height: 391px;
+    transform: scale(0.53); 
+}
+#china-text {
+    transform: matrix(1.886792, 0, 0, 1.886792, -172, -149);
 }
 #congo-space {
-    top: 969px;
-    left: 748px;
+    top: 424px;
+    left: 474px;
+    width: 400px;
+    height: 391px;
+    transform: scale(0.33); 
+}
+#congo-text {
+    transform: matrix(3.030303, 0, 0, 3.030303, -411, -370);
 }
 #east-africa-space {
-    top: 897px;
-    left: 847px;
+    top: 306px;
+    left: 536px;
+    width: 400px;
+    height: 589px;
+    transform: scale(0.37); 
+}
+#east-africa-text {
+    transform: matrix(2.702703, 0, 0, 2.702703, -358, -611);
 }
 #eastern-australia-space {
-    top: 1062px;
-    left: 1344px;
+    top: 407px;
+    left: 961px;
+    width: 400px;
+    height: 602px;
+    transform: scale(0.33); 
+}
+#eastern-australia-text {
+    transform: matrix(3.030303, 0, 0, 3.030303, -410, -670);
 }
 #eastern-usa-space {
-    top: 527px;
-    left: 304px;
+    top: 137px;
+    left: 105px;
+    width: 400px;
+    height: 356px;
+    transform: scale(0.45);
+}
+#eastern-usa-text {
+    transform: matrix(2.222222, 0, 0, 2.222222, -262, -206);
 }
 #egypt-space {
-    top: 794px;
-    Left: 770px;
+    top: 349px;
+    left: 474px;
+    width: 400px;
+    height: 259px;
+    transform: scale(0.33); 
+}
+#egypt-text {
+    transform: matrix(3.030303, 0, 0, 3.030303, -411, -282);
 }
 #great-britan-space {
-    top: 528px;
-    left: 560px;    
+    top: -8px;
+    left: 311px;
+    width: 400px;
+    height: 524px;
+    transform: scale(0.25); 
+}
+#great-britan-text {
+    transform: matrix(4, 0, 0, 4, -607, -734);
 }
 #greenland-space {
-    top: 242px;
-    left: 454px;    
+    top: -101px;
+    left: 226px;
+    width: 400px;
+    height: 411px;
+    transform: scale(0.45);   
 }
-#iceland-space {
-    top: 429px;
-    left: 588px;    
+#greenland-text {
+    transform: matrix(2.222222, 0, 0, 2.222222, -232, -282);
 }
-#india-space {
-    top: 741px;
-    left: 1043px;    
+#iceland-space {   
+    top: 35px;
+    left: 332px;
+    width: 400px;
+    height: 272px;
+    transform: scale(0.25); 
+}
+#iceland-text {
+    transform: matrix(4, 0, 0, 4, -600, -385);
+}
+#india-space {  
+    top: 164px;
+    left: 703px;
+    width: 400px;
+    height: 589px;
+    transform: scale(0.37); 
+}
+#india-text {
+    transform: matrix(2.702703, 0, 0, 2.702703, -334, -534);
 }
 #indonesia-space {
-    top: 949px;
-    left: 1174px;
+    top: 426px;
+    left: 813px;
+    width: 400px;
+    height: 357px;
+    transform: scale(0.35); 
 }
-#irkutsk-space {
-    top: 490px;
-    left: 1152px;    
+#indonesia-text {
+    transform: matrix(2.857143, 0, 0, 2.857143, -371, -313);
 }
-#japan-space {
-    top: 547px;
-    left: 1340px;    
+#irkutsk-space { 
+    top: 44px;
+    left: 798px;
+    width: 400px;
+    height: 325px;
+    transform: scale(0.38); 
 }
-#kamchatka-space {
-    top: 402px;
-    left: 1279px;    
+#irkutsk-text {
+    transform: matrix(2.631579, 0, 0, 2.631579, -332, -249);
+}
+#japan-space {   
+    top: -63px;
+    left: 918px;
+    width: 400px;
+    height: 714px;
+    transform: scale(0.22); 
+}
+#japan-text {
+    transform: matrix(4.545455, 0, 0, 4.545455, -661, -1142);
+}
+#kamchatka-space {   
+    top: -78px;
+    left: 899px;
+    width: 400px;
+    height: 504px;
+    transform: scale(0.47); 
+}
+#kamchatka-text {
+    transform: matrix(2.12766, 0, 0, 2.12766, -258, -302);
 }
 #madagascar-space {
-    top: 1090px;
-    left: 944px;
+    top: 428px;
+    left: 584px;
+    width: 400px;
+    height: 592px;
+    transform: scale(0.2); 
 }
-#middle-east-space {
-    top: 706px;
-    left: 842px;    
+#madagascar-text {
+    transform: matrix(5, 0, 0, 5, -800, -1236);
 }
-#mongolia-space {
-    top: 569px;
-    left: 1164px;    
+#middle-east-space {  
+    top: 261px;
+    left: 559px;
+    width: 400px;
+    height: 381px;
+    transform: scale(0.5); 
+}
+#middle-east-text {
+    transform: matrix(2, 0, 0, 2, -181, -262);
+}
+#mongolia-space {   
+    top: 116px;
+    left: 814px;
+    width: 400px;
+    height: 338px;
+    transform: scale(0.4); 
+}
+#mongolia-text {
+    transform: matrix(2.5, 0, 0, 2.5, -298, -244);
 }
 #new-guinea-space {
-    top: 916px;
-    left: 1346px;
+    top: 412px;
+    left: 922px;
+    width: 400px;
+    height: 324px;
+    transform: scale(0.28); 
+}
+#new-guinea-text {
+    transform: matrix(3.571429, 0, 0, 3.571429, -513, -417);
 }
 #north-africa-space {
-    top: 830px;
-    left: 618px;
+    top: 293px;
+    left: 389px;
+    width: 400px;
+    height: 440px;
+    transform: scale(0.5); 
 }
-#northern-europe-space {
-    top: 559px;
-    left: 698px;    
+#north-africa-text {
+    transform: matrix(2, 0, 0, 2, -237, -235);
+}
+#northern-europe-space { 
+    top: 81px;
+    left: 422px;
+    width: 400px;
+    height: 395px;
+    transform: scale(0.33);  
+}
+#northern-europe-text {
+    transform: matrix(3.030303, 0, 0, 3.030303, -411, -337);
 }
 #northwest-territory-space {
-    top: 260px;
-    left: 202px;    
+    top: 21px;
+    left: 31px;
+    width: 400px;
+    height: 188px;
+    transform: scale(0.55); 
+}
+#northwest-territory-text {
+    transform: matrix(1.818182, 0, 0, 1.818182, -173, -48);
 }
 #ontario-space {
-    top: 389px;
-    left: 280px;    
+    top: -22px;
+    left: 90px;
+    width: 400px;
+    height: 491px;
+    transform: scale(0.27);  
 }
-#peru-space {
-    top: 812px;
-    left: 283px;    
+#ontario-text {
+    transform: matrix(3.703704, 0, 0, 3.703704, -559, -675);
 }
-#quebec-space {
-    top: 404px;
-    left: 416px;    
+#peru-space { 
+    top: 358px;
+    left: 109px;
+    width: 400px;
+    height: 421px;
+    transform: scale(0.4); 
 }
-#scandanavia-space {
-    top: 391px;
-    left: 710px;    
+#peru-text {
+    transform: matrix(2.5, 0, 0, 2.5, -326, -282);
 }
-#siam-space {
-    top: 805px;
-    left: 1184px;    
+#quebec-space { 
+    top: -16px;
+    left: 167px;
+    width: 400px;
+    height: 474px;
+    transform: scale(0.27); 
 }
-#siberia-space {
-    top: 321px;
-    left: 1047px;    
+#quebec-text {
+    transform: matrix(3.703704, 0, 0, 3.703704, -563, -579);
+}
+#scandanavia-space { 
+    top: -56px;
+    left: 437px;
+    width: 400px;
+    height: 446px;
+    transform: scale(0.33); 
+}
+#scandanavia-text {
+    transform: matrix(3.030303, 0, 0, 3.030303, -411, -523);
+}
+#siam-space {  
+    top: 229px;
+    left: 797px;
+    width: 400px;
+    height: 505px;
+    transform: scale(0.27); 
+}
+#siam-text {
+    transform: matrix(3.703704, 0, 0, 3.703704, -552, -662);
+}
+#siberia-space {  
+    top: -181px;
+    left: 707px;
+    width: 400px;
+    height: 696px;
+    transform: scale(0.4);  
+}
+#siberia-text {
+    transform: matrix(2.5, 0, 0, 2.5, -299, -600);
 }
 #south-africa-space {
-    top: 1125px;
-    left: 751px;
+    top: 459px;
+    left: 489px;
+    width: 400px;
+    height: 508px;
+    transform: scale(0.35); 
 }
-#southern-europe-space {
-    top: 649px;
-    left: 708px;    
+#south-africa-text {
+    transform: matrix(2.857143, 0, 0, 2.857143, -388, -434);
 }
-#ukraine-space {
-    top: 421px;
-    left: 848px;    
+#southern-europe-space {  
+    top: 149px;
+    left: 431px;
+    width: 400px;
+    height: 425px;
+    transform: scale(0.33); 
 }
-#ural-space {
-    top: 466px;
-    left: 998px;    
+#southern-europe-text {
+    transform: matrix(3.030303, 0, 0, 3.030303, -415, -444);
 }
-#veneseulea-space {
-    top: 685px;
-    left: 328px;    
+#ukraine-space {  
+    top: -63px;
+    left: 540px;
+    width: 400px;
+    height: 612px;
+    transform: scale(0.48); 
+}
+#ukraine-text {
+    transform: matrix(2.083333, 0, 0, 2.083333, -232, -334);
+}
+#ural-space {  
+    top: -179px;
+    left: 660px;
+    width: 400px;
+    height: 739px;
+    transform: scale(0.31, 0.32); 
+}
+#ural-text {
+    transform: matrix(3.225806, 0, 0, 3.125, -470, -717);
+}
+#veneseulea-space {   
+    top: 356px;
+    left: 122px;
+    width: 400px;
+    height: 233px;
+    transform: scale(0.4); 
+}
+#veneseulea-text {
+    transform: matrix(2.5, 0, 0, 2.5, -320, -183);
 }
 #western-australia-space {
-    top: 1105px;
-    left: 1246px;
+    top: 490px;
+    left: 887px;
+    width: 400px;
+    height: 454px;
+    transform: scale(0.4, 0.38); 
 }
-#western-europe-space {
-    top: 676px;
-    left: 588px;    
+#western-australia-text {
+    transform: matrix(2.5, 0, 0, 2.631579, -297, -327);
+}
+#western-europe-space {  
+    top: 121px;
+    left: 338px;
+    width: 400px;
+    height: 493px;
+    transform: scale(0.3); 
+}
+#western-europe-text {
+    transform: matrix(3.030303, 0, 0, 3.030303, -454, -463);
 }
 #western-usa-space {
-    top: 502px;
-    left: 167px;    
+    top: 106px;
+    left: 9px;
+    width: 400px;
+    height: 381px;
+    transform: scale(0.4, 0.35);   
+}
+#western-usa-text {
+    transform: matrix(2.5, 0, 0, 2.857143, -317, -359);
 }
 #yakutsk-space {
-    top: 358px;
-    left: 1188px;    
+    top: -95px;
+    left: 807px;
+    width: 400px;
+    height: 415px;
+    transform: scale(0.33); 
+}
+#yakutsk-text {
+    transform: matrix(3.030303, 0, 0, 3.030303, -387, -411);
 }
 
 

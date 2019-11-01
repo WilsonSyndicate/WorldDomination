@@ -256,7 +256,7 @@ function findPlayerName(playerNumber) {
 
 function addMapElement(addToId, elementType, elementContent, idToInclude, classToInclude, clickFunctionToInclude, hoverFunctionToInclude, offHoverFunctionToInclude) {
     var newElement = document.createElementNS("http://www.w3.org/2000/svg", elementType),//create a new svg element    
-    countryShape = document.createElementNS("http://www.w3.org/2000/svg", "circle");//inner shape area
+    countryShape = document.createElementNS("http://www.w3.org/2000/svg", 'path');//inner shape area
 
     //add class
     if (!!classToInclude && classToInclude !== "noClass") {
@@ -265,16 +265,24 @@ function addMapElement(addToId, elementType, elementContent, idToInclude, classT
     if (!!idToInclude && idToInclude !== "noId") {
         newElement.id = idToInclude + "-space";
     }
+
+
     //svg area, will be different for each country
-    newElement.setAttributeNS(null, "width", 150);
-    newElement.setAttributeNS(null, "height", 150);
+    //newElement.setAttributeNS(null, "width", countryWidth);
+    //newElement.setAttributeNS(null, "height", countryHeight);
+
+    //svg size
+    //newElement.setAttributeNS(null, "viewbox", "0, 0, " + 50 + ", " + 50);
+    newElement.setAttributeNS(null, "preserveAspectRatio", "none"); 
+
+    //specific country shape
+    countryShape.setAttributeNS(null, "d", countryShapes[idToInclude].path);
+
+
+
     //add new element and contents to DOM
     var currentElement = document.getElementById(addToId);
     currentElement.appendChild(newElement);
-    //specific country shape
-    countryShape.setAttributeNS(null, "cx", 75);
-    countryShape.setAttributeNS(null, "cy", 75);
-    countryShape.setAttributeNS(null, "r", 69);
     //add class
     if (!!classToInclude && classToInclude !== "noClass") {
         countryShape.classList.add(classToInclude);
@@ -306,6 +314,8 @@ function addMapElement(addToId, elementType, elementContent, idToInclude, classT
         newText.setAttributeNS(null,"y","50%");
         newText.setAttributeNS(null,"text-anchor","middle");
         newText.setAttributeNS(null,"dominant-baseline","center");
+        newText.setAttributeNS(null,"class","country-text");
+        newText.setAttributeNS(null,"id",idToInclude + "-text");
         newText.appendChild(textNode);
         newElement.appendChild(newText);
     }

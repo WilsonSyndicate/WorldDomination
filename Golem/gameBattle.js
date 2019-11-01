@@ -1,5 +1,18 @@
 
+function setPlayerInfoLocation() {
+    var battlePlayerCount = gameVars.battleScreenInfo.battlePlayersCount;
 
+    if (battlePlayerCount === 3) {
+        document.getElementById("battle-player2").style.margin= "auto";
+        document.getElementById("battle-player2").style.position= "relative";
+        document.getElementById("battle-player2").style.top= "187px";
+    }
+    else if (battlePlayerCount > 3) {
+        document.getElementById("battle-player2").style.margin= "25px";
+        document.getElementById("battle-player2").style.position= "absolute";
+        document.getElementById("battle-player2").style.top= "325px";
+    }
+}
 
 function endOfGame(winningPlayer) {
     var winningName = findPlayerName(winningPlayer);
@@ -9,8 +22,6 @@ function endOfGame(winningPlayer) {
     gameVars.gameStatus.mode = "end";
 
     document.getElementById("intro-screen-toolbar").innerHTML = winningName + " wins!";
-
-
 }
 
 function countBattleLife(bonuses, penalties) {
@@ -169,6 +180,8 @@ function attackChosen() {
         for (var j = 0; j < gameVars.battleScreenInfo.battlePlayersCount; j++) {
             displayBattleInfo(j);
         }
+        //set info locations
+        setPlayerInfoLocation();
         //update log
         updateLog([countGames + " Game Begins"]);
         //add attacking country to already attacked list
@@ -206,6 +219,8 @@ function battleScreenCleanup() {
     gameVars.battleScreenInfo.groundZero = "";
     gameVars.battleScreenInfo.battleBonuses = [];
     gameVars.battleScreenInfo.battlePenalties = [];
+            //clear deck info and buttons
+            clearBattleScreenInformation();
 }
 
 function findBattleDeckNameWithPlayer(currentBattlePlayer) {
@@ -270,6 +285,12 @@ function showWinningButtonText(winningPlace, totalBattlePlayers) {
     //winning text for initiation
     if (totalBattlePlayers === winningPlace) {
         addElement("battle-screen-toolbar", "button", "Confirm Winners", "confirm-winners", "noClass", battleWinnerConfirmed);
+        //add btn class to button
+        addClass("confirm-winners", "btn");
+        //add primary button class to button
+        addClass("confirm-winners", "btn-primary");
+        //add danger button class to button
+        addClass("confirm-winners", "battle-button");
         return "utterly defeated";
     }
     return numberSuffix(winningPlace) + " place";
@@ -352,7 +373,7 @@ function markDeckAsLoser(deckPlayer, deckName, defenderPlayer) {
 }
 
 function clearBattleScreenInformation() {
-    for (var i = 0; i < gameVars.battleScreenInfo.battleDecks.length; i++) {
+    for (var i = 0; i < 6; i++) {
         removeElement("battle-information", "battle-player" + i);
     }
 }
@@ -440,8 +461,6 @@ function battleWinner(winningPlayerButton) {
                     logTempNote.push(findPlayerName(losingDecks[i].deckPlayer) + " playing " + losingDecks[i].deckName + " lost");
                 }
             }
-            // clear battle screen infomration
-            clearBattleScreenInformation();
             //log end of battle
             logNote = ["Battle Game Complete"];
             logNote.push(logTempNote);
@@ -451,6 +470,8 @@ function battleWinner(winningPlayerButton) {
                 //change mode to move
                 setToMove();
             }
+            // clear battle screen infomration
+            clearBattleScreenInformation();
             //clear game variables and go to map
             gameVars.battleScreenInfo.battleDecks = [];
             gameVars.battleScreenInfo.battlePlayersCount = 0;
@@ -479,6 +500,12 @@ function battleWinner(winningPlayerButton) {
         document.getElementById(winningPlayerButton).innerHTML = winningButtonText;
         if (winningPlayerCount === 1) {
             addElement("battle-screen-toolbar", "button", "Cancel", "reset-winners", "noClass", resetWinners);
+            //add btn class to button
+            addClass("reset-winners", "btn");
+            //add danger button class to button
+            addClass("reset-winners", "btn-danger");
+            //add battle button class to button
+            addClass("reset-winners", "battle-button");
             document.getElementById("battle-note").innerHTML = winningPlayerName + " goes first";
         }
         else {
@@ -555,10 +582,8 @@ function displayBattleInfo(battleDeckRef) {
     ];
     //add player and deck name (color)
     addElement("battle-information", "div", battleText, "battle-player" + battleDeckRef, "battle-player");
-    //create buttons
-    addElement("battle-player" + battleDeckRef, "button", currentPlayerName, "battle-winner-" + currentPlayer, "player-color-" + currentPlayer, battleWinner);
-    //add btn class to button
-    addClass("battle-winner-" + currentPlayer, "btn");
+    //add player number class to deck info space
+    addClass("battle-player" + battleDeckRef, "player-" + currentPlayer + "-battle-info");
     //for each battle player show player, deck, life, cards
     for (var d = 0; d < gameMods.length; d++) {
         if (gameMods[d] !== "") {
@@ -566,4 +591,10 @@ function displayBattleInfo(battleDeckRef) {
             addElement("battle-player" + battleDeckRef, "div", gameModsCurrentText);
         }
     }
+    //create buttons
+    addElement("battle-player" + battleDeckRef, "button", currentPlayerName, "battle-winner-" + currentPlayer, "player-color-" + currentPlayer, battleWinner);
+    //add btn class to button
+    addClass("battle-winner-" + currentPlayer, "btn");
+    //add win-button class to button
+    addClass("battle-winner-" + currentPlayer, "win-button");
 }

@@ -1,5 +1,23 @@
 //Player Setup
 
+function setupCheck() {
+    var totalNumberPlayers = Number(document.getElementById("update-player-count").value),
+    currentPlayerNumber = Number(document.getElementById("update-setup-player").value);
+
+    if (totalNumberPlayers > 5) {
+        document.getElementById("update-player-count").value = 5;
+    }
+    if (totalNumberPlayers < 2) {
+        document.getElementById("update-player-count").value = 2;
+    }
+    if(currentPlayerNumber > totalNumberPlayers) {
+        document.getElementById("update-setup-player").value = Number(document.getElementById("update-player-count").value);
+    }
+    if(currentPlayerNumber < 1) {
+        document.getElementById("update-setup-player").value = 1;
+    }
+}
+
 function findIntroLogText(currentLogEntry) {
     if (currentLogEntry[1].search("Begins") !== -1) {
         if (currentLogEntry[1].search("Initiation") !== -1) {
@@ -33,7 +51,7 @@ function showLogInfo() {
     if (gameVars.gameLog.length > 0) {
         var logTextToShow = [];
 
-        for (var i = 0; i < gameVars.gameLog.length; i++) {
+        for (var i = gameVars.gameLog.length - 1; i >= 0; i--) {
             logTextToShow.push({
                 logEntry: stringToDate(gameVars.gameLog[i][0])[1] + " " + stringToDate(gameVars.gameLog[i][0])[2] + ", " + stringToDate(gameVars.gameLog[i][0])[3],
                 logText: findIntroLogText(gameVars.gameLog[i])
@@ -206,7 +224,7 @@ function updateIntroScreen() {
     tbl.appendChild(tblBody);
     tableBody.appendChild(tbl);
     //add class for bootstrap
-    document.getElementById("known-info").classList.add("table-hover");
+    document.getElementById("known-info").classList.add("table-striped");
     //display log information
     showLogInfo();
 }
@@ -340,6 +358,8 @@ function toIniGame() {
         for (var j = 0; j < gameVars.battleScreenInfo.battlePlayersCount; j++) {
             displayBattleInfo(j);
         }
+        //set info locations
+        setPlayerInfoLocation();
         //log beginning of initiation game
         updateLog(["Initiation Game Begins"]);
     }
@@ -421,17 +441,8 @@ function changeCurrentSetupPlayer() {
         removeClass("setup-toolbar", "player-color-" + i);
     }
     addClass("setup-toolbar", "player-color-" + currentPlayerNumber);
-    //change name change button color
-    removeAllNameChangeButtonPlayerColors();
-    document.getElementById("button-change-name").classList.add("player-color-" + document.getElementById("update-setup-player").value);
     //shuffledecklists
     shuffleAllDecklists();
-}
-
-function removeAllNameChangeButtonPlayerColors() {
-    for (var i = 1; i <= gameVars.globalGameOptions.totalPlayers; i++) {
-        removeClass("button-change-name", "player-color-" + i);
-    }
 }
 
 function changeNumberOfPlayers() {
