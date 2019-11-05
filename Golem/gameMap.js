@@ -326,10 +326,10 @@ function countryMapName(currentCountry) {
         isHidden = findDeckWithPlayerNumberAndName(currentPlayerNumber, curentDeckName).deckHidden;  
 
         if (isHidden) {
-            return currentPlayerName;
+            return "<span>" + currentCountryName + "<br>" + currentPlayerName + "</span>";
         }
         else {
-            return curentDeckName;
+            return "<span>" + currentCountryName + "<br>" + curentDeckName + "</span>";
         }
     }
     else {
@@ -394,15 +394,22 @@ function buildMapButtons() {
     //reset possible attack count
     gameVars.mapInfo.possibleAttack = 0;
     gameVars.mapInfo.playableSupply = [];
+
+    //add svg element
+    removeElement("world-map", "map-countries");
+    addMapArea("world-map", "map-countries");
+    //add country text container
+    removeElement("world-map", "text-countries");
+    addElement("world-map", "div", "noContent", "text-countries");
+    //add countries
     for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
         var currentFullCountry = gameVars.mapInfo.countryList[i],
         currentCountry = currentFullCountry.country,
         alreadyAttacked = isItemInArray(currentCountry, gameVars.mapInfo.alreadyAttacked);
 
-        //refresh each country button
-        removeElement("map-countries", currentCountry + "-space");
-        addElement("map-countries", "svg", countryMapName(currentFullCountry), currentCountry, "country-button", mapCountryClick, mapCountryHover);
-        //all check for player color
+        //build each country path
+        addMapElement("map-countries", countryMapName(currentFullCountry), currentCountry, "country-button", mapCountryClick, mapCountryHover);
+        //all add player color
         if (!!currentFullCountry.deck) {
             var currentPlayer = currentFullCountry.deck.deckPlayer;
 
@@ -439,8 +446,7 @@ function buildMapButtons() {
             }
         }
         else if (gameVars.gameStatus.mode === "placement") {
-            //future version
-            //map placement
+            //future version to set up map
         }
     }
 }

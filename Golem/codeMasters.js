@@ -254,114 +254,79 @@ function findPlayerName(playerNumber) {
     return gameVars.playerInfo["player" + playerNumber].playerName;
 }
 
-function addMapElement(addToId, elementType, elementContent, idToInclude, classToInclude, clickFunctionToInclude, hoverFunctionToInclude, offHoverFunctionToInclude) {
-    var newElement = document.createElementNS("http://www.w3.org/2000/svg", elementType),//create a new svg element    
-    countryShape = document.createElementNS("http://www.w3.org/2000/svg", 'path');//inner shape area
+function addMapArea(addToId, idToInclude) {
+    var newElement = document.createElementNS("http://www.w3.org/2000/svg", "svg");//create a new svg element 
+
+    //add id
+    newElement.id = idToInclude;
+    //add new element and contents to DOM
+    var currentElement = document.getElementById(addToId);
+    currentElement.appendChild(newElement);   
+}
+
+function addMapElement(addToId, elementContent, idToInclude, classToInclude, clickFunctionToInclude, hoverFunctionToInclude, offHoverFunctionToInclude) {
+    var countryArea = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    
+    //country area
+    countryArea.setAttributeNS(null, "d", countryShapes[idToInclude].path);
+    //add id
+    countryArea.id = idToInclude;
+    //add functions
+    if (!!clickFunctionToInclude && clickFunctionToInclude !== "noFunction") {
+        countryArea.onclick = function() { clickFunctionToInclude(countryArea.id); };
+    }
+    if (!!hoverFunctionToInclude && hoverFunctionToInclude !== "noHover") {
+        countryArea.onmouseover = function() { hoverFunctionToInclude(countryArea.id); };
+    }
+    if (!!offHoverFunctionToInclude && offHoverFunctionToInclude !== "noOffHover") {
+        countryArea.onmouseout = function() { offHoverFunctionToInclude(countryArea.id); };
+    }
+    //add class
+    countryArea.classList.add(classToInclude);
+    //append path to svg
+    document.getElementById(addToId).appendChild(countryArea);
+    //country label
+    addElement("text-countries", "div", elementContent, idToInclude + "-text", "country-text");
+}
+
+
+
+function addElement(addToId, elementType, elementContent, idToInclude, classToInclude, clickFunctionToInclude, hoverFunctionToInclude, offHoverFunctionToInclude) {
+    var newElement = document.createElement(elementType);//create a new element
 
     //add class
     if (!!classToInclude && classToInclude !== "noClass") {
-        newElement.classList.add(classToInclude + "-space");
-        }
-    if (!!idToInclude && idToInclude !== "noId") {
-        newElement.id = idToInclude + "-space";
+        newElement.classList.add(classToInclude);
     }
+    //add functions
+    if (!!idToInclude && idToInclude !== "noId") {
+        newElement.id = idToInclude;
 
-
-    //svg area, will be different for each country
-    //newElement.setAttributeNS(null, "width", countryWidth);
-    //newElement.setAttributeNS(null, "height", countryHeight);
-
-    //svg size
-    //newElement.setAttributeNS(null, "viewbox", "0, 0, " + 50 + ", " + 50);
-    newElement.setAttributeNS(null, "preserveAspectRatio", "none"); 
-
-    //specific country shape
-    countryShape.setAttributeNS(null, "d", countryShapes[idToInclude].path);
-
-
-
+        if (!!clickFunctionToInclude && clickFunctionToInclude !== "noFunction") {
+            newElement.onclick = function() { clickFunctionToInclude(idToInclude); };
+        }
+        if (!!hoverFunctionToInclude && hoverFunctionToInclude !== "noHover") {
+            newElement.onmouseover = function() { hoverFunctionToInclude(idToInclude); };
+        }
+        if (!!offHoverFunctionToInclude && offHoverFunctionToInclude !== "noOffHover") {
+            newElement.onmouseout = function() { offHoverFunctionToInclude(idToInclude); };
+        }
+    }
+    //add text
+    if (elementContent.indexOf("<") !== 0 && elementContent !== "noContent") {
+        //create content node
+        newContent = document.createTextNode(elementContent);
+        //add text node to new element
+        newElement.appendChild(newContent);
+    }
     //add new element and contents to DOM
     var currentElement = document.getElementById(addToId);
     currentElement.appendChild(newElement);
-    //add class
-    if (!!classToInclude && classToInclude !== "noClass") {
-        countryShape.classList.add(classToInclude);
-        }
-    //add functions
-    if (!!idToInclude && idToInclude !== "noId") {
-        countryShape.id = idToInclude;
-
-        if (!!clickFunctionToInclude && clickFunctionToInclude !== "noFunction") {
-            countryShape.onclick = function() { clickFunctionToInclude(countryShape.id); };
-        }
-        if (!!hoverFunctionToInclude && hoverFunctionToInclude !== "noHover") {
-            countryShape.onmouseover = function() { hoverFunctionToInclude(countryShape.id); };
-        }
-        if (!!offHoverFunctionToInclude && offHoverFunctionToInclude !== "noOffHover") {
-            countryShape.onmouseout = function() { offHoverFunctionToInclude(countryShape.id); };
-        }
-    }
-    //append shape to svg
-    newElement.appendChild(countryShape);
-    
-    //add text, help from: https://stackoverflow.com/questions/9281199/adding-text-to-svg-document-in-javascript
-    if (!!elementContent && elementContent !== "noContent") {
-        var newText = document.createElementNS("http://www.w3.org/2000/svg","text"),
-
-        textNode = document.createTextNode(elementContent);
-        newText.setAttributeNS(null,"pointer-events","none");
-        newText.setAttributeNS(null,"x","50%");
-        newText.setAttributeNS(null,"y","50%");
-        newText.setAttributeNS(null,"text-anchor","middle");
-        newText.setAttributeNS(null,"dominant-baseline","center");
-        newText.setAttributeNS(null,"class","country-text");
-        newText.setAttributeNS(null,"id",idToInclude + "-text");
-        newText.appendChild(textNode);
-        newElement.appendChild(newText);
-    }
-}
-
-function addElement(addToId, elementType, elementContent, idToInclude, classToInclude, clickFunctionToInclude, hoverFunctionToInclude, offHoverFunctionToInclude) {
-    if (elementType === "svg") {
-        addMapElement(addToId, elementType, elementContent, idToInclude, classToInclude, clickFunctionToInclude, hoverFunctionToInclude, offHoverFunctionToInclude);
-    }
-    else {
-        var newElement = document.createElement(elementType);//create a new element
-
-        //add class
-        if (!!classToInclude && classToInclude !== "noClass") {
-            newElement.classList.add(classToInclude);
-        }
-        //add functions
-        if (!!idToInclude && idToInclude !== "noId") {
-            newElement.id = idToInclude;
-
-            if (!!clickFunctionToInclude && clickFunctionToInclude !== "noFunction") {
-                newElement.onclick = function() { clickFunctionToInclude(idToInclude); };
-            }
-            if (!!hoverFunctionToInclude && hoverFunctionToInclude !== "noHover") {
-                newElement.onmouseover = function() { hoverFunctionToInclude(idToInclude); };
-            }
-            if (!!offHoverFunctionToInclude && offHoverFunctionToInclude !== "noOffHover") {
-                newElement.onmouseout = function() { offHoverFunctionToInclude(idToInclude); };
-            }
-        }
-        //add text
-        if (elementContent.indexOf("<") !== 0 && elementContent !== "noContent") {
-            //create content node
-            newContent = document.createTextNode(elementContent);
-            //add text node to new element
-            newElement.appendChild(newContent);
-        }
-        //add new element and contents to DOM
-        var currentElement = document.getElementById(addToId);
-        currentElement.appendChild(newElement);
-        //add html text
-        if (elementContent.indexOf("<") === 0) {
-            //create innerHTML text
-            document.getElementById(idToInclude).innerHTML = elementContent;
-        }
-    }
+    //add html text
+    if (elementContent.indexOf("<") === 0) {
+        //create innerHTML text
+        document.getElementById(idToInclude).innerHTML = elementContent;
+    } 
 }
 
 function removeElement(parentId, elementId) {

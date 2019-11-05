@@ -9,7 +9,7 @@
     --player-3-inactive: rgb(234, 250, 238);
     --player-4-color: var(--yellow);
     --player-4-inactive: rgb(255, 249, 230);
-    --player-5-color: var(--purple);
+    --player-5-color: rgb(123, 82, 199);
     --player-5-inactive: rgb(240, 236, 249);
     --threat-possible: var(--orange);
     --selected: yellow;
@@ -17,9 +17,6 @@
 }
 
 /*Country Base Style*/
-.country-button-space {
-    position: absolute;
-}
 .is-supplyable {
     stroke: yellow;
     stroke-width: 2;
@@ -95,17 +92,18 @@
 /*Country Button Colors*/
 .country-button {  
     fill: var(--gray);
+    stroke: black;
+    stroke-width: 1;
 }
 .country-button.not-attackable,
 .country-button.not-movable,
 .country-button.not-supplyable {
-    fill: rgba(128, 128, 128, 0.25); 
+    fill: rgb(230, 230, 230); 
 }
 /*Player 1*/
 .country-button.player-color-1 {
     fill: var(--player-1-color);
-}
-.not-attackable.player-color-1, 
+} 
 .out-of-range.player-color-1,
 .not-movable.player-color-1,
 .already-attacked.player-color-1,
@@ -117,7 +115,6 @@
 .country-button.player-color-2 {
     fill: var(--player-2-color);
 }
-.not-attackable.player-color-2, 
 .out-of-range.player-color-2,
 .not-movable.player-color-2,
 .already-attacked.player-color-2,
@@ -129,7 +126,6 @@
 .country-button.player-color-3 {
     fill: var(--player-3-color);
 }
-.not-attackable.player-color-3, 
 .out-of-range.player-color-3,
 .not-movable.player-color-3,
 .already-attacked.player-color-3,
@@ -141,7 +137,6 @@
 .country-button.player-color-4 {
     fill: var(--player-4-color);
 }
-.not-attackable.player-color-4, 
 .out-of-range.player-color-4,
 .not-movable.player-color-4,
 .already-attacked.player-color-4,
@@ -153,7 +148,6 @@
 .country-button.player-color-5 {
     fill: var(--player-5-color);
 }
-.not-attackable.player-color-5, 
 .out-of-range.player-color-5,
 .not-movable.player-color-5,
 .already-attacked.player-color-5,
@@ -163,13 +157,12 @@
 
 
 
-/*Country Border Styles*/
-.map-attack, 
-.map-defend, 
-.map-join,
-.map-select{
-    stroke: var(--selected);
-    stroke-width: 3;
+/*Select Styles*/
+.map-attack.country-button, 
+.map-defend.country-button, 
+.map-join.country-button,
+.map-select.country-button{
+    fill: var(--selected);
 }
 
 /*Button Styles*/
@@ -403,446 +396,281 @@
     margin: auto;
     width: 100%;
     max-height: 100%;
-    border-left: 2px solid black;
-    border-right: 2px solid black;
-    border-bottom: 2px solid black;
 }
 #map-countries {
     position: absolute;
     top: 150px;
-    left: 200px;
-    /*background-image: url('art/world-map-1.png');*/
-    background-repeat: no-repeat;
-    background-size: contain;
-    width: 1250px;
-    height: 850px;
+    width: 100%;
+    height: 1000px;
     transform: scale(1.0, 1.0);
+    background-image: url('art/water-tile.jpg');
+    border-left: 2px solid black;
+    border-right: 2px solid black;
+    border-bottom: 2px solid black;
 }
 .country-text {
+    text-align: center;
+    width: 150px;
+    height: 48px;
+    margin: auto;
+    font-weight: bold;
+    position: absolute;
+    pointer-events: none;
 }
 
 
 /*Country Positions*/
-#afghanistan-space {
-    top: 99px;
-    left: 626px;
-    overflow: visible;
-    width: 400px;
-    height: 426px;
-    transform: scale(0.38); 
+#afghanistan {
+    transform: matrix(0.44, 0, 0, 0.44, 872, 266);
 }
 #afghanistan-text {
-    transform: matrix(2.631579, 0, 0, 2.631579, -313, -314);
+    transform: translate(897px, 478px);
 }
-#alaska-space {
-    top: -57px;
-    left: -105px;
-    width: 400px;
-    height: 410px;
-    transform: scale(0.33);
+#alaska {
+    transform: matrix(0.35, 0, 0, 0.35, 45, 100);
 }
 #alaska-text {
-    transform: matrix(3.030303, 0, 0, 3.030303, -453, -420);
+    transform: translate(37px, 277px);
 }
-#alberta-space {
-    top: 37px;
-    left: -11px;
-    width: 400px;
-    height: 327px;
-    transform: scale(0.33);
+#alberta {
+    transform: matrix(0.38, 0, 0, 0.38, 148, 171);
 }
 #alberta-text {
-    transform: matrix(3.030303, 0, 0, 3.030303, -388, -361);
+    transform: translate(157px, 355px);
 }
-#argentina-space {
-    top: 292px;
-    left: 133px;
-    width: 400px;
-    height: 816px;
-    transform: scale(0.3); 
+#argentina {
+    transform: matrix(0.35, 0, 0, 0.35, 317, 663);
 }
 #argentina-text {
-    transform: matrix(3.333333, 0, 0, 3.333333, -480, -1050);
+    transform: translate(305px, 897px);
 }
-#brazil-space {
-    top: 370px;
-    left: 170px;
-    width: 400px;
-    height: 403px;
-    transform: scale(0.55); 
+#brazil {
+    transform: matrix(0.62, 0, 0, 0.62, 303, 534);
 }
 #brazil-text {
-    transform: matrix(1.818182, 0, 0, 1.818182, -147, -223);
+    transform: translate(380px, 745px);
 }
-#central-america-space {
-    top: 169px;
-    left: 9px;
-    width: 400px;
-    height: 476px;
-    transform: scale(0.33);
+#central-america {
+    transform: matrix(0.43, 0, 0, 0.43, 171, 376);
 }
 #central-america-text {
-    transform: matrix(3.030303, 0, 0, 3.030303, -370, -469);
+    transform: translate(178px, 589px);
 }
-#china-space {
-    top: 165px;
-    left: 773px;
-    width: 400px;
-    height: 391px;
-    transform: scale(0.53); 
+#china {
+    transform: matrix(0.62, 0, 0, 0.62, 1005, 299);
 }
 #china-text {
-    transform: matrix(1.886792, 0, 0, 1.886792, -172, -149);
+    transform: translate(1061px, 552px);
 }
-#congo-space {
-    top: 424px;
-    left: 474px;
-    width: 400px;
-    height: 391px;
-    transform: scale(0.33); 
+#congo {
+    transform: matrix(0.42, 0, 0, 0.42, 698, 638);
 }
 #congo-text {
-    transform: matrix(3.030303, 0, 0, 3.030303, -411, -370);
+    transform: translate(707px, 836px);
 }
-#east-africa-space {
-    top: 306px;
-    left: 536px;
-    width: 400px;
-    height: 589px;
-    transform: scale(0.37); 
+#east-africa {
+    transform: matrix(0.43, 0, 0, 0.43, 770, 577);
 }
 #east-africa-text {
-    transform: matrix(2.702703, 0, 0, 2.702703, -358, -611);
+    transform: translate(783px, 777px);
 }
-#eastern-australia-space {
-    top: 407px;
-    left: 961px;
-    width: 400px;
-    height: 602px;
-    transform: scale(0.33); 
+#eastern-australia {
+    transform: matrix(0.4, 0, 0, 0.4, 1265, 703);
 }
 #eastern-australia-text {
-    transform: matrix(3.030303, 0, 0, 3.030303, -410, -670);
+    transform: translate(1296px, 914px);
 }
-#eastern-usa-space {
-    top: 137px;
-    left: 105px;
-    width: 400px;
-    height: 356px;
-    transform: scale(0.45);
+#eastern-usa {
+    transform: matrix(0.52, 0, 0, 0.52, 263, 276);
 }
 #eastern-usa-text {
-    transform: matrix(2.222222, 0, 0, 2.222222, -262, -206);
+    transform: translate(314px, 495px);
 }
-#egypt-space {
-    top: 349px;
-    left: 474px;
-    width: 400px;
-    height: 259px;
-    transform: scale(0.33); 
+#egypt {
+    transform: matrix(0.42, 0, 0, 0.42, 703, 507);
 }
 #egypt-text {
-    transform: matrix(3.030303, 0, 0, 3.030303, -411, -282);
+    transform: translate(708px, 677px);
 }
-#great-britan-space {
-    top: -8px;
-    left: 311px;
-    width: 400px;
-    height: 524px;
-    transform: scale(0.25); 
+#great-britan {
+    transform: matrix(0.3, 0, 0, 0.3, 533, 217);
 }
 #great-britan-text {
-    transform: matrix(4, 0, 0, 4, -607, -734);
+    transform: translate(520px, 419px);
 }
-#greenland-space {
-    top: -101px;
-    left: 226px;
-    width: 400px;
-    height: 411px;
-    transform: scale(0.45);   
+#greenland {
+    transform: matrix(0.55, 0, 0, 0.55, 384, 7);
 }
 #greenland-text {
-    transform: matrix(2.222222, 0, 0, 2.222222, -232, -282);
+    transform: translate(434px, 223px);
 }
-#iceland-space {   
-    top: 35px;
-    left: 332px;
-    width: 400px;
-    height: 272px;
-    transform: scale(0.25); 
+#iceland {
+    transform: matrix(0.25, 0, 0, 0.25, 569, 169);
 }
 #iceland-text {
-    transform: matrix(4, 0, 0, 4, -600, -385);
+    transform: translate(545px, 328px);
 }
-#india-space {  
-    top: 164px;
-    left: 703px;
-    width: 400px;
-    height: 589px;
-    transform: scale(0.37); 
+#india {
+    transform: matrix(0.42, 0, 0, 0.44, 964, 397);
 }
 #india-text {
-    transform: matrix(2.702703, 0, 0, 2.702703, -334, -534);
+    transform: translate(973px, 615px);
 }
-#indonesia-space {
-    top: 426px;
-    left: 813px;
-    width: 400px;
-    height: 357px;
-    transform: scale(0.35); 
+#indonesia {
+    transform: matrix(0.4, 0, 0, 0.4, 1096, 631);
 }
 #indonesia-text {
-    transform: matrix(2.857143, 0, 0, 2.857143, -371, -313);
+    transform: translate(1108px, 820px);
 }
-#irkutsk-space { 
-    top: 44px;
-    left: 798px;
-    width: 400px;
-    height: 325px;
-    transform: scale(0.38); 
+#irkutsk {
+    transform: matrix(0.45, 0, 0, 0.45, 1069, 168);
 }
 #irkutsk-text {
-    transform: matrix(2.631579, 0, 0, 2.631579, -332, -249);
+    transform: translate(1092px, 365px);
 }
-#japan-space {   
-    top: -63px;
-    left: 918px;
-    width: 400px;
-    height: 714px;
-    transform: scale(0.22); 
+#japan {
+    transform: matrix(0.25, 0, 0, 0.25, 1249, 251);
 }
 #japan-text {
-    transform: matrix(4.545455, 0, 0, 4.545455, -661, -1142);
+    transform: translate(1243px, 457px);
 }
-#kamchatka-space {   
-    top: -78px;
-    left: 899px;
-    width: 400px;
-    height: 504px;
-    transform: scale(0.47); 
+#kamchatka {
+    transform: matrix(0.54, 0, 0, 0.56, 1165, 60);
 }
 #kamchatka-text {
-    transform: matrix(2.12766, 0, 0, 2.12766, -258, -302);
+    transform: translate(1197px, 317px);
 }
-#madagascar-space {
-    top: 428px;
-    left: 584px;
-    width: 400px;
-    height: 592px;
-    transform: scale(0.2); 
+#madagascar {
+    transform: matrix(0.3, 0, 0, 0.3, 852, 752);
 }
 #madagascar-text {
-    transform: matrix(5, 0, 0, 5, -800, -1236);
+    transform: translate(845px, 956px);
 }
-#middle-east-space {  
-    top: 261px;
-    left: 559px;
-    width: 400px;
-    height: 381px;
-    transform: scale(0.5); 
+#middle-east {
+    transform: matrix(0.6, 0, 0, 0.6, 761, 413);
 }
 #middle-east-text {
-    transform: matrix(2, 0, 0, 2, -181, -262);
+    transform: translate(820px, 647px);
 }
-#mongolia-space {   
-    top: 116px;
-    left: 814px;
-    width: 400px;
-    height: 338px;
-    transform: scale(0.4); 
+#mongolia {
+    transform: matrix(0.46, 0, 0, 0.46, 1086, 257);
 }
 #mongolia-text {
-    transform: matrix(2.5, 0, 0, 2.5, -298, -244);
+    transform: translate(1100px, 466px);
 }
-#new-guinea-space {
-    top: 412px;
-    left: 922px;
-    width: 400px;
-    height: 324px;
-    transform: scale(0.28); 
+#new-guinea {
+    transform: matrix(0.32, 0, 0, 0.32, 1238, 616);
 }
 #new-guinea-text {
-    transform: matrix(3.571429, 0, 0, 3.571429, -513, -417);
+    transform: translate(1233px, 779px);
 }
-#north-africa-space {
-    top: 293px;
-    left: 389px;
-    width: 400px;
-    height: 440px;
-    transform: scale(0.5); 
+#north-africa {
+    transform: matrix(0.58, 0, 0, 0.56, 566, 473);
 }
 #north-africa-text {
-    transform: matrix(2, 0, 0, 2, -237, -235);
+    transform: translate(615px, 739px);
 }
-#northern-europe-space { 
-    top: 81px;
-    left: 422px;
-    width: 400px;
-    height: 395px;
-    transform: scale(0.33);  
+#northern-europe {
+    transform: matrix(0.38, 0, 0, 0.38, 644, 246); 
 }
 #northern-europe-text {
-    transform: matrix(3.030303, 0, 0, 3.030303, -411, -337);
+    transform: translate(652px, 449px);
 }
-#northwest-territory-space {
-    top: 21px;
-    left: 31px;
-    width: 400px;
-    height: 188px;
-    transform: scale(0.55); 
+#northwest-territory {
+    transform: matrix(0.63, 0, 0, 0.63, 139, 77);
 }
 #northwest-territory-text {
-    transform: matrix(1.818182, 0, 0, 1.818182, -173, -48);
+    transform: translate(202px, 281px);
 }
-#ontario-space {
-    top: -22px;
-    left: 90px;
-    width: 400px;
-    height: 491px;
-    transform: scale(0.27);  
+#ontario {
+    transform: matrix(0.3, 0, 0, 0.31, 274, 184);  
 }
 #ontario-text {
-    transform: matrix(3.703704, 0, 0, 3.703704, -559, -675);
+    transform: translate(256px, 380px);
 }
-#peru-space { 
-    top: 358px;
-    left: 109px;
-    width: 400px;
-    height: 421px;
-    transform: scale(0.4); 
+#peru {
+    transform: matrix(0.45, 0, 0, 0.45, 268, 560);
 }
 #peru-text {
-    transform: matrix(2.5, 0, 0, 2.5, -326, -282);
+    transform: translate(274px, 781px);
 }
-#quebec-space { 
-    top: -16px;
-    left: 167px;
-    width: 400px;
-    height: 474px;
-    transform: scale(0.27); 
+#quebec {
+    transform: matrix(0.33, 0, 0, 0.33, 356, 176);
 }
 #quebec-text {
-    transform: matrix(3.703704, 0, 0, 3.703704, -563, -579);
+    transform: translate(345px, 355px);
 }
-#scandanavia-space { 
-    top: -56px;
-    left: 437px;
-    width: 400px;
-    height: 446px;
-    transform: scale(0.33); 
+#scandanavia {
+    transform: matrix(0.36, 0, 0, 0.36, 672, 116);
 }
 #scandanavia-text {
-    transform: matrix(3.030303, 0, 0, 3.030303, -411, -523);
+    transform: translate(671px, 295px);
 }
-#siam-space {  
-    top: 229px;
-    left: 797px;
-    width: 400px;
-    height: 505px;
-    transform: scale(0.27); 
+#siam {
+    transform: matrix(0.33, 0, 0, 0.33, 1091, 479);
 }
 #siam-text {
-    transform: matrix(3.703704, 0, 0, 3.703704, -552, -662);
+    transform: translate(1084px, 672px);
 }
-#siberia-space {  
-    top: -181px;
-    left: 707px;
-    width: 400px;
-    height: 696px;
-    transform: scale(0.4);  
+#siberia {
+    transform: matrix(0.58, 0, 0, 0.5, 935, 21);
 }
 #siberia-text {
-    transform: matrix(2.5, 0, 0, 2.5, -299, -600);
+    transform: translate(994px, 293px);
 }
-#south-africa-space {
-    top: 459px;
-    left: 489px;
-    width: 400px;
-    height: 508px;
-    transform: scale(0.35); 
+#south-africa {
+    transform: matrix(0.42, 0, 0, 0.42, 717, 729);
 }
 #south-africa-text {
-    transform: matrix(2.857143, 0, 0, 2.857143, -388, -434);
+    transform: translate(718px, 976px);
 }
-#southern-europe-space {  
-    top: 149px;
-    left: 431px;
-    width: 400px;
-    height: 425px;
-    transform: scale(0.33); 
+#southern-europe {
+    transform: matrix(0.38, 0, 0, 0.38, 656, 334);
 }
 #southern-europe-text {
-    transform: matrix(3.030303, 0, 0, 3.030303, -415, -444);
+    transform: translate(660px, 537px);
 }
-#ukraine-space {  
-    top: -63px;
-    left: 540px;
-    width: 400px;
-    height: 612px;
-    transform: scale(0.48); 
+#ukraine {
+    transform: matrix(0.55, 0, 0, 0.55, 745, 107);
 }
 #ukraine-text {
-    transform: matrix(2.083333, 0, 0, 2.083333, -232, -334);
+    transform: translate(786px, 372px);
 }
-#ural-space {  
-    top: -179px;
-    left: 660px;
-    width: 400px;
-    height: 739px;
-    transform: scale(0.31, 0.32); 
+#ural {
+    transform: matrix(0.38, 0, 0, 0.38, 921, 75);
 }
 #ural-text {
-    transform: matrix(3.225806, 0, 0, 3.125, -470, -717);
+    transform: translate(920px, 348px);
 }
-#veneseulea-space {   
-    top: 356px;
-    left: 122px;
-    width: 400px;
-    height: 233px;
-    transform: scale(0.4); 
+#veneseulea {
+    transform: matrix(0.48, 0, 0, 0.48, 280, 491);
 }
 #veneseulea-text {
-    transform: matrix(2.5, 0, 0, 2.5, -320, -183);
+    transform: translate(284px, 667px);
 }
-#western-australia-space {
-    top: 490px;
-    left: 887px;
-    width: 400px;
-    height: 454px;
-    transform: scale(0.4, 0.38); 
+#western-australia {
+    transform: matrix(0.46, 0, 0, 0.46, 1166, 731);
 }
 #western-australia-text {
-    transform: matrix(2.5, 0, 0, 2.631579, -297, -327);
+    transform: translate(1184px, 974px);
 }
-#western-europe-space {  
-    top: 121px;
-    left: 338px;
-    width: 400px;
-    height: 493px;
-    transform: scale(0.3); 
+#western-europe {
+    transform: matrix(0.35, 0, 0, 0.35, 556, 339);
 }
 #western-europe-text {
-    transform: matrix(3.030303, 0, 0, 3.030303, -454, -463);
+    transform: translate(538px, 573px);
 }
-#western-usa-space {
-    top: 106px;
-    left: 9px;
-    width: 400px;
-    height: 381px;
-    transform: scale(0.4, 0.35);   
+#western-usa {
+    transform: matrix(0.5, 0, 0, 0.42, 155, 265);
 }
 #western-usa-text {
-    transform: matrix(2.5, 0, 0, 2.857143, -317, -359);
+    transform: translate(177px, 455px);
 }
-#yakutsk-space {
-    top: -95px;
-    left: 807px;
-    width: 400px;
-    height: 415px;
-    transform: scale(0.33); 
+#yakutsk {
+    transform: matrix(0.4, 0, 0, 0.42, 1092, 38);
 }
 #yakutsk-text {
-    transform: matrix(3.030303, 0, 0, 3.030303, -387, -411);
+    transform: translate(1104px, 245px);
 }
 
 
