@@ -136,7 +136,6 @@ function removeAllWildCardButtons() {
     removeElement("map-screen-toolbar", "wild-drop1");
 }
 
-
 function maxSupplyCheck() {
     var currentTurn = gameVars.gameStatus.turn,
     currentPlayerSupplyCount = gameVars.playerInfo["player" + currentTurn].playerSupplyPoints.length;

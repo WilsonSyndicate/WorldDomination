@@ -256,6 +256,16 @@ function attackCountryClicked(country) {
     }
 }
 
+function deckPenaltiesPunctuation(deckPenalties) {
+    if (deckPenalties > 0) {
+        return ", ";
+    }
+}
+
+function mapCountryOffHover(country) {
+    endAnimateCountry(country);
+}
+
 function mapCountryHover(country) {
     var countryName = findFullCountryWithCountry(country).countryName;
 
@@ -272,26 +282,47 @@ function mapCountryHover(country) {
         deckBonuses = gameVars.playerInfo["player" + countryPlayer].playerDecklist[deckId].deckBonuses,
         deckPenalties = gameVars.playerInfo["player" + countryPlayer].playerDecklist[deckId].deckPenalties;
 
-        document.getElementById("country-information").innerHTML += "<br>" + playerName;
+        document.getElementById("country-information").innerHTML += "<br>" + playerName + "<br>";
         //player deck if not hidden
         if (isHidden === false) {
-            document.getElementById("country-information").innerHTML += "<br>" + deckName + " (" + deckColors + ")";
+            document.getElementById("country-information").innerHTML += deckName + " (" + deckColors + ")<br>";
         }
         if (deckBonuses === 1) {
-            document.getElementById("country-information").innerHTML += "<br>" + "One Bonus";
+            document.getElementById("country-information").innerHTML += "One Bonus<br>";
         }
         if (deckBonuses > 1) {
-            document.getElementById("country-information").innerHTML += "<br>" + deckBonuses + " Bonuses";
+            document.getElementById("country-information").innerHTML += deckBonuses + " Bonuses<br>";
         }
         if (deckPenalties === 1) {
-            document.getElementById("country-information").innerHTML += "<br>" + "One Penalty";
+            document.getElementById("country-information").innerHTML += "One Penalty<br>";
         }
         if (deckPenalties > 1) {
-            document.getElementById("country-information").innerHTML += "<br>" + deckPenalties + " Penalties";
+            document.getElementById("country-information").innerHTML += deckPenalties + " Penalties<br>";
         }
+
+
+        //clear map button
+        //removeElement();
+        //rewrite map button
+        //if not last map element built
+        //addMapElement();
+
         //future version
         //add hero, conspiracy, defense plane, vanguards, support bonus, etc
     }
+    //update background color
+    for (i = 1; i < 6; i++) {
+        removeClass("country-information", 'player-color-' + i);
+    }
+    removeClass("country-information", 'player-color-');
+    if (countryPlayer === undefined) {
+        addClass("country-information", 'player-color-');
+    }
+    else {
+        addClass("country-information", 'player-color-' + countryPlayer);
+    }
+
+    animateCountry(country);
 }
 
 function mapCountryClick(country) {
@@ -304,9 +335,8 @@ function mapCountryClick(country) {
         case "move":
             makeMove(country);
         break;
-        case "placement":
-            //future version - placement
-            console.log(country + " clicked for placement mode")
+        case "setup":
+            placementClick(country);
         break;        
         case "drop":
             chooseSupplyDrop(country);
@@ -408,7 +438,7 @@ function buildMapButtons() {
         alreadyAttacked = isItemInArray(currentCountry, gameVars.mapInfo.alreadyAttacked);
 
         //build each country path
-        addMapElement("map-countries", countryMapName(currentFullCountry), currentCountry, "country-button", mapCountryClick, mapCountryHover);
+        addMapElement("map-countries", countryMapName(currentFullCountry), currentCountry, "country-button", mapCountryClick, mapCountryHover, mapCountryOffHover);
         //all add player color
         if (!!currentFullCountry.deck) {
             var currentPlayer = currentFullCountry.deck.deckPlayer;

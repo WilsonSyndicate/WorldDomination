@@ -1,15 +1,90 @@
 //Code Masters
+function findFullHeroWithName(currentHeroName) {
+    for (var i = 0; i < heroDeck.length; i++) {
+        if (heroDeck[i].heroName = currentHeroName) {
+            return heroDeck[i];
+        }
+    }
+}
+
+function findFullConspiracyWithName(currentConspiracyName) {
+    for (var i = 0; i < conspiracyDeck.length; i++) {
+        if (conspiracyDeck[i].conspiracyName = currentConspiracyName) {
+            return conspiracyDeck[i];
+        }
+    }
+}
+
+function findVanguardRef(currentVanguardName) {
+    for (var i = 0; i < vanguardDeck.length; i++) {
+        if (vanguardDeck[i].vanguardName = currentVanguardName) {
+            return i;
+        }
+    }
+}
+
+function endAnimateCountry(country) {
+    var oldMatrixA = gameVars.mapInfo.backupCountryMatrix[0],
+    oldMatrixD = gameVars.mapInfo.backupCountryMatrix[1],
+    oldMatrixE = gameVars.mapInfo.backupCountryMatrix[2],
+    oldMatrixF = gameVars.mapInfo.backupCountryMatrix[3];
+
+    //set old matrix
+    document.getElementById(country).style.transform = "matrix(" + oldMatrixA + ", 0, 0, " + oldMatrixD + ", " + oldMatrixE + ", " + oldMatrixF + ")";
+}
+
+function animateCountry(country) {
+    var style = window.getComputedStyle(document.getElementById(country)),
+    matrix = new WebKitCSSMatrix(style.webkitTransform),
+    newMatrixA = matrix.a,
+    newMatrixD = matrix.d,
+    newMatrixE = matrix.e,
+    newMatrixF = matrix.f,
+    matrixAIncrease = 0.05,
+    matrixDIncrease = 0.05,
+    matrixEIncrease = -10,
+    matrixFIncrease = -10;
+
+    //save previous matrix values
+    gameVars.mapInfo.backupCountryMatrix[0] = newMatrixA;
+    gameVars.mapInfo.backupCountryMatrix[1] = newMatrixD;
+    gameVars.mapInfo.backupCountryMatrix[2] = newMatrixE;
+    gameVars.mapInfo.backupCountryMatrix[3] = newMatrixF;
+    
+    //add increase
+    newMatrixA = matrix.a += matrixAIncrease;
+    newMatrixD = matrix.d += matrixDIncrease;
+    newMatrixE = matrix.e += matrixEIncrease;
+    newMatrixF = matrix.f += matrixFIncrease;
+    /*
+    var interval = setInterval(frame, 5);
+
+    function frame() {
+        if (interval == 5) {
+            //set old matrix
+            document.getElementById(country).style.transform = "matrix(" + gameVars.mapInfo.backupCountryMatrix[0] + ", 0, 0, " + gameVars.mapInfo.backupCountryMatrix[1] + ", " + gameVars.mapInfo.backupCountryMatrix[2] + ", " + gameVars.mapInfo.backupCountryMatrix[3] + ")";
+
+            //transition timing
+            document.getElementById(country).style.transitionDuration = "1s";
+            //reset interval
+            interval = 0;
+        }
+        else {
+    */
+            //set new matrix
+            document.getElementById(country).style.transform = "matrix(" + newMatrixA + ", 0, 0, " + newMatrixD + ", " + newMatrixE + ", " +newMatrixF + ")";
+    /*
+            //count interval
+            interval += 1;
+        }
+    }
+    */
+}
+
 function stringToDate(string) {
     var newDate = Date(string),
     parts = newDate.split(' '),
     findTimeZone = [];
-
-    //WeekDay = parts[0],
-    //Month = parts[1],
-    //Day = parts[2],
-    //Year = parts[3],
-    //Time = parts[4],
-    //TimeZoneDiff = parts[5],
 
     for (var i = 6; i <= parts.length; i++) {
         findTimeZone.push(parts[i]);
@@ -288,8 +363,6 @@ function addMapElement(addToId, elementContent, idToInclude, classToInclude, cli
     //country label
     addElement("text-countries", "div", elementContent, idToInclude + "-text", "country-text");
 }
-
-
 
 function addElement(addToId, elementType, elementContent, idToInclude, classToInclude, clickFunctionToInclude, hoverFunctionToInclude, offHoverFunctionToInclude) {
     var newElement = document.createElement(elementType);//create a new element

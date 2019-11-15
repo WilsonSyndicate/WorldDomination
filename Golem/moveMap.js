@@ -1,5 +1,4 @@
 //move map
-
 function earthShakingEventCheck() { 
     if (gameVars.mapInfo.possibleAttack === 0) {
         alert("No attacks within range for " + findPlayerName(gameVars.gameStatus.turn));
@@ -14,6 +13,8 @@ function earthShakingEvent() {
     showMap();
     //rebuild map buttons
     buildMapButtons();
+    //rebuild hero and conspiracy
+    shuffleHeroAndConspiracy();
 }
 
 function updateToolbarColors(player) {

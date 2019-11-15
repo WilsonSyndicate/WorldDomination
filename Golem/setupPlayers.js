@@ -1,4 +1,91 @@
 //Player Setup
+function shuffleHeroAndConspiracy() {
+    var countryNames = [],
+    heroList = [],
+    conspiracyList = [];
+
+    //load country names
+    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
+        countryNames.push(gameVars.mapInfo.countryList[i].country);
+        //remove previous hero
+        if (!!gameVars.mapInfo.countryList[i].hero) {
+            gameVars.mapInfo.countryList[i].hero = "";
+        }
+        //remove previous conspiracy
+        if (!!gameVars.mapInfo.countryList[i].conspiracy) {
+            gameVars.mapInfo.countryList[i].conspiracy = "";
+        }
+    }
+    //create hero list
+    if (adminSettings.useHero === true) {
+        //add possible heros to hero list
+        for (var h = 0; h < heroDeck.length; h++) {
+            heroList.push(heroDeck[h].heroName);
+        }
+        //shuffle hero list
+        shuffleArray(heroList);
+        //shuffle country list
+        shuffleArray(countryNames);
+        //add hero to countries
+        for (var hl = 0; hl < heroList.length && countryNames.length; hl++) {
+            var currentFullCountry = findFullCountryWithCountry(countryNames[hl]);
+
+            currentFullCountry.hero = heroList[hl];
+
+            console.log(countryNames[hl] + " hero");
+        }
+    }
+    if (adminSettings.useConspiracy === true) {
+        //add possible conspracy list
+        for (var h = 0; h < conspiracyDeck.length; h++) {
+            conspiracyList.push(conspiracyDeck[h].conspiracyName);
+        }
+        //shuffle conspiracy list
+        shuffleArray(conspiracyList);
+        //shuffle country list
+        shuffleArray(countryNames);
+        //add conspiracy to countries
+        for (var cl = 0; cl < conspiracyList.length && countryNames.length; cl++) {
+            var currentFullCountry = findFullCountryWithCountry(countryNames[cl]);
+
+            currentFullCountry.conspiracy = conspiracyList[cl];
+
+            console.log(countryNames[cl] + " conspiracy");
+        }
+    }
+}
+
+function placementClick(country) {
+    var currentPlacementPlayer = gameVars.gameStatus.turnOrder[adminSettings.placementSetup.placementPlayer];
+    dugoutDeck = gameVars.playerInfo["player" + currentPlacementPlayer].playerDugout + 1,
+    dugoutDeckName = gameVars.playerInfo["player" + currentPlacementPlayer].playerDecklist[dugoutDeck].deckName,
+    totalPlayers = gameVars.gameStatus.turnOrder.length,
+    totalCountries = gameVars.mapInfo.countryList.length,
+    countriesPerPlayer = Math.floor(totalCountries / totalPlayers);
+
+    if (!findFullCountryWithCountry(country).deck) {
+        //add deck name and deck player to country
+        findFullCountryWithCountry(country).deck = {deckPlayer: currentPlacementPlayer, deckName: dugoutDeckName};
+        //add 1 to dugout
+        gameVars.playerInfo["player" + currentPlacementPlayer].playerDugout += 1;
+        //go to next turn order player
+        if (adminSettings.placementSetup.placementPlayer === totalPlayers - 1) {
+            //once setup is complete, go to top of turn
+            if (dugoutDeck === countriesPerPlayer) {
+                //to top of turn to end setup
+                topOfTurn();
+            }
+            else {
+                adminSettings.placementSetup.placementPlayer = 0;
+            }
+        }
+        else {
+            adminSettings.placementSetup.placementPlayer += 1;
+        }
+        //refresh country list
+        buildMapButtons();
+    }
+}
 
 function setupCheck() {
     var totalNumberPlayers = Number(document.getElementById("update-player-count").value),
@@ -58,7 +145,6 @@ function showLogInfo() {
             });
         }
 
-
         //create table with above info
         var tableBody = document.getElementById("log-information"), //reference for body
         tbl = document.createElement("table"), //table element
@@ -103,17 +189,6 @@ function showLogInfo() {
         tableBody.appendChild(tbl);
         //add class for bootstrap
         document.getElementById("log-info").classList.add("table-striped");
-
-
-
-
-
-
-
-
-
-
-
     }
 }
 
@@ -178,8 +253,9 @@ function updateIntroScreen() {
             deckPenalties: introScreenPenalty(gameVars.mapInfo.countryList[c])
         }); 
     }
+
     //future version 
-    //add defense plane, hero, conspiracy, etc
+    //add defense plane
 
     //create table with above info
     var tableBody = document.getElementById("intro-information"), //reference for body
@@ -249,6 +325,8 @@ function cleanupPlayerDeckLists() {
             currentPlayerDecklist[d].deckUniqueId = {deckPlayer: currentPlayer, deckName: currentPlayerDecklist[d].deckName};
         }
     }
+    //setup hero, conspiracy
+    shuffleHeroAndConspiracy();
 }
 
 function buildSupplyPointList() {
@@ -284,18 +362,15 @@ function buildSupplyPointList() {
 function topOfPlacementSetup() {
     //clear all battle buttons and battle variables
     battleScreenCleanup();
-
+    //setup map
     showMap();
-
-    //future version - placement setup
-    //starting with ref 1, add decks in turn order until all decks are set.
-    //once setup is complete, go to top of turn
+    buildMapButtons();
 }
 
 function setupComplete() {
     var logText = ["Initiation Game Complete"],
     battleDecks = [],
-    randomSetup = true;//change when placement setup enabled on future version
+    placementSetup = adminSettings.placementSetup.usePlacementSetup
 
     //log end of game, add winner decks in order
     for (var i = 0; i < gameVars.battleScreenInfo.battleWinner.length; i++) {
@@ -321,14 +396,15 @@ function setupComplete() {
     //future version
     //setup conspiracy
 
-    if (randomSetup) {
+    if (placementSetup === false) {
+        //random setup
         //set up map
         setupMapInformation();
-
         //top of turn
         topOfTurn();
     }
     else {
+        //placement setup
         //top of placement setup
         topOfPlacementSetup()
     }
