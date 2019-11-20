@@ -85,10 +85,12 @@ function makeSupplyDrop() {
                     }
                 }
                 else {
-                    //drop deck
-                    var newDeckName = dropDeckIntoGame(gameVars.gameStatus.turn, country);
-                    //add log text
-                    logText += ": " + findPlayerName(fullCountry.deck.deckPlayer) + " drops " + newDeckName + " into game";
+                    if (adminSettings.useAdditionalDeckDrops === true) {
+                        //drop deck
+                        var newDeckName = dropDeckIntoGame(gameVars.gameStatus.turn, country);
+                        //add log text
+                        logText += ": " + findPlayerName(fullCountry.deck.deckPlayer) + " drops " + newDeckName + " into game";
+                    }
                 }
                 //border drop
                 for (var b = 0; b < fullCountry.borders.length; b++) {
@@ -250,7 +252,9 @@ function buildWildCardButtons() {
     if (countWildSupply(gameVars.playerInfo["player" + gameVars.gameStatus.turn].playerSupplyPoints) > 0) {
         for (var i = 0; i < countWildSupply(gameVars.playerInfo["player" + gameVars.gameStatus.turn].playerSupplyPoints); i++) {
         //add wild card button
-        addElement("map-screen-toolbar", "button", "Use Wild Card", "wild-drop" + i, "map-button", dropWildCard)
+        addElement("map-screen-toolbar", "button", "Use Wild Card", "wild-drop" + i, "map-button", dropWildCard);
+        addClass("wild-drop" + i, "btn");
+        addClass("wild-drop" + i, "btn-cation");
         }
     }
 }
@@ -269,13 +273,14 @@ function goToSupplyDrop() {
     gameVars.gameStatus.mode = "drop";
     //make cancel drop button
     addElement("map-screen-toolbar", "button", "Cancel Supply Drop", "drop-select-cancel", "map-button", clearDropSelect);
-
+    addClass("drop-select-cancel", "btn");
+    addClass("drop-select-cancel", "btn-danger");
     //check for max to disable cancel
     maxSupplyCheck();
-
-
     //make confirm drop button and disable
     addElement("map-screen-toolbar", "button", "Make Supply Drop", "make-drop", "map-button", makeSupplyDrop);
+    addClass("make-drop", "btn");
+    addClass("make-drop", "btn-primary");
     disableId("make-drop");
     //make wild drop button for each wild card
     buildWildCardButtons();
@@ -353,5 +358,7 @@ function supplyDropCheck() {
     else if (supplyDropReady === true) {
         //create supply drop button
         addElement("map-screen-toolbar", "button", "Supply Drop", "supply-drop-button", "map-button", selectSupplyDrop);
+        addClass("supply-drop-button", "btn");
+        addClass("supply-drop-button", "btn-cation");
     }
 }

@@ -263,7 +263,7 @@ function deckPenaltiesPunctuation(deckPenalties) {
 }
 
 function mapCountryOffHover(country) {
-    endAnimateCountry(country);
+    //endAnimateCountry(country);
 }
 
 function mapCountryHover(country) {
@@ -322,7 +322,7 @@ function mapCountryHover(country) {
         addClass("country-information", 'player-color-' + countryPlayer);
     }
 
-    animateCountry(country);
+    //animateCountry(country);
 }
 
 function mapCountryClick(country) {
@@ -494,8 +494,12 @@ function beginAttack() {
         buildMapButtons();
         //create skip attack button
         addElement("map-screen-toolbar", "button", "Decline Attack", "decline-attack", "map-button", declineAttack);
+        addClass("decline-attack", "btn");
+        addClass("decline-attack", "btn-danger");
         //create confirm attack button and disable
         addElement("map-screen-toolbar", "button", "Confirm Attack", "confirm-attack", "map-button", attackChosen);
+        addClass("confirm-attack", "btn");
+        addClass("confirm-attack", "btn-primary");
         disableId("confirm-attack");
         //update message and note
         document.getElementById("map-message").innerHTML = currentTurnPlayerName + " Choose Your Attack";
@@ -511,6 +515,8 @@ function beginAttack() {
 }
 
 function topOfTurn() {
+    //update toolbar color
+    addClass("map-screen-toolbar", "player-color-" + gameVars.gameStatus.turn);
     //clear all battle buttons and battle variables
     battleScreenCleanup();
     //change mode

@@ -39,32 +39,100 @@ function setEndOfTurn() {
     updateToolbarColors(gameVars.gameStatus.turn)
 }
 
+function clearContinentOwnedList() {
+    var newArray = [];
+
+    for (var i = 0; i < gameVars.mapInfo.continentsOwned.length; i++) {
+        if (gameVars.mapInfo.continentsOwned[i][1] !== gameVars.gameStatus.turn) {
+            newArray.push(gameVars.mapInfo.continentsOwned[i]);
+        }
+    }
+    gameVars.mapInfo.continentsOwned = newArray;
+}
+
+function controlledContinentUpdate() {
+    var continentWithCountryList = continentsWithCountries(),
+    colorPrompt = false;
+
+    //clear previous controlled and owned list
+    gameVars.mapInfo.continentsControlled = [];
+    //remove current player from owned list
+    clearContinentOwnedList();
+    //for each continent
+    for (var i = 0; i < continentWithCountryList.length; i++) {
+        var currentContinent = continentWithCountryList[i][0],
+        currentContinentPlayerList = [];
+
+        //check player numbers on each country
+        for (var y = 1; y < continentWithCountryList[i].length; y++) {
+            var currentCountry = continentWithCountryList[i][y];
+
+            if (!!findFullCountryWithCountry(currentCountry).deck) {
+                //and add to current list
+                currentContinentPlayerList.push(findCountryPlayer(currentCountry));
+            }
+        }
+        //if list has only one player mark as controlled
+        if (findUniqueValuesInArray(currentContinentPlayerList).length === 1) {
+            var currentControllerPlayer = findUniqueValuesInArray(currentContinentPlayerList)[0];
+            gameVars.mapInfo.continentsControlled.push([currentContinent, currentControllerPlayer]);
+
+            //if list has only one player and deck totals = country totals mark as owned
+            if (currentContinentPlayerList.length === numberOfCountriesOnContinent(continentWithCountryList[i][0]) && gameVars.gameStatus.turn === currentControllerPlayer) {
+                //add current player to owned list
+                gameVars.mapInfo.continentsOwned.push([currentContinent, currentControllerPlayer]);
+                colorPrompt = true;
+            }
+        }
+    }
+    return colorPrompt;
+}
+
+function continentColorPrompt() {
+    for (var i = 0; i < gameVars.mapInfo.continentsOwned.length; i++) {
+        if (gameVars.mapInfo.continentsOwned[i][1] === gameVars.gameStatus.turn) {
+            var colorPrompt = prompt("Please choose a color to add to " + gameVars.mapInfo.continentsOwned[i][0] + ".\n (Example: W, U, B, R, G)", "");
+            
+            if (colorPrompt === "W" || colorPrompt === "U" || colorPrompt === "B" || colorPrompt === "R" || colorPrompt === "G") {
+                gameVars.mapInfo.continentsOwned[i].push(colorPrompt);
+                //end the turn
+                setEndOfTurn();
+                break;
+            }
+            alert("Valid Colors Are: W U B R G");
+            continentColorPrompt();
+        }
+    }
+}
+
 function moveComplete() {
     var currentTurnPlayerName = findPlayerName(gameVars.gameStatus.turn),
     moveConfirmation = confirm(currentTurnPlayerName + " is done moving?");
 
     if (moveConfirmation === true) {
-    //future version - continent owned bonus
-    //check for continent owned color
+        //remove drop button
+        removeElement("map-screen-toolbar", "supply-drop-button");
+        //remove map buttons
+        removeElement("map-screen-toolbar", "complete-move");
+        removeElement("map-screen-toolbar", "cancel-move");
+        removeElement("map-screen-toolbar", "supply-drop-button");
+        //cleanup battlescreen info
+        gameVars.battleScreenInfo.eliminatedDeck = "";
+        //cleanup map info
+        gameVars.mapInfo.cancelMoveList = [];
+        gameVars.mapInfo.alreadyAttacked = [];
+        gameVars.mapInfo.joinThreat = [];
+        gameVars.mapInfo.mapMoves = 0;
+        gameVars.mapInfo.mapSelect = [];
+        gameVars.mapInfo.possibleAttack = 0;
+        gameVars.mapInfo.possibleBattle = [];
+        if (adminSettings.continentBonuses.useContinentBonuses && controlledContinentUpdate()) {
+            continentColorPrompt();
+        }
+        else {
+            setEndOfTurn();
 
-    //remove drop button
-    removeElement("map-screen-toolbar", "supply-drop-button");
-    //remove map buttons
-    removeElement("map-screen-toolbar", "complete-move");
-    removeElement("map-screen-toolbar", "cancel-move");
-    removeElement("map-screen-toolbar", "supply-drop-button");
-    //cleanup battlescreen info
-    gameVars.battleScreenInfo.eliminatedDeck = "";
-    //cleanup map info
-    gameVars.mapInfo.cancelMoveList = [];
-    gameVars.mapInfo.alreadyAttacked = [];
-    gameVars.mapInfo.joinThreat = [];
-    gameVars.mapInfo.mapMoves = 0;
-    gameVars.mapInfo.mapSelect = [];
-    gameVars.mapInfo.possibleAttack = 0;
-    gameVars.mapInfo.possibleBattle = [];
-    //end the turn
-    setEndOfTurn();
+        }
     }
 }
 
@@ -251,8 +319,12 @@ function setToMove() {
     backupCountryList();
     //make move complete button
     addElement("map-screen-toolbar", "button", "Move Complete", "complete-move", "map-button", moveComplete);
+    addClass("complete-move", "btn");
+    addClass("complete-move", "btn-primary");
     //make reset move button and disable
     addElement("map-screen-toolbar", "button", "Reset Map", "cancel-move", "map-button", cancelMoves);
+    addClass("cancel-move", "btn");
+    addClass("cancel-move", "btn-danger");
     disableId("cancel-move");
     //update map note and message
     document.getElementById("map-message").innerHTML = findPlayerName(gameVars.gameStatus.turn) + " Choose Move";

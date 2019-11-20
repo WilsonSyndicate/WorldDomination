@@ -1,16 +1,16 @@
 ﻿/*Player Colors*/
 :root {
-    --player-1-color: var(--cyan);
-    --player-1-inactive: rgb(232, 250, 252);
-    --player-2-color: var(--red);
-    --player-2-inactive: rgb(251, 233, 235);
-    --player-3-color: var(--green);
-    --player-3-inactive: rgb(234, 250, 238);
-    --player-4-color: var(--yellow);
-    --player-4-inactive: rgb(255, 249, 230);
-    --player-5-color: rgb(123, 82, 199);
-    --player-5-inactive: rgb(240, 236, 249);
-    --threat-possible: var(--orange);
+    --player-1-color: rgb(207, 23, 69);
+    --player-1-inactive: rgb(128, 0, 0);
+    --player-2-color: rgb(67, 99, 216);
+    --player-2-inactive: rgb(0, 0, 179);
+    --player-3-color: rgb(255, 225, 25);
+    --player-3-inactive: rgb(128, 128, 0);
+    --player-4-color: rgb(245, 130, 49);
+    --player-4-inactive: rgb(154, 99, 36);
+    --player-5-color: rgb(60, 180, 75);
+    --player-5-inactive: rgb(45, 134, 57);
+    --threat-possible: yellow;
     --selected: yellow;
     --shadow: rgba(77, 77, 77, 0.25);
 }
@@ -93,7 +93,7 @@
 .country-button.not-attackable,
 .country-button.not-movable,
 .country-button.not-supplyable {
-    fill: rgb(230, 230, 230); 
+    fill: rgb(89, 89, 89); 
 }
 /*Player 1*/
 .country-button.player-color-1 {
@@ -171,7 +171,7 @@
 #confirm-attack {
     position: absolute;
     top: 10px;
-    right: 135px;
+    right: 147px;
 }
 #supply-drop-button {
     position: absolute;
@@ -181,7 +181,7 @@
 #complete-move {
     position: absolute;
     top: 10px;
-    right: 107px;
+    right: 120px;
 }
 #make-drop {
     position: absolute;
@@ -271,6 +271,16 @@
     width: 100%;
     height: auto;
     position: fixed;
+}
+#card-picture {
+    position: relative;
+    background-repeat: no-repeat;
+    background-size: cover;
+    top: 520px;
+    margin: auto;
+    width: 282px;
+    height: 404px;
+    border-radius: 10px;
 }
 #battle-information {
     min-height: 100%;
@@ -393,6 +403,12 @@
 #toolbar-information {
     width: 80%;
     height: 123px;
+}
+.btn {
+    border: 1px solid black;
+    border-radius: 0.25rem;
+    margin: 2px;
+
 }
 #battle-screen-toolbar,
 #intro-screen-toolbar {

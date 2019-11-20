@@ -31,8 +31,6 @@ function shuffleHeroAndConspiracy() {
             var currentFullCountry = findFullCountryWithCountry(countryNames[hl]);
 
             currentFullCountry.hero = heroList[hl];
-
-            console.log(countryNames[hl] + " hero");
         }
     }
     if (adminSettings.useConspiracy === true) {
@@ -49,8 +47,6 @@ function shuffleHeroAndConspiracy() {
             var currentFullCountry = findFullCountryWithCountry(countryNames[cl]);
 
             currentFullCountry.conspiracy = conspiracyList[cl];
-
-            console.log(countryNames[cl] + " conspiracy");
         }
     }
 }
@@ -72,15 +68,28 @@ function placementClick(country) {
         if (adminSettings.placementSetup.placementPlayer === totalPlayers - 1) {
             //once setup is complete, go to top of turn
             if (dugoutDeck === countriesPerPlayer) {
+                //update owned continents
+                controlledContinentUpdate();
                 //to top of turn to end setup
                 topOfTurn();
             }
             else {
+                //remove previous toolbar color
+                removeClass("map-screen-toolbar", "player-color-" + gameVars.gameStatus.turnOrder[adminSettings.placementSetup.placementPlayer])
+                //update placement player
                 adminSettings.placementSetup.placementPlayer = 0;
+                //update toolbar color
+                addClass("map-screen-toolbar", "player-color-" + gameVars.gameStatus.turnOrder[adminSettings.placementSetup.placementPlayer]);
             }
         }
         else {
+            //remove previous toolbar color
+            removeClass("map-screen-toolbar", "player-color-" + gameVars.gameStatus.turnOrder[adminSettings.placementSetup.placementPlayer])
+            //update placement player
             adminSettings.placementSetup.placementPlayer += 1;
+            //update toolbar color
+            addClass("map-screen-toolbar", "player-color-" + gameVars.gameStatus.turnOrder[adminSettings.placementSetup.placementPlayer]);
+
         }
         //refresh country list
         buildMapButtons();
@@ -389,15 +398,10 @@ function setupComplete() {
     updateToolbarColors(gameVars.gameStatus.turn);
     //cleanup decklists
     cleanupPlayerDeckLists();
-
-    //future version
-    //setup hero
-
-    //future version
-    //setup conspiracy
-
     if (placementSetup === false) {
         //random setup
+        //update owned continents
+        controlledContinentUpdate();
         //set up map
         setupMapInformation();
         //top of turn

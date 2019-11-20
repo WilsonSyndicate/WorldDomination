@@ -1,3 +1,31 @@
+
+function battlePictureHover(mod) {
+    var battleDeckReference = mod.charAt(mod.length - 1),
+    pictureType = mod.slice(0, -1);
+
+    if (pictureType === "vanguard" && pictureType !== "noVanguard") {
+        var vanguardToShowName = gameVars.battleScreenInfo.battleVanguards[battleDeckReference],
+        vanguardRef = findVanguardRef(vanguardToShowName),
+        pictureToShow = vanguardDeck[vanguardRef].vanguardPicture;
+
+        document.getElementById("card-picture").style.backgroundImage = pictureToShow;
+    } 
+    else if (pictureType === "hero" && pictureType !== "noHero") {
+        var heroToShowName = gameVars.battleScreenInfo.battleHero[battleDeckReference],
+        heroRef = findHeroRef(heroToShowName),
+        pictureToShow = heroDeck[heroRef].heroPicture;
+
+        document.getElementById("card-picture").style.backgroundImage = pictureToShow;
+    } 
+    else if (pictureType === "conspiracy" && pictureType !== "noConspiracy") {
+        var conspiracyToShowName = gameVars.battleScreenInfo.battleConspiracy[battleDeckReference],
+        conspiracyRef = findConspiracyRef(conspiracyToShowName),
+        pictureToShow = conspiracyDeck[conspiracyRef].conspiracyPicture;
+
+        document.getElementById("card-picture").style.backgroundImage = pictureToShow;
+    }
+}
+
 function availableVanguardCards() {
     var takenVanguardCards = [],
     availableVanguardDeck = [];
@@ -101,10 +129,6 @@ function countBattleLife(bonuses, penalties, countrySupport, battleDeckRef) {
     if (gameVars.gameStatus.mode === "attack" && gameVars.battleScreenInfo.battleHero[battleDeckRef] !== "noHero") {
         lifeTotal += findFullHeroWithName(gameVars.battleScreenInfo.battleHero[battleDeckRef]).heroLife;
     }
-    //conspiracy
-    if (gameVars.gameStatus.mode === "attack" && gameVars.battleScreenInfo.battleConspiracy[battleDeckRef] !== "noConspiracy") {
-        lifeTotal += findFullConspiracyWithName(gameVars.battleScreenInfo.battleConspiracy[battleDeckRef]).conspiracyLife;
-    }
     //vanguard
     if (gameVars.gameStatus.mode === "attack" && gameVars.battleScreenInfo.battleVanguards[battleDeckRef] !== "noVanguard") {
         var vanguardRef = findVanguardRef(gameVars.battleScreenInfo.battleVanguards[battleDeckRef]);
@@ -120,7 +144,7 @@ function countBattleLife(bonuses, penalties, countrySupport, battleDeckRef) {
             lifeTotal += Math.floor(adminSettings.supportBonus.attackingLife * countrySupport[0]);
         }
     }
-    return ["Beginning Life Total: ", lifeTotal];
+    return ["Beginning Life Total: ", lifeTotal, "beginning-life"];
 }
 
 function countBattleHand(bonuses, penalties, countrySupport, battleDeckRef) {
@@ -140,10 +164,6 @@ function countBattleHand(bonuses, penalties, countrySupport, battleDeckRef) {
     if (gameVars.gameStatus.mode === "attack" && gameVars.battleScreenInfo.battleHero[battleDeckRef] !== "noHero") {
         handTotal += findFullHeroWithName(gameVars.battleScreenInfo.battleHero[battleDeckRef]).heroHand;
     }
-    //conspiracy
-    if (gameVars.gameStatus.mode === "attack" && gameVars.battleScreenInfo.battleConspiracy[battleDeckRef] !== "noConspiracy") {
-        handTotal += findFullConspiracyWithName(gameVars.battleScreenInfo.battleConspiracy[battleDeckRef]).conspiracyHand;
-    }
     //vanguard
     if (gameVars.gameStatus.mode === "attack" && gameVars.battleScreenInfo.battleVanguards[battleDeckRef] !== "noVanguard") {
         handTotal += vanguardDeck[findVanguardRef(gameVars.battleScreenInfo.battleVanguards[battleDeckRef])].vanguardHand;
@@ -157,7 +177,7 @@ function countBattleHand(bonuses, penalties, countrySupport, battleDeckRef) {
             handTotal += Math.floor(adminSettings.supportBonus.attackingHand * countrySupport[0]);
         }
     }
-    return ["Opening & Max Hand Size: ", handTotal];
+    return ["Opening & Max Hand Size: ", handTotal, "hand-size"];
 }
 
 function countBattlePower(bonuses, penalties, countrySupport, battleDeckRef) {
@@ -233,7 +253,7 @@ function countBattlePowerAndToughness(bonuses, penalties, countrySupport, battle
         return "";
     }
     else {
-        return ["Your Creatures Get: ", creatureMod]
+        return ["Your Creatures Get: ", creatureMod, "power-and-toughness"]
     }
 }
 
@@ -242,7 +262,7 @@ function battleVanguard(battleDeckRef) {
         return "";
     }
     else {
-        return ["Vanguard: ", gameVars.battleScreenInfo.battleVanguards[battleDeckRef]];
+        return ["Vanguard: ", gameVars.battleScreenInfo.battleVanguards[battleDeckRef], "vanguard"];
     }
 }
 
@@ -252,8 +272,64 @@ function battleDefensePlane(battleDeckRef) {
 }
 
 function continentBonuses(battleDeckRef) {
-    //future version
-    return "";
+
+
+    //not working correctly
+
+
+
+    if (adminSettings.continentBonuses.useContinentBonuses) {
+        var currentPlayer = gameVars.battleScreenInfo.battleDecks[battleDeckRef].deckPlayer,
+        currentDeckName = gameVars.battleScreenInfo.battleDecks[battleDeckRef].deckName,
+        currentDeckColors = getDeckColors(currentPlayer, currentDeckName),
+        continentBonuses = [],
+        groundZero = gameVars.battleScreenInfo.groundZero,
+        groundZeroColor = adminSettings.continentBonuses[findContinentWithCountry(groundZero)],
+        controlledContinents = listControlledContinentsWithPlayerAndColor(currentPlayer, currentDeckColors),
+        ownedContinents = listOwnedContinentsWithPlayerAndColor(currentPlayer, currentDeckColors),
+        bonusText = "Continent Bonus: ";
+    
+        //add ground zero if color matches
+        if (colorOnList(groundZeroColor, currentDeckColors)) {
+            continentBonuses.push(findContinentWithCountry(groundZero));
+        }
+        //add owned continents with color match
+        for (let i = 0; i < ownedContinents.length; i++) {
+            continentBonuses.push(ownedContinents[i]);
+        }
+        //add controlled continents with color match
+        for (let i = 0; i < controlledContinents.length; i++) {
+            continentBonuses.push(controlledContinents[i]);
+        }
+        //remove duplicates from ownedContinents list
+        continentBonuses = findUniqueValuesInArray(continentBonuses);
+
+
+
+
+        //not returning continent bonus text
+
+
+        //return bonus or blank
+        if (ownedContinents.length === 0) {
+            return "";
+        }
+        else {
+            //build bonus text
+            for (let i = 0; i < continentBonuses.length; i++) {
+                if (i = 0) {
+                    bonusText += continentBonuses[i];
+                }
+                else {
+                    bonusText += ", " + continentBonuses[i];
+                }
+            }
+            return bonusText;
+        }
+    }
+    else {
+        return "";
+    }
 }
 
 function battleHero(battleDeckRef) {
@@ -266,7 +342,7 @@ function battleHero(battleDeckRef) {
     
             if (currentHero !== "") {
                 gameVars.battleScreenInfo.battleHero.push(currentHero);
-                return ["Hero: ", currentHero];
+                return ["Hero: ", currentHero, "hero"];
             }
         }
         gameVars.battleScreenInfo.battleHero.push("noHero");
@@ -284,7 +360,7 @@ function battleConspiracy(battleDeckRef) {
     
             if (currentConspiracy !== "") {
                 gameVars.battleScreenInfo.battleConspiracy.push(currentConspiracy);
-                return ["Conspiracy: ", currentConspiracy];
+                return ["Conspiracy: ", currentConspiracy, "conspiracy"];
             }
         }
         gameVars.battleScreenInfo.battleConspiracy.push("noConspiracy");
@@ -338,6 +414,8 @@ function attackChosen() {
             //load battle screen info
             displayBattleInfo(j);
         }
+        //add card picture element
+        addElement("battle-information", "div", "noContent", "card-picture");
         //set info locations
         setPlayerInfoLocation();
         //update log
@@ -382,6 +460,9 @@ function battleScreenCleanup() {
     gameVars.battleScreenInfo.battleConspiracy = [];
     //clear deck info and buttons
     clearBattleScreenInformation();
+    //cleanup continent owned and controlled list
+    cleanupContinentOwnedList();
+    cleanupContinentControlledList();
 }
 
 function findBattleDeckNameWithPlayer(currentBattlePlayer) {
@@ -589,6 +670,9 @@ function battleWinner(winningPlayerButton) {
 
     if (gameVars.gameStatus.mode === "attack") {
         var winnerConfirmed = confirm(winningPlayerName + " wins!");
+        
+        //clear card picture
+        removeElement("battle-information", "card-picture");
 
         if (winnerConfirmed) {
             var battleDefender = gameVars.battleScreenInfo.battleDecks[1],
@@ -651,6 +735,9 @@ function battleWinner(winningPlayerButton) {
             }
             //check for player eliminated and end of game
             eliminatedPlayerCheck(winningDeck, battleDefender);
+            //cleanup continent owned and controlled list
+            cleanupContinentOwnedList();
+            cleanupContinentControlledList();
         }
     }
     //if mode is setup
@@ -749,7 +836,8 @@ function displayBattleInfo(battleDeckRef) {
     var currentPlayer = gameVars.battleScreenInfo.battleDecks[battleDeckRef].deckPlayer,
     currentPlayerName = findPlayerName(currentPlayer),
     currentDeckName = gameVars.battleScreenInfo.battleDecks[battleDeckRef].deckName,
-    currentDeckColor = findDeckWithPlayerAndRef(currentPlayer, 0).deckColors,
+    currentDeckRef = findDeckRef(currentPlayer, currentDeckName),
+    currentDeckColor = findDeckWithPlayerAndRef(currentPlayer, currentDeckRef).deckColors,
     battleText = [
         currentPlayerName + " playing " + currentDeckName + " (" + currentDeckColor + ")"
     ],
@@ -776,7 +864,7 @@ function displayBattleInfo(battleDeckRef) {
         if (gameMods[d] !== "") {
             var gameModsCurrentText = gameMods[d][0] + gameMods[d][1];
 
-            addElement("battle-player" + battleDeckRef, "h6", gameModsCurrentText, "small");
+            addElement("battle-player" + battleDeckRef, "h6", gameModsCurrentText, gameMods[d][2] + battleDeckRef, "small", "noFunction", battlePictureHover, "noOffHover");
         }
     }
     //create buttons

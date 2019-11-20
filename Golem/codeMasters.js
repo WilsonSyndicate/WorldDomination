@@ -1,7 +1,165 @@
 //Code Masters
+
+function findContinentWithCountry(country) {
+    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
+        if (gameVars.mapInfo.countryList[i].country === country) {
+            return gameVars.mapInfo.countryList[i].continent;
+        }
+    }
+}
+
+function colorOnList(continentColor, deckColorList) {
+    if (continentColor === "WUBRG") {
+        if (deckColorList === "WUBRG") {
+            return true;
+        }
+        return false;
+    }
+    else {
+        for (var i = 0; i < deckColorList.length; i++) {
+            if (continentColor === deckColorList[i]) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+function listControlledContinentsWithPlayerAndColor(player, deckColors) {
+    var continentBonus = [];
+
+    for (var i = 0; i < gameVars.mapInfo.continentsControlled.length; i++) {
+        var currentContinentColor = adminSettings.continentBonuses[gameVars.mapInfo.continentsControlled[i][0]];
+
+        if (gameVars.mapInfo.continentsControlled[i][1] === player && colorOnList(currentContinentColor, deckColors)) {
+            continentBonus.push(gameVars.mapInfo.continentsControlled[i][0]);
+        }
+    }
+    return continentBonus;
+}
+
+function listOwnedContinentsWithPlayerAndColor(player, deckColors) {
+    var continentBonus = [];
+    
+    for (var i = 0; i < gameVars.mapInfo.continentsOwned.length; i++) {
+        var currentContinentColor = gameVars.mapInfo.continentsOwned[i][2];
+
+        if (gameVars.mapInfo.continentsOwned[i][1] === player && colorOnList(currentContinentColor, deckColors)) {
+            continentBonus.push(gameVars.mapInfo.continentsControlled[i][0]);
+        }
+    }
+    return continentBonus;
+}
+
+function getDeckColors(deckPlayer, deckName) {
+    for (var i = 0; i < gameVars.playerInfo["player" + deckPlayer].playerDecklist.length; i++) {
+        if (gameVars.playerInfo["player" + deckPlayer].playerDecklist[i].deckName === deckName) {
+            return gameVars.playerInfo["player" + deckPlayer].playerDecklist[i].deckColors;
+        }
+    }
+    console.log("Unable to find Deck Colors");
+}
+
+function cleanupContinentOwnedList() {
+    for (var i = 0; i < gameVars.mapInfo.continentsOwned.length; i++) {
+        var currentContinent = gameVars.mapInfo.continentsOwned[i][0],
+        currentPlayer = gameVars.mapInfo.continentsOwned[i][1];
+
+        //remove if no longer owning
+        if (numberOfCountriesOnContinent(currentContinent) !== playerDecksOnContinent(currentPlayer, currentContinent)) {
+            gameVars.mapInfo.continentsOwned = removeItemFromArray(gameVars.mapInfo.continentsOwned[i], gameVars.mapInfo.continentsOwned);
+        }
+    }
+
+}
+
+function countriesInContinent(continent) {
+    var countryList = [];
+
+    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
+        if (gameVars.mapInfo.countryList[i].continent === continent) {
+            countryList.push(gameVars.mapInfo.countryList[i].country);
+        }
+    }
+    return countryList;
+}
+
+function cleanupContinentControlledList() {
+    for (var i = 0; i < gameVars.mapInfo.continentsControlled.length; i++) {
+        var currentContinent = gameVars.mapInfo.continentsControlled[i][0],
+        currentPlayer = gameVars.mapInfo.continentsControlled[i][1],
+        countryList = countriesInContinent(currentContinent);
+
+        //remove if no longer controlled
+        for (var c = 0; c < countryList.length; c++) {
+            if (currentPlayer !== findCountryPlayer(countryList[c]) && findCountryPlayer(countryList[c]) !== undefined) {
+                gameVars.mapInfo.continentsControlled = removeItemFromArray(gameVars.mapInfo.continentsControlled[i], gameVars.mapInfo.continentsControlled);
+            }
+        }
+    }
+}
+
+function playerDecksOnContinent(player, continent) {
+    var totalPlayerDecks = 0;
+
+    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
+        var currentFullCountry = gameVars.mapInfo.countryList[i];
+
+        if (!!currentFullCountry.deck && currentFullCountry.deck.deckPlayer === player && currentFullCountry.continent === continent) {
+            totalPlayerDecks += 1;
+        }
+    }
+    return totalPlayerDecks;
+}
+
+function numberOfCountriesOnContinent(continent) {
+    var countryCount = 0;
+
+    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
+        if (gameVars.mapInfo.countryList[i].continent === continent) {
+            countryCount += 1;
+        }
+    }
+    return countryCount;
+}
+
+function continentsWithCountries() {
+    var allContinents = continentList(),
+    continentsWithCountryList = [];
+
+    //for each continent
+    for (var i = 0; i < allContinents.length; i++) {
+        var tempContinentList = [];
+        //add continent name to list
+        tempContinentList.push(allContinents[i]);
+        //add all countries on that continent to list
+        for (var y = 0; y < gameVars.mapInfo.countryList.length; y++) {
+            if (gameVars.mapInfo.countryList[y].continent === tempContinentList[0]) {
+                tempContinentList.push(gameVars.mapInfo.countryList[y].country);
+            }
+        }
+        //add list to return variable
+        continentsWithCountryList.push(tempContinentList);
+    }
+    return continentsWithCountryList;
+}
+
+function continentList() {
+    var continentList = [];
+
+    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
+        var currentContinent = gameVars.mapInfo.countryList[i].continent;
+
+        if (isItemInArray(currentContinent, continentList) === false) {
+            continentList.push(currentContinent);
+        }
+    }
+    return continentList;
+}
+
 function findFullHeroWithName(currentHeroName) {
     for (var i = 0; i < heroDeck.length; i++) {
-        if (heroDeck[i].heroName = currentHeroName) {
+        if (heroDeck[i].heroName === currentHeroName) {
             return heroDeck[i];
         }
     }
@@ -9,15 +167,31 @@ function findFullHeroWithName(currentHeroName) {
 
 function findFullConspiracyWithName(currentConspiracyName) {
     for (var i = 0; i < conspiracyDeck.length; i++) {
-        if (conspiracyDeck[i].conspiracyName = currentConspiracyName) {
+        if (conspiracyDeck[i].conspiracyName === currentConspiracyName) {
             return conspiracyDeck[i];
+        }
+    }
+}
+
+function findHeroRef(currentHeroName) {
+    for (var i = 0; i < heroDeck.length; i++) {
+        if (heroDeck[i].heroName === currentHeroName) {
+            return i;
+        }
+    }
+}
+
+function findConspiracyRef(currentConspiracyName) {
+    for (var i = 0; i < conspiracyDeck.length; i++) {
+        if (conspiracyDeck[i].conspiracyName === currentConspiracyName) {
+            return i;
         }
     }
 }
 
 function findVanguardRef(currentVanguardName) {
     for (var i = 0; i < vanguardDeck.length; i++) {
-        if (vanguardDeck[i].vanguardName = currentVanguardName) {
+        if (vanguardDeck[i].vanguardName === currentVanguardName) {
             return i;
         }
     }
