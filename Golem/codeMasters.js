@@ -1,5 +1,20 @@
 //Code Masters
 
+function cleanupHeroAndConspiracy() {
+    gameVars.mapInfo.heroConspiracyPlayed = findUniqueValuesInArray(gameVars.mapInfo.heroConspiracyPlayed)
+}
+
+function playerDeckCount(player) {
+    var deckCount = 0;
+
+    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
+        if (!!gameVars.mapInfo.countryList[i].deck && gameVars.mapInfo.countryList[i].deck.deckPlayer === player) {
+            deckCount += 1;
+        }
+    }
+    return deckCount;
+}
+
 function findContinentWithCountry(country) {
     for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
         if (gameVars.mapInfo.countryList[i].country === country) {
@@ -70,7 +85,6 @@ function cleanupContinentOwnedList() {
             gameVars.mapInfo.continentsOwned = removeItemFromArray(gameVars.mapInfo.continentsOwned[i], gameVars.mapInfo.continentsOwned);
         }
     }
-
 }
 
 function countriesInContinent(continent) {
@@ -701,4 +715,22 @@ function formatDuration(duration) {
     if (seconds.length === 1) seconds = '0' + seconds;
   
     return days + ":" + hours + ":" + minutes + ":" + seconds;
+}
+
+
+
+//testing functions
+function testImages() {
+    for (let i = 0; i < vanguardDeck.length; i++) {
+        var pictureToShow = vanguardDeck[i].vanguardPicture;
+        document.getElementById("card-picture").style.backgroundImage = pictureToShow
+    }
+    for (let i = 0; i < heroDeck.length; i++) {
+        var pictureToShow = heroDeck[i].heroPicture;
+        document.getElementById("card-picture").style.backgroundImage = pictureToShow
+    }
+    for (let i = 0; i < conspiracyDeck.length; i++) {
+        var pictureToShow = conspiracyDeck[i].conspiracyPicture;
+        document.getElementById("card-picture").style.backgroundImage = pictureToShow
+    }
 }

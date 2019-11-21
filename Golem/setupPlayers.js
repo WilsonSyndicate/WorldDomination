@@ -4,6 +4,8 @@ function shuffleHeroAndConspiracy() {
     heroList = [],
     conspiracyList = [];
 
+    //clear hero and conspiracy played list
+    gameVars.mapInfo.heroConspiracyPlayed = [];
     //load country names
     for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
         countryNames.push(gameVars.mapInfo.countryList[i].country);

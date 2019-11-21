@@ -1,26 +1,25 @@
 
-//continent controlled and owned bonus to show on battle screen
-
-
-
 //better color picker prompt
+//defense plane - with deck
+//map hover to view defense plane, hero, conspiracy and vanguard
 
-//battle screen hover to show mod tally
 
 //toolbar messed up on large screen
 
-//map hover to view hero, conspiracy and vanguard
-//map hover rewrite & animate country
-
-
 //future game versions
-//defense plane - with deck
 //continent moves
 //drop type specific
 //more bonuses and penalties
+//  bonuses: tutor for 1 land, spells x cheaper for x turns, begin with 1 permanent in play
+//  penalties: first 3 lands come into play tapped, counter 1 spell, exile top 10
 //initiative game evey turn
 //last deck is two headed giant
+//two headed giant option
 //Archenemy rolls
+
+//ability to save game state through browser restart
+//ability to upload new decklists
+//map hover rewrite & animate country
 
 //Admin Settings
 const adminSettings = {
@@ -36,7 +35,7 @@ const adminSettings = {
         attackingToughness: 0.3
     },
     placementSetup: {
-        usePlacementSetup: true,//true has player placement setup, false forces random setup
+        usePlacementSetup: false,//true has player placement setup, false forces random setup
         placementPlayer: 0,
         placementDeckRef: 1
     },
@@ -47,11 +46,20 @@ const adminSettings = {
     continentBonuses: {
         useContinentBonuses: true,
         "Africa": "B",
-        "SouthAmerica": "WUBRG",
+        "South America": "WUBRG",
         "Europe": "U",
         "North America": "W",
         "Asia": "G",
-        "Australia": "R"
+        "Australia": "R",
+        continentCardPerDeckBonus: 0.34,
+        continentCardMinimum: 3,
+        continentLifeBonus: 40,
+        "bonusAfrica": "At the beggining of your upkeep put a 2/2 black zombie with defender in play.",
+        "bonusSouth America": "Your Artifacts cost 1 less to cast. If your deck has all five colors you get double rolls.",
+        "bonusNorth America": "Your starting life increases by ",
+        "bonusAsia": "All your land taps for an additional mana of the same color.",
+        "bonusEurope": "Your starting and max hand size increase by ",
+        "bonusAustralia": "Your Red creatures get haste."
     },
     gameBonuses: [
         {"life": 13},
@@ -86,7 +94,11 @@ var gameVars = {
         eliminatedDeck: {},
         battleVanguards: [],
         battleHero: [],
-        battleConspiracy: []
+        battleConspiracy: [],
+        battleContinentBonuses: [],
+        battleLifeMods: [],
+        battleHandMods: [],
+        battlePowerAndToughnessMods: []
     },
     gameLog: [],
     globalGameOptions: {
@@ -116,6 +128,7 @@ var gameVars = {
         joinThreat: [],
         alreadyAttacked: [],
         possibleAttack: 0,
+        heroConspiracyPlayed: [],
         cancelMoveList: [],
         continentsControlled: [],
         continentsOwned: [],
@@ -1193,7 +1206,7 @@ conspiracyDeck = [
     {conspiracyName: "Hired Heist", conspiracyAbility: "Hidden Agenda (Start the game with this conspiracy face down in the command zone and secretly name a card. You may turn this conspiracy face up any time and reveal the chosen name.) Whenever a creature you control with the chosen name deals combat damage to a player, you may pay . If you do, draw a card.", conspiracyPicture: "url('art/cards-conspiracy/hired-heist.jpg"},
     {conspiracyName: "Hold the Perimeter", conspiracyAbility: "(Start the game with this conspiracy face up in the command zone.) At the beginning of your first upkeep, put a 1/2 white Soldier creature token with defender onto the battlefield. At the beginning of each other player's first upkeep, that player puts a 1/1 red Goblin creature token onto the battlefield with 'This creature can't block.'", conspiracyPicture: "url('art/cards-conspiracy/hold-the-perimeter.jpg"},
     {conspiracyName: "Hymn of the Wilds", conspiracyAbility: "(Start the game with this conspiracy face up in the command zone.) The first creature spell you cast each turn costs  less to cast. You can't cast instant or sorcery spells.", conspiracyPicture: "url('art/cards-conspiracy/hymn-of-the-wilds.jpg"},
-    {conspiracyName: "Immeciate Action", conspiracyAbility: "Hidden agenda (Start the game with this conspiracy face down in the command zone and secretly name a card. You may turn this conspiracy face up any time and reveal the chosen name) Creatures you control with the chosen name have haste.", conspiracyPicture: "url('art/cards-conspiracy/immeciate-action.jpg"},
+    {conspiracyName: "Immediate Action", conspiracyAbility: "Hidden agenda (Start the game with this conspiracy face down in the command zone and secretly name a card. You may turn this conspiracy face up any time and reveal the chosen name) Creatures you control with the chosen name have haste.", conspiracyPicture: "url('art/cards-conspiracy/immediate-action.jpg"},
     {conspiracyName: "Incendiary Dissent", conspiracyAbility: "Hidden agenda (Start the game with this conspiracy face down in the command zone and secretly name a card. You may turn this conspiracy face up any time and reveal the chosen name.) Creatures you control with the chosen name have '(R): This creature gets +1/+0 until end of turn.'", conspiracyPicture: "url('art/cards-conspiracy/incendiary-dissent.jpg"},
     {conspiracyName: "Iterative Analysis", conspiracyAbility: "Hidden agenda (Start the game with this conspiracy face down in the command zone and secretly name a card. You may turn this conspiracy face up any time and reveal the chosen name) Whenever you cast an instant or sorcery spell with the chosen name, you may draw a card.", conspiracyPicture: "url('art/cards-conspiracy/iterative-analysis.jpg"},
     {conspiracyName: "Muzzio's Preparations", conspiracyAbility: "Hidden agenda (Start the game with this conspiracy face down in the command zone and secretly name a card. You may turn this conspiracy face up any time and reveal the chosen name) Each creature you control with the chosen name enters the battlefield with an additional +1/+1 counter.", conspiracyPicture: "url('art/cards-conspiracy/muzzios-preparations.jpg"},
