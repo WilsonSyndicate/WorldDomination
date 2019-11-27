@@ -1,3 +1,158 @@
+function shufflePlanarDeck(plane) {
+    var currentGroundZero = gameVars.battleScreenInfo.groundZero,
+    groundZeroContinent = findCountryContinent(currentGroundZero),
+    newPlanarDeck = [],
+    possiblePhenomenomDeck = [];
+
+    //reset current planar card
+    gameVars.battleScreenInfo.currentPlanarCard = 0;
+    //first shuffle
+    if (gameVars.battleScreenInfo.planarDeck.length === 0) {
+        //push continent planes
+        for (var i = 0; i < planarDeck.length; i++) {
+            if (planarDeck[i].planeContinent === groundZeroContinent && planarDeck[i].planeName !== plane.planeName) {
+                newPlanarDeck.push(planarDeck[i].planeName);
+            }
+        }
+        //push random phenomenom
+        for (var p = 0; p < phenomenomDeck.length; p++) {
+            if (isItemInArray(phenomenomDeck[p].planeName, newPlanarDeck) === false) {
+                possiblePhenomenomDeck.push(phenomenomDeck[p].planeName);
+            }
+        }
+        shuffleArray(possiblePhenomenomDeck);
+        if (possiblePhenomenomDeck.length > 0) {
+            newPlanarDeck.push(possiblePhenomenomDeck[0]);
+        }
+        //shuffle planar deck
+        shuffleArray(newPlanarDeck);
+        //saves planar deck
+        if (findPlaneContinent(plane.planeName) === findCountryContinent(currentGroundZero)) {//start in plane
+            var planarDeckToUse = [];
+            
+            //push defense plane
+            planarDeckToUse.push(plane.planeName);
+            //push rest of shuffled planar deck
+            for (var d = 0; d < newPlanarDeck.length; d++) {
+                planarDeckToUse.push(newPlanarDeck[d]);
+            }
+            //update planar deck
+            gameVars.battleScreenInfo.planarDeck = planarDeckToUse;
+        }
+        else {//start in random
+            //push defense plane
+            newPlanarDeck.push(plane.planeName);
+            //shuffle planar deck
+            shuffleArray(newPlanarDeck);
+            //update planar deck
+            gameVars.battleScreenInfo.planarDeck = newPlanarDeck;
+        }
+    }
+    //ongoing shuffle
+    else {
+        //add phenomenom
+        for (var c = 0; c < phenomenomDeck.length; c++) {
+            if (isItemInArray(phenomenomDeck[c].planeName, gameVars.battleScreenInfo.planarDeck) === false) {
+                possiblePhenomenomDeck.push(phenomenomDeck[c].planeName);
+            }
+        }
+        if (possiblePhenomenomDeck.length > 0) {
+            shuffleArray(possiblePhenomenomDeck);
+            gameVars.battleScreenInfo.planarDeck.push(possiblePhenomenomDeck[0]);
+        }
+        //shuffle planar deck and reset current card
+        shuffleArray(gameVars.battleScreenInfo.planarDeck);
+        //show picture
+        document.getElementById("battle-defense-plane").style.backgroundImage = getPlanarPicture(gameVars.battleScreenInfo.planarDeck[0]);
+    }
+}
+
+function shuffleNoteText(plane) {
+    var currentGroundZero = gameVars.battleScreenInfo.groundZero,
+    groundZeroContinent = findCountryContinent(currentGroundZero);
+
+    if (findPlaneContinent(plane.planeName) === findCountryContinent(currentGroundZero)) {
+        return "Start in " + plane.planeName + ", and shuffle the " + groundZeroContinent + " planes and add a phenomenon";
+    }
+    else {
+        return "Start in a random plane and shuffle " + plane.planeName + " in with the " + groundZeroContinent + " planes and add a phenomenon";
+    }
+}
+
+function createDefensePlane() {
+    var defendingPlayerDeck = gameVars.battleScreenInfo.battleDecks[1];
+
+    //do this if deck has defense plane
+    if (gameVars.gameStatus.mode === "attack" && !!findFullDeckWithPlayerAndName(defendingPlayerDeck.deckPlayer, defendingPlayerDeck.deckName).defensePlane) {
+        var defensePlaneRef = findDefensePlaneRefWithPlayerAndDeckName(defendingPlayerDeck.deckPlayer, defendingPlayerDeck.deckName);
+
+        //create the element
+        addElement("battle-information", "div", "noContent", "battle-defense-plane", "noClass", planarChaosRoll);
+        //plane shuffle note
+        document.getElementById("battle-note").innerHTML = shuffleNoteText(planarDeck[defensePlaneRef])
+        //create planar deck
+        shufflePlanarDeck(planarDeck[defensePlaneRef]);
+        //show picture
+        document.getElementById("battle-defense-plane").style.backgroundImage = getPlanarPicture(gameVars.battleScreenInfo.planarDeck[gameVars.battleScreenInfo.currentPlanarCard]);
+    }
+}
+
+function getPlanarPicture(planeName) {
+    for (var i = 0; i < planarDeck.length; i++) {
+        if (planarDeck[i].planeName === planeName) {
+            return planarDeck[i].planePicture;
+        }
+    }
+    for (var p = 0; p < phenomenomDeck.length; p++) {
+        if (phenomenomDeck[p].planeName === planeName) {
+            return phenomenomDeck[p].planePicture;
+        }
+    }
+}
+
+function planarChaosRoll() {
+    var currentPlaneName = gameVars.battleScreenInfo.planarDeck[gameVars.battleScreenInfo.currentPlanarCard];
+    //add exceptions for special cards
+    switch (currentPlaneName) {
+        case "Pools of Becoming":
+            handlePoolsOfBecoming();
+            break;
+        case "Stairs to Infinity":
+            handleStairsToInfinity();
+            break;
+        case "Chaotic Aether":
+            handleChaoticAether();
+            break;
+        case "Interplanar Tunnel":
+            handleInterplanarTunnel();
+            break;
+        case "Spatial Merging":
+            handleSpatialMerging();
+            break;
+        default:
+            handleNormalPlanePrompt();
+    }
+}
+
+function rollNextPlane() {
+    //hide prompt
+    addClass("planar-prompt", "hide-item-class");
+    if (gameVars.battleScreenInfo.planarDeck.length === gameVars.battleScreenInfo.currentPlanarCard + 1) {
+        console.log("shuffle deck");
+        //reshuffle
+        shufflePlanarDeck();
+    }
+    else {
+        //go to next card
+        gameVars.battleScreenInfo.currentPlanarCard += 1;
+        //show picture
+        document.getElementById("battle-defense-plane").style.backgroundImage = getPlanarPicture(gameVars.battleScreenInfo.planarDeck[gameVars.battleScreenInfo.currentPlanarCard]);
+    }
+    //remove plane card spaces
+    removeElement("battle-information", "battle-defense-plane2");
+    //clear prompt menu
+    cancelPrompt();
+}
 
 function battleHoverLifeText(battleDeckReference) {
     var lifeText = "Life Tally:";
@@ -274,8 +429,9 @@ function countBattleHand(bonuses, penalties, countrySupport, battleDeckRef) {
     }
     //vanguard
     if (gameVars.gameStatus.mode === "attack" && gameVars.battleScreenInfo.battleVanguards[battleDeckRef] !== "noVanguard") {
-        handTotal += vanguardDeck[findVanguardRef(gameVars.battleScreenInfo.battleVanguards[battleDeckRef])].vanguardHand;
+        var vanguardRef = findVanguardRef(gameVars.battleScreenInfo.battleVanguards[battleDeckRef]);
 
+        handTotal += vanguardDeck[findVanguardRef(gameVars.battleScreenInfo.battleVanguards[battleDeckRef])].vanguardHand;
         if (vanguardDeck[findVanguardRef(gameVars.battleScreenInfo.battleVanguards[battleDeckRef])].vanguardHand < 0) {
             handTotalMods.push("Vanguard Hand: " + vanguardDeck[vanguardRef].vanguardHand);
         }
@@ -398,11 +554,6 @@ function battleVanguard(battleDeckRef) {
     else {
         return ["Vanguard: ", gameVars.battleScreenInfo.battleVanguards[battleDeckRef], "vanguard"];
     }
-}
-
-function battleDefensePlane(battleDeckRef) {
-    //future version
-    return "";
 }
 
 function continentBonuses(battleDeckRef) {
@@ -556,18 +707,167 @@ function attackChosen() {
         updateAttackDefendJoined();
         //reset map
         resetMapScreen();
+        if (adminSettings.useDefensePlane) {
+            defensePlanePrompt();
+        }
+        else {
+            //go to battle screen 
+            showBattle();
+            //update battle message and note
+            document.getElementById("battle-message").innerHTML = countGames + " Battle Game for " + groundZero;
+            //remove supply drop button
+            removeElement("map-screen-toolbar", "supply-drop-button");
+        }
+    }
+}
 
-        //future version
-        //check if defender has a defense plane, if not go to plane chooser instead of battle
+function defensePlanePrompt() {
+    var defendingDeck = gameVars.battleScreenInfo.battleDecks[1],
+    groundZero = findFullCountryWithCountry(gameVars.battleScreenInfo.groundZero).countryName,
+    countGames = numberSuffix(gameCount()),
+    playerName = findPlayerName(defendingDeck.deckPlayer),
+    defensePromptText = playerName + " choose Defense Plane for " + defendingDeck.deckName + " defending " + groundZero;
 
+    if (!!findFullDeckWithPlayerAndName(defendingDeck.deckPlayer, defendingDeck.deckName).defensePlane) {
         //go to battle screen 
         showBattle();
         //update battle message and note
         document.getElementById("battle-message").innerHTML = countGames + " Battle Game for " + groundZero;
-        document.getElementById("battle-note").innerHTML = "Click Winning Deck";
         //remove supply drop button
         removeElement("map-screen-toolbar", "supply-drop-button");
     }
+    else {
+        //unhide defense prompt
+        unhideId("defense-plane-prompt");
+        //update defense prompt note
+        document.getElementById("defense-choice-text").innerHTML = defensePromptText;
+        //save plane prompt text
+        gameVars.battleScreenInfo.planePromptText = defensePromptText;
+        //build defense plane buttons
+        buildDefensePlaneButtons(defendingDeck.deckPlayer);
+    }
+}
+
+function buildDefensePlaneButtons(defensePlayer) {
+    //update defense prompt color
+    for (var i = 1; i < 6; i++) {
+        removeClass("defense-choice-box", "defense-color-" + i);  
+    }
+    addClass("defense-choice-box", "defense-color-" + defensePlayer);
+    //build defense plane buttons without phenomenoms
+    for (var i = 0; i < planarDeck.length; i++) {
+        var currentPlaneName = planarDeck[i].planeName,
+        planeColor = findContinentColor(planarDeck[i].planeContinent).toLowerCase();
+        
+        removeElement("defense-plane-buttons", "plane-ref-" + i);
+        addElement("defense-plane-buttons", "button", currentPlaneName, "plane-ref-" + i, "btn", planePromptChoice, planeOnHover);
+        //update button color
+        addClass("plane-ref-" + i, "plane-color-" + planeColor);
+
+        //check plane for already taken
+        if (countPlaneNameUsedByPlayer(currentPlaneName, defensePlayer) ===  playerHighestPlaneCount(defensePlayer)) {
+            //mark as taken
+            addClass("plane-ref-" + i, "taken");
+            //disable
+            disableId("plane-ref-" + i);
+        }
+    }
+}
+
+function countPlaneNameUsedByPlayer(planeName, player) {
+    var planeCount = 0;
+
+    for (var d = 0; d < gameVars.playerInfo["player" + player].playerDecklist.length; d++) {
+        var currentDeck = gameVars.playerInfo["player" + player].playerDecklist[d];
+
+        if (!!currentDeck.defensePlane && currentDeck.defensePlane === planeName) {
+            planeCount += 1;
+        }
+    }
+    return planeCount;
+}
+
+function playerHighestPlaneCount(player) {
+    var planeCount = 0,
+    planeCountTally = [];
+
+    for (var p = 0; p < planarDeck.length; p++) {
+        var currentPlane = planarDeck[p].planeName,
+        currentPlaneCount = 0;
+
+        for (var d = 0; d < gameVars.playerInfo["player" + player].playerDecklist.length; d++) {
+            var currentDeck = gameVars.playerInfo["player" + player].playerDecklist[d];
+            
+            if (!!currentDeck.defensePlane && currentDeck.defensePlane === currentPlane) {
+                currentPlaneCount += 1;
+            }
+        }
+        //record running total of decks this plane is in on given player
+        planeCountTally.push(currentPlaneCount);
+        //record if it is the highest number of decks use this plane on given player
+        if (currentPlaneCount > planeCount) {
+            planeCount = currentPlaneCount;
+        }
+    }
+    //if they are all the same return 1 more
+    if (findUniqueValuesInArray(planeCountTally).length === 1) {
+        planeCount += 1;
+    }
+    return planeCount;
+}
+
+function planeOnHover(planeRef) {
+    var actualPlaneRef = planeRef.slice(10),
+    takenDeckNames = findDefenseDecks(gameVars.battleScreenInfo.battleDecks[1].deckPlayer, planarDeck[actualPlaneRef].planeName);
+    //show picture
+    document.getElementById("defense-preview").style.backgroundImage = planarDeck[actualPlaneRef].planePicture;
+    //display current deck if taken
+    if (takenDeckNames.length === 0) {
+        document.getElementById("defense-preview").innerHTML = "";
+        document.getElementById("defense-choice-text").innerHTML = gameVars.battleScreenInfo.planePromptText;
+    }
+    else {
+        var takenDeckNameText = "";
+
+        for (var i = 0; i < takenDeckNames.length; i++) {
+            if (i === 0) {
+                takenDeckNameText += findDefenseDecks(playerNumber, defenseName);
+            }
+            else if (i === takenDeckNames.length - 1) {
+                takenDeckNameText += ", and " + findDefenseDecks(playerNumber, defenseName);
+            }
+            else {
+                takenDeckNameText += ", " + findDefenseDecks(playerNumber, defenseName);
+            }
+        }
+        document.getElementById("defense-choice-text").innerHTML = "This plane is assigned to " + takenDeckNameText;
+    }
+}
+
+function addDefensePlaneToDeck(planeRef) {
+    const deckPlayer = gameVars.battleScreenInfo.battleDecks[1].deckPlayer,
+    deckName = gameVars.battleScreenInfo.battleDecks[1].deckName,
+    deckToAddTo = findDeckWithPlayerNumberAndName(deckPlayer, deckName),
+    defenseToAdd = planarDeck[planeRef].planeName;
+
+    deckToAddTo["defensePlane"] = defenseToAdd;
+}
+
+function planePromptChoice(planeRef) {
+    var groundZero = findFullCountryWithCountry(gameVars.battleScreenInfo.groundZero).countryName,
+    actualPlaneRef = planeRef.slice(10),
+    countGames = numberSuffix(gameCount());
+
+    //hide defense prompt
+    hideId("defense-plane-prompt");
+    //add plane info to deck
+    addDefensePlaneToDeck(actualPlaneRef)
+    //go to battle screen 
+    showBattle();
+    //update battle message and note
+    document.getElementById("battle-message").innerHTML = countGames + " Battle Game for " + groundZero;
+    //remove supply drop button
+    removeElement("map-screen-toolbar", "supply-drop-button");
 }
 
 function battleScreenCleanup() {
@@ -589,6 +889,11 @@ function battleScreenCleanup() {
     gameVars.battleScreenInfo.battleContinentBonuses = [];
     gameVars.battleScreenInfo.battleLifeMods = [];
     gameVars.battleScreenInfo.battleHandMods = [];
+    gameVars.battleScreenInfo.planePromptText = "";
+    gameVars.battleScreenInfo.planarDeck = [];
+    gameVars.battleScreenInfo.currentPlanarCard = 0;
+    //remove defense plane
+    removeElement("battle-information", "battle-defense-plane");
     //clear deck info and buttons
     clearBattleScreenInformation();
     //cleanup continent owned and controlled list
@@ -702,7 +1007,7 @@ function eliminateDeck(deckPlayer, deckName) {
     winningDeckCountry = findFullCountryWithDeckPlayerAndDeckName(winningPlayerNumber, winningPlayerDeckName);
     
     //mark as eliminated
-    deckToEliminate.deckEleminated = true;
+    deckToEliminate.deckEliminated = true;
     //add winner to losers country
     eliminatedDeckCountry.deck = {deckPlayer: winningPlayerNumber, deckName: winningPlayerDeckName};
     //remove winner from its country
@@ -861,6 +1166,11 @@ function battleWinner(winningPlayerButton) {
             gameVars.battleScreenInfo.battleContinentBonuses = [];
             gameVars.battleScreenInfo.battleLifeMods = [];
             gameVars.battleScreenInfo.battleHandMods = [];
+            gameVars.battleScreenInfo.planePromptText= "";
+            gameVars.battleScreenInfo.planarDeck = [];
+            gameVars.battleScreenInfo.currentPlanarCard = 0;
+            //remove defense plane
+            removeElement("battle-information", "battle-defense-plane");
             showMap();
             buildMapButtons();
             if (winningPlayerId !== gameVars.gameStatus.turn) {  
@@ -979,7 +1289,6 @@ function displayBattleInfo(battleDeckRef) {
     bonuses = findDeckBonuses(currentPlayer, currentDeckName),
     gameMods = [
         battleVanguard(battleDeckRef),
-        battleDefensePlane(battleDeckRef),
         continentBonuses(battleDeckRef),
         battleHero(battleDeckRef),
         battleConspiracy(battleDeckRef),

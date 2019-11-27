@@ -558,7 +558,6 @@ function setupPlayerName() {
 
 function initialStartup() {
     showIntro();
-
     //refresh player 1 info
     changeCurrentSetupPlayer();
 }

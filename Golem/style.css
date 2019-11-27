@@ -14,6 +14,42 @@
     --selected: yellow;
     --shadow: rgba(77, 77, 77, 0.25);
 }
+
+
+.defense-color-1 {
+    background-color: var(--player-1-inactive);
+}
+.defense-color-2 {
+    background-color: var(--player-2-inactive);
+}
+.defense-color-3 {
+    background-color: var(--player-3-inactive);
+}
+.defense-color-4 {
+    background-color: var(--player-4-inactive);
+}
+.defense-color-5 {
+    background-color: var(--player-5-inactive);
+    
+}
+
+
+.white-color {
+    background-color: var(--white);
+}
+.blue-color {
+    background-color: var(--blue);
+}
+.black-color {
+    background-color: var(--gray-dark);
+}
+.red-color {
+    background-color: var(--red);
+}
+.green-color {
+    background-color: var(--green);
+}
+
 /*Country Base Style*/
 .is-supplyable {
     stroke: yellow;
@@ -262,6 +298,180 @@
     width: 100%;
     max-height:1021px;
 }
+
+/*Prompt Screens*/
+#continent-color-prompt {
+    margin: auto;
+}
+#continent-prompt-opacity-field {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: gray;
+    opacity: 75%;
+    z-index: 2;
+}
+#continent-choice-box {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width :323px;
+    height: 200px;
+    padding: 20px;
+    text-align: center;
+    background-color: gray;
+    opacity: 100%;
+    border: 2px solid black;
+    border-radius: 20px;
+    z-index: 3;
+}
+#color-choice-text {
+    font-weight: bold;
+    padding-bottom: 30px;
+}
+
+.btn.plane-color-w {
+    background-color: rgb(255, 255, 255);
+}
+.btn.plane-color-u {
+    background-color: rgb(51, 102, 255);
+}
+.btn.plane-color-b {
+    background-color: rgb(140, 140, 140);
+}
+.btn.plane-color-r {
+    background-color: rgb(255, 0, 0);
+}
+.btn.plane-color-g {
+    background-color: rgb(51, 204, 51);
+}
+.btn.plane-color-s {
+    background-color: rgb(255, 204, 0);
+}
+.btn.plane-color-w.taken {
+    background-color: rgb(64, 64, 64);
+}
+.btn.plane-color-u.taken {
+    background-color: rgb(64, 64, 64);
+}
+.btn.plane-color-b.taken {
+    background-color: rgb(64, 64, 64);
+}
+.btn.plane-color-r.taken {
+    background-color: rgb(64, 64, 64);
+}
+.btn.plane-color-g.taken {
+    background-color: rgb(64, 64, 64);
+}
+.btn.plane-color-s.taken {
+    background-color: rgb(64, 64, 64);
+}
+#defense-plane-prompt {
+    margin: auto;
+}
+#defense-plane-opacity-field {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: gray;
+    opacity: 75%;
+    z-index: 2;
+}
+#defense-choice-box {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width : 75%;
+    padding: 20px;
+    text-align: center;
+    opacity: 100%;
+    border: 2px solid black;
+    border-radius: 20px;
+    z-index: 3;
+}
+#defense-preview {
+    margin: auto;
+    width: 622px;
+    height: 434px;
+    border: 2px solid black;
+    border-radius: 35px;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+#defense-choice-text {
+    font-size: 24px;
+    font-weight: bold;
+    padding-bottom: 30px;
+}
+
+
+
+
+#planar-prompt {
+    margin: auto;
+}
+#planar-prompt-opacity-field {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: gray;
+    opacity: 75%;
+    z-index: 2;
+}
+#planar-choice-box {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width : 75%;
+    padding: 20px;
+    text-align: center;
+    background-color: gray;
+    border: 2px solid black;
+    border-radius: 20px;
+    z-index: 3;
+}
+#planar-choice-text {
+    font-size: 24px;
+    font-weight: bold;
+    padding-bottom: 30px;
+}
+#planar-choice-menu {
+    height: 500px;
+    width : 750px;
+    border: 2px solid red;
+}
+.reveal-one-card {
+    
+    margin: auto;
+    width: 622px;
+    height: 434px;
+    border: 2px solid black;
+    border-radius: 35px;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.reveal-five-cards {
+    width: 311px;
+    height: 217px;
+    border: 2px solid black;
+    border-radius: 35px;
+    background-repeat: no-repeat;
+    background-size: cover;
+
+}
+
+
+
+
 /*For Battle Screen*/
 #battle-screen {
     background-image: url('art/battle-screen-1.jpg');
@@ -281,6 +491,15 @@
     width: 282px;
     height: 404px;
     border-radius: 17px;
+}
+#battle-defense-plane {
+    margin: auto;
+    width: 622px;
+    height: 434px;
+    border: 2px solid black;
+    border-radius: 35px;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 #battle-information {
     min-height: 100%;
@@ -409,7 +628,6 @@
     border: 1px solid black;
     border-radius: 0.25rem;
     margin: 2px;
-
 }
 #battle-screen-toolbar,
 #intro-screen-toolbar {
@@ -473,17 +691,6 @@
         background-position: 100px 0;
     }
 }
-/*
-#map-background-2{
-    position: absolute;
-    top: 150px;
-    width: 100%;
-    height: 1000px;
-    background-image: url('art/water-tile.jpg');
-    opacity: 0.2;
-    background-size: 100px 100px;
-}
-*/
 #map-monster {
     background-image: url('art/map-monster.png');
     background-repeat: no-repeat;

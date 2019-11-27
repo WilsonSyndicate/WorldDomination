@@ -88,20 +88,75 @@ function controlledContinentUpdate() {
     return colorPrompt;
 }
 
-function continentColorPrompt() {
+function undisableAllColorButtons() {
+    undisableId("choice-w")
+    undisableId("choice-u")
+    undisableId("choice-b")
+    undisableId("choice-r")
+    undisableId("choice-g")
+}
+
+function disableContinentColorButton(continent) {
+    switch (continent) {
+        case "North America":
+            disableId("choice-w");
+        break;
+        case "Europe":
+            disableId("choice-u");
+        break
+        case "Africa":
+            disableId("choice-b");
+        break;
+        case "Australia":
+            disableId("choice-r");
+        break;
+        case "Asia":
+            disableId("choice-g");
+        break;
+    }
+}
+
+function continentColorChoice(color) {
+    //update color
     for (var i = 0; i < gameVars.mapInfo.continentsOwned.length; i++) {
-        if (gameVars.mapInfo.continentsOwned[i][1] === gameVars.gameStatus.turn) {
-            var colorPrompt = prompt("Please choose a color to add to " + gameVars.mapInfo.continentsOwned[i][0] + ".\n (Example: W, U, B, R, G)", "");
-            
-            if (colorPrompt === "W" || colorPrompt === "U" || colorPrompt === "B" || colorPrompt === "R" || colorPrompt === "G") {
-                gameVars.mapInfo.continentsOwned[i].push(colorPrompt);
-                //end the turn
-                setEndOfTurn();
-                break;
-            }
-            alert("Valid Colors Are: W U B R G");
-            continentColorPrompt();
+        if (gameVars.mapInfo.continentsOwned[i] === gameVars.mapInfo.continentTemp[0]) {
+            gameVars.mapInfo.continentsOwned[i].push(color);
+            //update temp continent reference
+            gameVars.mapInfo.continentTemp = removeItemFromArray(gameVars.mapInfo.continentTemp[0], gameVars.mapInfo.continentTemp);
+            //hide prompt
+            hideId("continent-color-prompt");
+            break;
         }
+    }
+    //go back to color prompt
+    continentColorPrompt()
+}
+
+function continentColorPrompt() {
+    //clear temp
+    gameVars.mapInfo.continentTemp = [];
+    //build temp
+    for (var i = 0; i < gameVars.mapInfo.continentsOwned.length; i++) {
+        if (gameVars.mapInfo.continentsOwned[i][1] === gameVars.gameStatus.turn && gameVars.mapInfo.continentsOwned[i].length === 2) {
+            //update temp list
+            gameVars.mapInfo.continentTemp.push(gameVars.mapInfo.continentsOwned[i]);
+        }
+    }
+    if (gameVars.mapInfo.continentTemp.length > 0) {
+        //unhide color prompt
+        unhideId("continent-color-prompt");
+        //update text
+        document.getElementById("color-choice-text").innerHTML = "Please choose a color to add to " + gameVars.mapInfo.continentTemp[0][0];
+        //undisable all color buttons
+        undisableAllColorButtons();
+        //disable current continent color button
+        disableContinentColorButton(gameVars.mapInfo.continentTemp[0][0]);
+    }
+    else {
+        //hide color prompt
+        hideId("continent-color-prompt");
+        //end the turn
+        setEndOfTurn();
     }
 }
 
