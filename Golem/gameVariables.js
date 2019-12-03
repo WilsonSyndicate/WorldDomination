@@ -1,11 +1,6 @@
-
-//defense plane
-
-
-//map hover to view defense plane, hero, conspiracy and vanguard
-
-
+//gui issues
 //toolbar messed up on large screen
+//plane menus need to look better
 
 //future game versions
 //continent moves
@@ -16,7 +11,7 @@
 //initiative game evey earth shaking event
 //last deck is extra headed giant
 //two headed giant option
-//Archenemy rolls
+//Archenemy rolls reshuffled only at end of deck
 
 //ability to save game state through browser restart
 //ability to upload new decklists
@@ -91,6 +86,7 @@ var gameVars = {
         planePromptText: "",
         planarDeck: [],
         planarTemp: [],
+        secondPlane: [],
         planeAdditionalCards: [],
         currentPlanarCard: 0,
         battlePlayersCount: [],

@@ -283,13 +283,20 @@ function mapCountryHover(country) {
         deckPenalties = gameVars.playerInfo["player" + countryPlayer].playerDecklist[deckId].deckPenalties,
         countryHero = findFullCountryWithCountry(country).hero,
         countryConspiracy = findFullCountryWithCountry(country).conspiracy,
-        deckVanguards = gameVars.playerInfo["player" + countryPlayer].playerDecklist[deckId].deckVanguards,
-        vanguardsToShow = "";
+        deckVanguards = gameVars.playerInfo["player" + countryPlayer].playerDecklist[deckId].vanguardList,
+        vanguardsToShow = "",
+        defensePlane = findFullDeckWithPlayerAndName(countryPlayer, deckName).defensePlane;
 
         document.getElementById("country-information").innerHTML += "<br>" + playerName + "<br>";
         //player deck if not hidden
         if (isHidden === false) {
             document.getElementById("country-information").innerHTML += deckName + " (" + deckColors + ")<br>";
+            if (!!defensePlane) {
+                document.getElementById("country-information").innerHTML += "Defense Plane: " + defensePlane + "<br>";
+                removeElement("country-information", "map-defense-preview");
+                addElement("country-information", "div", "noContent", "map-defense-preview");
+                document.getElementById("map-defense-preview").style.backgroundImage = getPlanarPicture(defensePlane);
+            }
         }
         if (deckBonuses === 1) {
             document.getElementById("country-information").innerHTML += "One Bonus<br>";
@@ -303,7 +310,7 @@ function mapCountryHover(country) {
         if (deckPenalties > 1) {
             document.getElementById("country-information").innerHTML += deckPenalties + " Penalties<br>";
         }
-        if (deckVanguards.length > 0) {
+        if (!!deckVanguards && deckVanguards.length > 0) {
             for (var i = 0; i < deckVanguards.length; i++) {
                 if (i === 0) {
                     vanguardsToShow += "Vanguard Pool: " + deckVanguards[i];
@@ -321,9 +328,6 @@ function mapCountryHover(country) {
             document.getElementById("country-information").innerHTML += "Conspiracy: " + countryConspiracy + "<br>";
         }
         //future version animate country;
-
-        //future version
-        //add hero, conspiracy, defense plane, vanguards, support bonus, etc
     }
     //update background color
     for (i = 1; i < 6; i++) {

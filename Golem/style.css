@@ -409,10 +409,6 @@
     font-weight: bold;
     padding-bottom: 30px;
 }
-
-
-
-
 #planar-prompt {
     margin: auto;
 }
@@ -447,10 +443,28 @@
 #planar-choice-menu {
     height: 500px;
     width : 750px;
+    background-color: white;
     border: 2px solid red;
 }
+#planeswalk {
+    background-image: url('art/symbol-planeswalk.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    transform: translate(0px, 0px);
+    width: 192px;
+    height: 109px;
+
+}
+#stairs-chaos,
+#pools-chaos {
+    background-image: url('art/symbol-chaos.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    transform: translate(0px, 0px);
+    width: 140px;
+    height: 123px;
+}
 .reveal-one-card {
-    
     margin: auto;
     width: 622px;
     height: 434px;
@@ -468,10 +482,6 @@
     background-size: cover;
 
 }
-
-
-
-
 /*For Battle Screen*/
 #battle-screen {
     background-image: url('art/battle-screen-1.jpg');
@@ -484,6 +494,7 @@
 }
 #card-picture {
     position: relative;
+    z-index: 1;
     background-repeat: no-repeat;
     background-size: cover;
     top: 520px;
@@ -493,6 +504,34 @@
     border-radius: 17px;
 }
 #battle-defense-plane {
+    transform: translate(0px, -200px);
+    margin: auto;
+    width: 622px;
+    height: 434px;
+    border: 2px solid black;
+    border-radius: 35px;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+#map-defense-preview {
+    width: 225px;
+    height: 158px;
+    border-radius: 10px;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+#reveal-chaotic-aether {
+    transform: translate(0px, -200px);
+    margin: auto;
+    width: 622px;
+    height: 434px;
+    border: 2px solid black;
+    border-radius: 35px;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+#reveal-spatial-merging {
+    transform: translate(0px, -200px);
     margin: auto;
     width: 622px;
     height: 434px;
@@ -546,6 +585,9 @@
     top: 187px;
 }
 /*Toolbar Styles*/
+#country-information {
+    font-size: smaller;
+}
 .toolbar {
     position: fixed;
     border: 2px solid black;

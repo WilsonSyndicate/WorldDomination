@@ -324,7 +324,6 @@ function cleanupPlayerDeckLists() {
         for (var d = 0; d < currentPlayerDecklist.length; d++) {
             currentPlayerDecklist[d].deckHidden = true;
             currentPlayerDecklist[d].deckEliminated = false;
-            currentPlayerDecklist[d].deckDefensePlane = "";
             currentPlayerDecklist[d].deckPenalties = 0;
             currentPlayerDecklist[d].deckBonuses = 0;
             currentPlayerDecklist[d].deckVanguards = [];

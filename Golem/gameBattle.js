@@ -1,3 +1,344 @@
+
+//Handle Planar Cards
+function planarPrompt(promptText) {
+    //show prompt text
+    document.getElementById("planar-choice-text").innerHTML = promptText;
+    //show prompt
+    removeClass("planar-prompt", "hide-item-class");
+}
+
+function handleNormalPlanePrompt() {
+    var planeText = "Planeswalk to Next Plane?";
+
+    //prompt for planeswalk
+    planarPrompt(planeText);
+    addElement("planar-choice-menu", "div", "noContent", "planeswalk", "noClass", rollNextPlane);
+    addElement("planar-choice-menu", "button", "Cancel", "cancel-prompt", "noClass", cancelPrompt);
+    addClass("cancel-prompt", "btn");
+    addClass("cancel-prompt", "btn-danger");
+}
+
+function poolsChaos() {
+    //remove previous choices
+    removeElement("planar-choice-menu", "cancel-prompt");
+    removeElement("planar-choice-menu", "pools-chaos");
+    removeElement("planar-choice-menu", "planeswalk");
+    //reveals next 3 cards in a row and puts on bottom
+    shufflePlanarDeck();
+    //move pools to top front
+    if (gameVars.battleScreenInfo.secondPlane.length === 0) {
+        gameVars.battleScreenInfo.planarDeck = moveArrayObjectToBeginningOfArray("Pools of Becoming", gameVars.battleScreenInfo.planarDeck);
+    }
+    else {
+        gameVars.battleScreenInfo.planarDeck = moveArrayObjectToBeginningOfArray(gameVars.battleScreenInfo.secondPlane[1], gameVars.battleScreenInfo.planarDeck);
+        gameVars.battleScreenInfo.planarDeck = moveArrayObjectToBeginningOfArray(gameVars.battleScreenInfo.secondPlane[0], gameVars.battleScreenInfo.planarDeck);
+    }
+    //show pools on battle screen
+    document.getElementById("battle-defense-plane").style.backgroundImage = getPlanarPicture(gameVars.battleScreenInfo.planarDeck[0]);
+    //add an element that shows next plane, click puts it on bottom for 3 clicks
+    addElement("planar-choice-menu", "div", "noContent", "pools-reveal", "reveal-one-card", poolsCardClick);
+    //show first card
+    document.getElementById("pools-reveal").style.backgroundImage = getPlanarPicture(gameVars.battleScreenInfo.planarDeck[1]);
+    //update card count
+    gameVars.battleScreenInfo.currentPlanarCard = 1;
+    //update prompt text
+    document.getElementById("planar-choice-text").innerHTML = "These 3 planar abilities happen (Phenomenons do nothing), click once ability is complete:";
+}
+
+function poolsCardClick() {
+    var planarAbilities = 2 - gameVars.battleScreenInfo.currentPlanarCard;
+
+    if (gameVars.battleScreenInfo.currentPlanarCard === 3) {
+        //move previous 3 cards to bottom
+        gameVars.battleScreenInfo.planarDeck = moveArrayObjectToEndOfArray(gameVars.battleScreenInfo.planarDeck[1], gameVars.battleScreenInfo.planarDeck);
+        gameVars.battleScreenInfo.planarDeck = moveArrayObjectToEndOfArray(gameVars.battleScreenInfo.planarDeck[1], gameVars.battleScreenInfo.planarDeck);
+        gameVars.battleScreenInfo.planarDeck = moveArrayObjectToEndOfArray(gameVars.battleScreenInfo.planarDeck[1], gameVars.battleScreenInfo.planarDeck);
+        //adjust planar card count
+        gameVars.battleScreenInfo.currentPlanarCard -= 3;
+        //cleanup prompt
+        removeElement("planar-choice-menu", "pools-reveal");
+        //go back to battle screen
+        addClass("planar-prompt", "hide-item-class");
+    }
+    else {
+        //update prompt text
+        document.getElementById("planar-choice-text").innerHTML = planarAbilities + " more planar abilities will happen (Phenomenons do nothing), click once ability is complete:";
+        //update card count
+        gameVars.battleScreenInfo.currentPlanarCard += 1;
+        //show current card
+        document.getElementById("pools-reveal").style.backgroundImage = getPlanarPicture(gameVars.battleScreenInfo.planarDeck[gameVars.battleScreenInfo.currentPlanarCard]);
+    }
+}
+
+function cancelPrompt() {
+    //remove previous choices
+    removeElement("planar-choice-menu", "cancel-prompt");
+    removeElement("planar-choice-menu", "pools-chaos");
+    removeElement("planar-choice-menu", "stairs-chaos");
+    removeElement("planar-choice-menu", "planeswalk");
+    //hide prompt
+    addClass("planar-prompt", "hide-item-class");
+    document.getElementById("planar-choice-text").innerHTML = "";
+}
+
+function handlePoolsOfBecoming() {
+    var planeText = "Planeswalk or Chaos?";
+
+    //prompt for planeswalk or chaos
+    planarPrompt(planeText);
+    addElement("planar-choice-menu", "div", "noContent", "pools-chaos", "noClass", poolsChaos);
+    addElement("planar-choice-menu", "div", "noContent", "planeswalk", "noClass", rollNextPlane);
+    addElement("planar-choice-menu", "button", "Cancel", "cancel-prompt", "noClass", cancelPrompt);
+    addClass("cancel-prompt", "btn");
+    addClass("cancel-prompt", "btn-danger");
+}
+
+function stairsChaosYes() {
+    var stairsCount = findItemRefInArray("Stairs to Infinity", gameVars.battleScreenInfo.planarDeck);
+
+    //move plane card to bottom
+    gameVars.battleScreenInfo.planarDeck = moveArrayObjectToEndOfArray(gameVars.battleScreenInfo.planarDeck[stairsCount + 1], gameVars.battleScreenInfo.planarDeck);
+    //clear prompt
+    stairsChaosNo();
+}
+
+function stairsChaosNo() {
+    //remove previous choices
+    removeElement("planar-choice-menu", "stairs-yes");
+    removeElement("planar-choice-menu", "stairs-no");
+    removeElement("planar-choice-menu", "stairs-reveal");
+    //hide prompt
+    addClass("planar-prompt", "hide-item-class");
+}
+
+function stairsChaos() {
+    var stairsCount = findItemRefInArray("Stairs to Infinity", gameVars.battleScreenInfo.planarDeck);
+
+    //remove previous choices
+    removeElement("planar-choice-menu", "cancel-prompt");
+    removeElement("planar-choice-menu", "stairs-chaos");
+    removeElement("planar-choice-menu", "planeswalk");
+    //add yes and no buttons
+    addElement("planar-choice-menu", "button", "Yes", "stairs-yes", "stairs-chaos-yes", stairsChaosYes);
+    addClass("stairs-yes", "btn");
+    addClass("stairs-yes", "btn-success");
+    addElement("planar-choice-menu", "button", "No", "stairs-no", "stairs-chaos-no", stairsChaosNo);
+    addClass("stairs-no", "btn");
+    addClass("stairs-no", "btn-danger");
+    //do this if on last card
+    if (gameVars.battleScreenInfo.planarDeck.length - 1 === stairsCount) {
+        //reveals next 3 cards in a row and puts on bottom
+        shufflePlanarDeck();
+        //move stairs to top front
+        gameVars.battleScreenInfo.planarDeck = moveArrayObjectToBeginningOfArray("Stairs to Infinity", gameVars.battleScreenInfo.planarDeck);
+        //show stairs on battle screen
+        document.getElementById("battle-defense-plane").style.backgroundImage = getPlanarPicture(gameVars.battleScreenInfo.planarDeck[0]);
+        //update stairs count
+        stairsCount = findItemRefInArray("Stairs to Infinity", gameVars.battleScreenInfo.planarDeck);
+    }
+    //add an element that shows next plane, click puts it on bottom for 3 clicks
+    addElement("planar-choice-menu", "div", "noContent", "stairs-reveal", "reveal-one-card");
+    //show next card
+    document.getElementById("stairs-reveal").style.backgroundImage = getPlanarPicture(gameVars.battleScreenInfo.planarDeck[stairsCount + 1]);
+    //update prompt text
+    document.getElementById("planar-choice-text").innerHTML = "Would you like to put this Planar card on the bottom?";
+}
+
+function handleStairsToInfinity() {
+    var planeText = "Planeswalk or Chaos?";
+
+    //prompt for planeswalk or chaos
+    planarPrompt(planeText);
+    addElement("planar-choice-menu", "div", "noContent", "stairs-chaos", "noClass", stairsChaos);
+    addElement("planar-choice-menu", "div", "noContent", "planeswalk", "noClass", rollNextPlane);
+    addElement("planar-choice-menu", "button", "Cancel", "cancel-prompt", "noClass", cancelPrompt);
+    addClass("cancel-prompt", "btn");
+    addClass("cancel-prompt", "btn-danger");
+}
+
+function tunnelChoice(choice) {    
+    newPlanarDeck = [],
+    cardsForBottom = [];
+
+    //shuffle other 4 and phenomenoms and put on bottom of deck
+    for (var i = 0; i < gameVars.battleScreenInfo.planarDeck.length; i++) {
+        if (isItemInArray(gameVars.battleScreenInfo.planarDeck[i], gameVars.battleScreenInfo.planarTemp)) {
+            if (gameVars.battleScreenInfo.planarDeck[i] === choice) {
+                newPlanarDeck.push(gameVars.battleScreenInfo.planarDeck[i]);
+            }
+            else {
+                cardsForBottom.push(gameVars.battleScreenInfo.planarDeck[i]);
+            }
+        }
+        else {
+            newPlanarDeck.push(gameVars.battleScreenInfo.planarDeck[i]);
+        }
+
+    }
+    //shuffle bottom cards
+    shuffleArray(cardsForBottom);
+    //move all other 4 to bottom in random order
+    for (var r = 0; r < cardsForBottom.length; r++) {
+        newPlanarDeck.push(cardsForBottom[r]);
+    }
+    gameVars.battleScreenInfo.planarDeck = newPlanarDeck;
+    //cleanup and hide prompt
+    removeElement("planar-choice-box", "planar-choice-menu");
+    addElement("planar-choice-box", "div", "noContent", "planar-choice-menu");
+    //clear temp
+    gameVars.battleScreenInfo.planarTemp = [];
+    //roll to next plane
+    rollNextPlane();
+}
+
+function tunnelPlaneswalk() {
+    var tunnelPreviewCards = [];
+
+    //remove choices
+    removeElement("planar-choice-menu", "cancel-prompt");
+    removeElement("planar-choice-menu", "planeswalk");
+    //reveals until 5 plane cards are found and player chooses next, rest on bottom in a random order
+    shufflePlanarDeck();
+    //move stairs to top
+    gameVars.battleScreenInfo.planarDeck = moveArrayObjectToBeginningOfArray("Interplanar Tunnel", gameVars.battleScreenInfo.planarDeck);
+    //show stairs on battle screen
+    document.getElementById("battle-defense-plane").style.backgroundImage = getPlanarPicture(gameVars.battleScreenInfo.planarDeck[0]);
+    //clear temp
+    gameVars.battleScreenInfo.planarTemp = [];
+    //finds next 5
+    for (var i = 1; i < gameVars.battleScreenInfo.planarDeck.length; i++) {
+        if (tunnelPreviewCards.length < 5 && isPlanePhenomenom(gameVars.battleScreenInfo.planarDeck[i]) === false) {
+            tunnelPreviewCards.push(gameVars.battleScreenInfo.planarDeck[i]);
+            //copy name to planar temp
+            gameVars.battleScreenInfo.planarTemp.push(gameVars.battleScreenInfo.planarDeck[i]);
+        }
+        else if (tunnelPreviewCards.length < 5) {
+            //copy name to planar temp
+            gameVars.battleScreenInfo.planarTemp.push(gameVars.battleScreenInfo.planarDeck[i]);
+        }
+    }
+    //build a button for each of 5 planes
+    for (var p = 0; p < tunnelPreviewCards.length; p++) {
+        addElement("planar-choice-menu", "div", "noContent", tunnelPreviewCards[p], "reveal-five-cards", tunnelChoice);
+        //show plane card
+        document.getElementById(tunnelPreviewCards[p]).style.backgroundImage = getPlanarPicture(tunnelPreviewCards[p]);
+    }
+}
+
+function isPlanePhenomenom(planeName) {
+    phenomenomNameList = [];
+
+    for (var i = 0; i < phenomenomDeck.length; i++) {
+        phenomenomNameList.push(phenomenomDeck[i].planeName);
+    }
+    return isItemInArray(planeName, phenomenomNameList);
+}
+
+function handleInterplanarTunnel() {
+    var planeText = "Planeswalk into the Interplanar Tunnel?";
+
+    planarPrompt(planeText);
+    addElement("planar-choice-menu", "div", "noContent", "planeswalk", "noClass", tunnelPlaneswalk);
+    addElement("planar-choice-menu", "button", "Cancel", "cancel-prompt", "noClass", cancelPrompt);
+    addClass("cancel-prompt", "btn");
+    addClass("cancel-prompt", "btn-danger");
+}
+
+function findNextPlane(planeToKeepOutOfDeck) {
+    //shuffle planar deck
+    shufflePlanarDeck();
+    //move plane to top
+    gameVars.battleScreenInfo.planarDeck = moveArrayObjectToBeginningOfArray(planeToKeepOutOfDeck, gameVars.battleScreenInfo.planarDeck);
+    //reveal until 1 plane card is found
+    for (var p = 1; p < gameVars.battleScreenInfo.planarDeck.length; p++) {
+        if (isPlanePhenomenom(gameVars.battleScreenInfo.planarDeck[p]) === false) {
+            return gameVars.battleScreenInfo.planarDeck[i];
+        }
+        else {
+            gameVars.battleScreenInfo.currentPlanarCard += 1;
+        }
+    }
+}
+
+function aetherPlaneswalk() {
+    //check that next plane is plane
+    findNextPlane("Chaotic Aether");
+    //display current plane
+    rollNextPlane();
+    //create second card space
+    addElement("battle-information", "div", "noContent", "reveal-chaotic-aether", "noClass");
+    //show picture
+    document.getElementById("reveal-chaotic-aether").style.backgroundImage = getPlanarPicture("Chaotic Aether");
+}
+
+function handleChaoticAether() {
+    var planeText = "Planeswalk into the Chaotic Aether?";
+
+    planarPrompt(planeText);
+    addElement("planar-choice-menu", "div", "noContent", "planeswalk", "noClass", aetherPlaneswalk);
+    addElement("planar-choice-menu", "button", "Cancel", "cancel-prompt", "noClass", cancelPrompt);
+}
+
+function findNextTwoPlanes(planeToKeepOutOfDeck) {
+    var nextTwoPlanes = [];
+
+    //shuffle planar deck
+    shufflePlanarDeck();
+    //move plane to top
+    gameVars.battleScreenInfo.planarDeck = moveArrayObjectToBeginningOfArray(planeToKeepOutOfDeck, gameVars.battleScreenInfo.planarDeck);
+    //find next two planes
+    for (var i = 1; i < gameVars.battleScreenInfo.planarDeck.length; i++) {
+        if (nextTwoPlanes.length < 2) {
+            if (isPlanePhenomenom(gameVars.battleScreenInfo.planarDeck[i]) === false) {
+                nextTwoPlanes.push(gameVars.battleScreenInfo.planarDeck[i])
+            }
+            else {
+                gameVars.battleScreenInfo.currentPlanarCard += 1;
+            }
+        }
+    }
+    return nextTwoPlanes;
+}
+
+function mergingPlaneswalk() {
+    //reveal until 2 plane cards are found and go first and next in second card space
+    var nextTwoPlanes = findNextTwoPlanes("Spatial Merging");
+
+    //cancel prompt
+    cancelPrompt();
+    //go to next card
+    gameVars.battleScreenInfo.currentPlanarCard += 1;
+    //display two current planes
+    moveArrayObjectToBeginningOfArray(nextTwoPlanes[0], gameVars.battleScreenInfo.planarDeck);
+    moveArrayObjectToBeginningOfArray(nextTwoPlanes[1], gameVars.battleScreenInfo.planarDeck);
+    
+    //remove plane card spaces
+    removeElement("battle-information", "battle-defense-plane2");
+    removeElement("battle-information", "reveal-chaotic-aether");
+    removeElement("battle-information", "reveal-spatial-merging");
+    //clear prompt menu
+    cancelPrompt();
+    //save second plane name
+    gameVars.battleScreenInfo.secondPlane.push(nextTwoPlanes[0]);
+    gameVars.battleScreenInfo.secondPlane.push(nextTwoPlanes[1]);
+    //go to next card
+    gameVars.battleScreenInfo.currentPlanarCard += 1;
+    //show picture
+    document.getElementById("battle-defense-plane").style.backgroundImage = getPlanarPicture(nextTwoPlanes[1]);
+    //create second card space
+    addElement("battle-information", "div", "noContent", "reveal-spatial-merging", "noClass", secondPlaneChaosRoll);
+    //show second picture
+    document.getElementById("reveal-spatial-merging").style.backgroundImage = getPlanarPicture(nextTwoPlanes[0]);
+}
+
+function handleSpatialMerging() {  
+    var planeText = "Planeswalk into the next two planes Spatial Merging?";
+
+    planarPrompt(planeText);
+    addElement("planar-choice-menu", "div", "noContent", "planeswalk", "noClass", mergingPlaneswalk);
+    addElement("planar-choice-menu", "button", "Cancel", "cancel-prompt", "noClass", cancelPrompt);   
+}
+
 function shufflePlanarDeck(plane) {
     var currentGroundZero = gameVars.battleScreenInfo.groundZero,
     groundZeroContinent = findCountryContinent(currentGroundZero),
@@ -110,8 +451,29 @@ function getPlanarPicture(planeName) {
     }
 }
 
+function secondPlaneChaosRoll() {
+    var secondPlaneName = gameVars.battleScreenInfo.secondPlane[0];
+    
+    //add exceptions for special cards
+    switch (secondPlaneName) {
+        case "Pools of Becoming":
+            handlePoolsOfBecoming();
+            break;
+        case "Stairs to Infinity":
+            handleStairsToInfinity();
+            break;
+        default:
+            handleNormalPlanePrompt();
+    }
+}
+
 function planarChaosRoll() {
-    var currentPlaneName = gameVars.battleScreenInfo.planarDeck[gameVars.battleScreenInfo.currentPlanarCard];
+    if (gameVars.battleScreenInfo.secondPlane.length === 0) {
+        var currentPlaneName = gameVars.battleScreenInfo.planarDeck[gameVars.battleScreenInfo.currentPlanarCard];
+    }
+    else {
+        var currentPlaneName = gameVars.battleScreenInfo.secondPlane[1];
+    }
     //add exceptions for special cards
     switch (currentPlaneName) {
         case "Pools of Becoming":
@@ -138,7 +500,6 @@ function rollNextPlane() {
     //hide prompt
     addClass("planar-prompt", "hide-item-class");
     if (gameVars.battleScreenInfo.planarDeck.length === gameVars.battleScreenInfo.currentPlanarCard + 1) {
-        console.log("shuffle deck");
         //reshuffle
         shufflePlanarDeck();
     }
@@ -148,8 +509,11 @@ function rollNextPlane() {
         //show picture
         document.getElementById("battle-defense-plane").style.backgroundImage = getPlanarPicture(gameVars.battleScreenInfo.planarDeck[gameVars.battleScreenInfo.currentPlanarCard]);
     }
-    //remove plane card spaces
+    //remove plane card spaces (only remove when a planeswalk is walked from for spatial merging)
     removeElement("battle-information", "battle-defense-plane2");
+    removeElement("battle-information", "reveal-chaotic-aether");
+    removeElement("battle-information", "reveal-spatial-merging");
+    gameVars.battleScreenInfo.secondPlane = [];
     //clear prompt menu
     cancelPrompt();
 }
@@ -194,6 +558,18 @@ function battleHoverContinentText(currentPlayer, battleDeckReference) {
         }
     }
     return hoverText;
+}
+
+function battlePictureOffHover(mod) {
+    if (gameVars.gameStatus.mode === "attack") {
+        document.getElementById("card-picture").innerHTML = "";
+        removeClass("card-picture", "player-color-1");
+        removeClass("card-picture", "player-color-2");
+        removeClass("card-picture", "player-color-3");
+        removeClass("card-picture", "player-color-4");
+        removeClass("card-picture", "player-color-5");
+        removeClass("card-picture", "toolbar");
+    }
 }
 
 function battlePictureHover(mod) {
@@ -892,6 +1268,7 @@ function battleScreenCleanup() {
     gameVars.battleScreenInfo.planePromptText = "";
     gameVars.battleScreenInfo.planarDeck = [];
     gameVars.battleScreenInfo.currentPlanarCard = 0;
+    removeElement("country-information", "map-defense-preview");
     //remove defense plane
     removeElement("battle-information", "battle-defense-plane");
     //clear deck info and buttons
@@ -1169,6 +1546,7 @@ function battleWinner(winningPlayerButton) {
             gameVars.battleScreenInfo.planePromptText= "";
             gameVars.battleScreenInfo.planarDeck = [];
             gameVars.battleScreenInfo.currentPlanarCard = 0;
+            removeElement("country-information", "map-defense-preview");
             //remove defense plane
             removeElement("battle-information", "battle-defense-plane");
             showMap();
@@ -1305,7 +1683,7 @@ function displayBattleInfo(battleDeckRef) {
         if (gameMods[d] !== "") {
             var gameModsCurrentText = gameMods[d][0] + gameMods[d][1];
 
-            addElement("battle-player" + battleDeckRef, "h6", gameModsCurrentText, gameMods[d][2] + battleDeckRef, "small", "noFunction", battlePictureHover, "noOffHover");
+            addElement("battle-player" + battleDeckRef, "h6", gameModsCurrentText, gameMods[d][2] + battleDeckRef, "small", "noFunction", battlePictureHover, battlePictureOffHover);
         }
     }
     //create buttons
