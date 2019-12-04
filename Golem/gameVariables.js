@@ -1,6 +1,13 @@
 //gui issues
 //toolbar messed up on large screen
 //plane menus need to look better
+//battle screen
+
+//hover not working on battle screen, maybe because div gets removed
+
+//two headed giant option, need to display second head on map hover
+//change map font size
+
 
 //future game versions
 //continent moves
@@ -10,8 +17,6 @@
 //  penalties: first 3 lands come into play tapped, counter 1 spell, exile top 10
 //initiative game evey earth shaking event
 //last deck is extra headed giant
-//two headed giant option
-//Archenemy rolls reshuffled only at end of deck
 
 //ability to save game state through browser restart
 //ability to upload new decklists
@@ -35,6 +40,8 @@ const adminSettings = {
         placementPlayer: 0,
         placementDeckRef: 1
     },
+    useTwoHeadedGiant: true,
+    useArchenemy: true,
     useDefensePlane: true,
     useAdditionalDeckDrops: true,//true stops decks from dropping in on supply drop empty countries
     useVanguard: true,//true adds vanguard cards into game
@@ -101,7 +108,9 @@ var gameVars = {
         battleContinentBonuses: [],
         battleLifeMods: [],
         battleHandMods: [],
-        battlePowerAndToughnessMods: []
+        battlePowerAndToughnessMods: [],
+        archenemyCount: 0,
+        archenemyDecklist: []
     },
     gameLog: [],
     globalGameOptions: {
@@ -187,6 +196,7 @@ var gameVars = {
         player1: {
             playerName: "Player1",
             playerDugout: 0,
+            secondHead: [],
             playerSupplyPoints: [],
             continentsControlled: [],
             continentsOwned: [],
@@ -300,6 +310,7 @@ var gameVars = {
         player2: {
             playerName: "Player2",
             playerDugout: 0,
+            secondHead: [],
             playerSupplyPoints: [],
             continentsControlled: [],
             continentsOwned: [],
@@ -435,6 +446,7 @@ var gameVars = {
         player3: {
             playerName: "Player3",
             playerDugout: 0,
+            secondHead: [],
             playerSupplyPoints: [],
             continentsControlled: [],
             continentsOwned: [],
@@ -598,6 +610,7 @@ var gameVars = {
         player4: {
             playerName: "Player4",
             playerDugout: 0,
+            secondHead: [],
             playerSupplyPoints: [],
             continentsControlled: [],
             continentsOwned: [],
@@ -771,6 +784,7 @@ var gameVars = {
         player5: {
             playerName: "Player5",
             playerDugout: 0,
+            secondHead: [],
             playerSupplyPoints: [],
             continentsControlled: [],
             continentsOwned: [],
@@ -1314,5 +1328,77 @@ phenomenomDeck = [
     {planeName: "Reality Shaping", planeContinent: "Phenomenon", planeAbility: "When you encounter Reality Shaping, starting with you, each player may put a permanent card from his or her hand onto the battlefield. (Then planeswalk away from this phenomenon.)", planePicture: "url(art/cards-planechase/reality-shaping.jpg"},
     {planeName: "Spatial Merging", planeContinent: "Phenomenon", planeAbility: "When you encounter Spatial Merging, reveal cards from the top of your planar deck until you reveal two plane cards. Simultaneously planeswalk to both of them. Put all other cards revealed this way on the bottom of your planar deck in any order.", planePicture: "url(art/cards-planechase/spatial-merging.jpg"},
     {planeName: "Time Distortion", planeContinent: "Phenomenon", planeAbility: "When you encounter Time Distortion, reverse the game's turn order. (For example, if play had proceeded clockwise around the table, it now goes counterclockwise. Then planeswalk away from this phenomenon.)", planePicture: "url(art/cards-planechase/time-distortion.jpg"}
+],
+archenemyDeck = [
+    {archenemyName: "A Display of My Dark Power", archenemyPicture: "url(art/cards-archenemy/a-display-of-my-dark-power.jpg"},
+    {archenemyName: "A Reckoning Approaches", archenemyPicture: "url(art/cards-archenemy/a-reckoning-approaches.jpg"},
+    {archenemyName: "All in Good Time", archenemyPicture: "url(art/cards-archenemy/all-in-good-time.jpg"},
+    {archenemyName: "All Shall Smolder in My Wake", archenemyPicture: "url(art/cards-archenemy/all-shall-smolder-in-my-wake.jpg"},
+    {archenemyName: "Approach My Molten Realm", archenemyPicture: "url(art/cards-archenemy/approach-my-molten-realm.jpg"},
+    {archenemyName: "Because I Have Willed It", archenemyPicture: "url(art/cards-archenemy/because-i-have-willed-it.jpg"},
+    {archenemyName: "Behold My Grandeur", archenemyPicture: "url(art/cards-archenemy/behold-my-grandeur.jpg"},
+    {archenemyName: "Behold the Power of Destruction", archenemyPicture: "url(art/cards-archenemy/behold-the-power-of-destruction.jpg"},
+    {archenemyName: "Bow To My Command", archenemyPicture: "url(art/cards-archenemy/bow-to-my-command.jpg"},
+    {archenemyName: "Choose Your Champion", archenemyPicture: "url(art/cards-archenemy/choose-your-champion.jpg"},
+    {archenemyName: "Choose Your Demise", archenemyPicture: "url(art/cards-archenemy/choose-your-demise.jpg"},
+    {archenemyName: "Dance, Pathetic Marionette", archenemyPicture: "url(art/cards-archenemy/dance-pathetic-marionette.jpg"},
+    {archenemyName: "Delight in The Hunt", archenemyPicture: "url(art/cards-archenemy/delight-in-the-hunt.jpg"},
+    {archenemyName: "Drench the Soil in Their Blood", archenemyPicture: "url(art/cards-archenemy/drench-the-soil-in-their-blood.jpg"},
+    {archenemyName: "Embrace My Diabolical Vision", archenemyPicture: "url(art/cards-archenemy/embrace-my-diabolical-vision.jpg"},
+    {archenemyName: "Every Dream a Nightmare", archenemyPicture: "url(art/cards-archenemy/every-dream-a-nightmare.jpg"},
+    {archenemyName: "Every Hope Shall Vanish", archenemyPicture: "url(art/cards-archenemy/every-hope-shall-vanish.jpg"},
+    {archenemyName: "Every Last Vestige Shall Rot", archenemyPicture: "url(art/cards-archenemy/every-last-vestige-shall-rot.jpg"},
+    {archenemyName: "Evil Comes to Fruition", archenemyPicture: "url(art/cards-archenemy/evil-comes-to-fruition.jpg"},
+    {archenemyName: "Feed the Machine", archenemyPicture: "url(art/cards-archenemy/feed-the-machine.jpg"},
+    {archenemyName: "For Each of You, a Gift", archenemyPicture: "url(art/cards-archenemy/for-each-of-you-a-gift.jpg"},
+    {archenemyName: "I Bask in Your Silent Awe", archenemyPicture: "url(art/cards-archenemy/i-bask-in-your-silent-awe.jpg"},
+    {archenemyName: "I Call on the Ancient Magics", archenemyPicture: "url(art/cards-archenemy/i-call-on-the-ancient-magics.jpg"},
+    {archenemyName: "I Delight in Your Convulsions", archenemyPicture: "url(art/cards-archenemy/i-delight-in-your-convulsions.jpg"},
+    {archenemyName: "I know All, I See All", archenemyPicture: "url(art/cards-archenemy/i-know-all-i-see-all.jpg"},
+    {archenemyName: "Ignite the Cloneforge!", archenemyPicture: "url(art/cards-archenemy/ignite-the-cloneforge.jpg"},
+    {archenemyName: "Imprison This Insolent Wretch", archenemyPicture: "url(art/cards-archenemy/imprison-this-insolent-wretch.jpg"},
+    {archenemyName: "Into the Earthen Maw", archenemyPicture: "url(art/cards-archenemy/into-the-earthen-maw.jpg"},
+    {archenemyName: "Introductions Are in Order", archenemyPicture: "url(art/cards-archenemy/introductions-are-in-order.jpg"},
+    {archenemyName: "Know Evil", archenemyPicture: "url(art/cards-archenemy/know-evil.jpg"},
+    {archenemyName: "Know Naught but Fire", archenemyPicture: "url(art/cards-archenemy/know-naught-but-fire.jpg"},
+    {archenemyName: "Look Skyward and Despair", archenemyPicture: "url(art/cards-archenemy/look-skyward-and-despair.jpg"},
+    {archenemyName: "Make Yourself Useful", archenemyPicture: "url(art/cards-archenemy/make-yourself-useful.jpg"},
+    {archenemyName: "May Civilization Collapse", archenemyPicture: "url(art/cards-archenemy/may-civilization-collapse.jpg"},
+    {archenemyName: "Mortal Flesh is Weak", archenemyPicture: "url(art/cards-archenemy/mortal-flesh-is-weak.jpg"},
+    {archenemyName: "My Crushing Masterstroke", archenemyPicture: "url(art/cards-archenemy/my-crushing-masterstroke.jpg"},
+    {archenemyName: "My Forces Are Innumerable", archenemyPicture: "url(art/cards-archenemy/my-forces-are-innumerable.jpg"},
+    {archenemyName: "My Genius Knows No Bounds", archenemyPicture: "url(art/cards-archenemy/my-genius-knows-no-bounds.jpg"},
+    {archenemyName: "My Laughter Echoes", archenemyPicture: "url(art/cards-archenemy/my-laughter-echoes.jpg"},
+    {archenemyName: "My Undead Horde Awakens", archenemyPicture: "url(art/cards-archenemy/my-undead-horde-awakens.jpg"},
+    {archenemyName: "My Wish Is Your Command", archenemyPicture: "url(art/cards-archenemy/my-wish-is-your-command.jpg"},
+    {archenemyName: "Nature Demands an Offering", archenemyPicture: "url(art/cards-archenemy/nature-demands-an-offering.jpg"},
+    {archenemyName: "Nature Shields Its Own", archenemyPicture: "url(art/cards-archenemy/nature-shields-its-own.jpg"},
+    {archenemyName: "No One Will Hear Your Cries", archenemyPicture: "url(art/cards-archenemy/no-one-will-hear-your-cries.jpg"},
+    {archenemyName: "Nothing Can Stop Me Now", archenemyPicture: "url(art/cards-archenemy/nothing-can-stop-me-now.jpg"},
+    {archenemyName: "Only Blood Ends Your Nightmares", archenemyPicture: "url(art/cards-archenemy/only-blood-ends-your-nightmares.jpg"},
+    {archenemyName: "Pay Tribute to Me", archenemyPicture: "url(art/cards-archenemy/pay-tribute-to-me.jpg"},
+    {archenemyName: "Perhapse ouve Met My Cohort", archenemyPicture: "url(art/cards-archenemy/perhapse-youve-met-my-cohort.jpg"},
+    {archenemyName: "Plots That Span Centuries", archenemyPicture: "url(art/cards-archenemy/plots-span-centuries.jpg"},
+    {archenemyName: "Power Without Equal", archenemyPicture: "url(art/cards-archenemy/power-without-equal.jpg"},
+    {archenemyName: "Realms Befitting My Majesty", archenemyPicture: "url(art/cards-archenemy/realms-befitting-my-majesty.jpg"},
+    {archenemyName: "Roots of All Evil", archenemyPicture: "url(art/cards-archenemy/roots-of-all-evil.jpg"},
+    {archenemyName: "Rotted Ones Lay Siege", archenemyPicture: "url(art/cards-archenemy/rotted-ones-lay-siege.jpg"},
+    {archenemyName: "Surrender Your Thoughts", archenemyPicture: "url(art/cards-archenemy/surrender-your-thoughts.jpg"},
+    {archenemyName: "The Dead Shall Serve", archenemyPicture: "url(art/cards-archenemy/the-dead-shall-serve.jpg"},
+    {archenemyName: "The Fate of the Flamable", archenemyPicture: "url(art/cards-archenemy/the-fate-of-the-flamable.jpg"},
+    {archenemyName: "The Iron Guardian Stirs", archenemyPicture: "url(art/cards-archenemy/the-iron-guardian-stirs.jpg"},
+    {archenemyName: "The Mighty Will Fall", archenemyPicture: "url(art/cards-archenemy/the-mighty-will-fall.jpg"},
+    {archenemyName: "The Pieces Are Coming Together", archenemyPicture: "url(art/cards-archenemy/the-pieces-are-coming-together.jpg"},
+    {archenemyName: "The Very Soil Shall Shake", archenemyPicture: "url(art/cards-archenemy/the-very-soil-shall-shake.jpg"},
+    {archenemyName: "There Is No Refuge", archenemyPicture: "url(art/cards-archenemy/there-is-no-refuge.jpg"},
+    {archenemyName: "This World Belongs to Me", archenemyPicture: "url(art/cards-archenemy/this-world-belongs-to-me.jpg"},
+    {archenemyName: "Tooth, Claw, and Nail", archenemyPicture: "url(art/cards-archenemy/tooth-claw-and-nail.jpg"},
+    {archenemyName: "What's Yours Is Now Mine", archenemyPicture: "url(art/cards-archenemy/whats-yours-is-now-mine.jpg"},
+    {archenemyName: "When Will You Learn", archenemyPicture: "url(art/cards-archenemy/when-will-you-learn.jpg"},
+    {archenemyName: "Which of You Burns Brightest?", archenemyPicture: "url(art/cards-archenemy/which-of-your-burns-brightest.jpg"},
+    {archenemyName: "Your Fate is Thrice Sealed", archenemyPicture: "url(art/cards-archenemy/your-fate-is-thrice-sealed.jpg"},
+    {archenemyName: "Your Inescapable Doom", archenemyPicture: "url(art/cards-archenemy/your-inescapable-doom.jpg"},
+    {archenemyName: "Your Puny Minds Cannot Fathom", archenemyPicture: "url(art/cards-archenemy/your-puny-minds-cannot-fathom.jpg"},
+    {archenemyName: "Your Will Is Not Your Own", archenemyPicture: "url(art/cards-archenemy/your-will-is-not-your-own.jpg"}
 ];
 

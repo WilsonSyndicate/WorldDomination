@@ -1,4 +1,13 @@
 //Player Setup
+function shuffleArchenemy() {
+    gameVars.battleScreenInfo.archenemyDecklist = [];
+    for (var i = 0; i < archenemyDeck.length; i++) {
+        gameVars.battleScreenInfo.archenemyDecklist.push(i);
+    }
+    shuffleArray(gameVars.battleScreenInfo.archenemyDecklist);
+    gameVars.battleScreenInfo.archenemyCount = 0;
+}
+
 function shuffleHeroAndConspiracy() {
     var countryNames = [],
     heroList = [],
@@ -65,13 +74,22 @@ function placementClick(country) {
         //add deck name and deck player to country
         findFullCountryWithCountry(country).deck = {deckPlayer: currentPlacementPlayer, deckName: dugoutDeckName};
         //add 1 to dugout
-        gameVars.playerInfo["player" + currentPlacementPlayer].playerDugout += 1;
+        rollUpPlayerDugout(currentPlacementPlayer);
+        if (adminSettings.useTwoHeadedGiant === true) {
+            rollUpPlayerDugout(currentPlacementPlayer);
+            //add second head
+            addHeadToDeck(currentPlacementPlayer, dugoutDeckName, gameVars.playerInfo["player" + currentPlacementPlayer].playerDugout);
+            //increase countries per player to account for added dugout decks
+            countriesPerPlayer = countriesPerPlayer + countriesPerPlayer - 1;
+        }
         //go to next turn order player
         if (adminSettings.placementSetup.placementPlayer === totalPlayers - 1) {
             //once setup is complete, go to top of turn
-            if (dugoutDeck === countriesPerPlayer) {
+            if (dugoutDeck >= countriesPerPlayer) {
                 //update owned continents
                 controlledContinentUpdate();
+                //update dugout
+                rollUpAllPlayerDugout();
                 //to top of turn to end setup
                 topOfTurn();
             }
@@ -335,8 +353,9 @@ function cleanupPlayerDeckLists() {
             currentPlayerDecklist[d].deckUniqueId = {deckPlayer: currentPlayer, deckName: currentPlayerDecklist[d].deckName};
         }
     }
-    //setup hero, conspiracy
+    //setup hero, conspiracy, archenemy
     shuffleHeroAndConspiracy();
+    shuffleArchenemy();
 }
 
 function buildSupplyPointList() {

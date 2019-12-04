@@ -1,6 +1,48 @@
-
-
 //Code Masters
+function findSecondHead(currentPlayer, currentDeckName) {
+    for (var i = 0; i < gameVars.playerInfo["player" + currentPlayer].secondHead.length; i++) {
+        if (gameVars.playerInfo["player" + currentPlayer].secondHead[i][0] === currentDeckName) {
+            var secondDeckName = gameVars.playerInfo["player" + currentPlayer].secondHead[i][1],
+            secondDeckColor = getDeckColors(currentPlayer, secondDeckName);
+
+            return [secondDeckName, secondDeckColor];
+        }
+    }
+}
+
+function rollUpAllPlayerDugout() {
+    for (var i = 1; i <= gameVars.gameStatus.turnOrder.length; i++) {
+        rollUpPlayerDugout(i);
+    }
+}
+
+function addSecondHeadsToCountryList(countriesPerPlayer) {
+    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
+        if (!!gameVars.mapInfo.countryList[i].deck) {
+            var countryDeckPlayer = gameVars.mapInfo.countryList[i].deck.deckPlayer,
+            countryDeckName = gameVars.mapInfo.countryList[i].deck.deckName,
+            currentDugoutToAdd = findDeckRef(countryDeckPlayer, countryDeckName) + countriesPerPlayer;
+
+            addHeadToDeck(countryDeckPlayer, countryDeckName, currentDugoutToAdd);
+        }
+    }
+}
+
+function addHeadToDeck(playerNumber, firstHeadDeckName, dugoutToAdd) {
+    var dugoutDeckNameToAdd = gameVars.playerInfo["player" + playerNumber].playerDecklist[dugoutToAdd].deckName;
+
+    gameVars.playerInfo["player" + playerNumber].secondHead.push([firstHeadDeckName, dugoutDeckNameToAdd]);
+}
+
+function rollUpPlayerDugout(playerNumber) {
+    var playerDecklistCount = gameVars.playerInfo["player" + playerNumber].playerDecklist.length;
+
+    gameVars.playerInfo["player" + playerNumber].playerDugout += 1;
+    if (playerDecklistCount === gameVars.playerInfo["player" + playerNumber].playerDugout) {
+        gameVars.playerInfo["player" + playerNumber].playerDugout = 0;
+    }
+}
+
 function findItemRefInArray(item, array) {
     for (var i = 0; i < array.length; i++) {
         if (item === array[i]) {
@@ -819,6 +861,10 @@ function testImages() {
     }
     for (let i = 0; i < conspiracyDeck.length; i++) {
         var pictureToShow = conspiracyDeck[i].conspiracyPicture;
+        document.getElementById("card-picture").style.backgroundImage = pictureToShow
+    }
+    for (let i = 0; i < archenemyDeck.length; i++) {
+        var pictureToShow = archenemyDeck[i].archenemyPicture;
         document.getElementById("card-picture").style.backgroundImage = pictureToShow
     }
 }

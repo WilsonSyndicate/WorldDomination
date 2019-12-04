@@ -518,6 +518,30 @@ function rollNextPlane() {
     cancelPrompt();
 }
 
+function closeArchenemyPrompt() {
+    addClass("archenemy-prompt", "hide-item-class");
+}
+
+function playArchenemy() {
+    var archPrompt = confirm("Play Archenemy? \n (Defender must roll a 6 on a six sided dice to play");
+
+    if (archPrompt) {
+        var archenemyCount = gameVars.battleScreenInfo.archenemyCount,
+        currentArchRef = gameVars.battleScreenInfo.archenemyDecklist[archenemyCount];
+
+        //show archenemy prompt
+        removeClass("archenemy-prompt", "hide-item-class");
+        //show archenemy card
+        document.getElementById("archenemy-choice-menu").style.backgroundImage = archenemyDeck[currentArchRef].archenemyPicture
+        //count archenemy
+        gameVars.battleScreenInfo.archenemyCount += 1;
+        //shuffle if at end of deck
+        if (gameVars.battleScreenInfo.archenemyCount === gameVars.battleScreenInfo.archenemyDecklist.length) {
+            shuffleArchenemy();
+        }
+    }
+}
+
 function battleHoverLifeText(battleDeckReference) {
     var lifeText = "Life Tally:";
 
@@ -1068,6 +1092,12 @@ function attackChosen() {
             loadBattleVanguards(j);
             //load battle screen info
             displayBattleInfo(j);
+        }
+        //add archenemy button
+        if (adminSettings.useArchenemy === true) {   
+            removeElement("battle-information", "archenemy-button");
+            addElement("battle-information", "button", "Archenemy", "archenemy-button", "btn", playArchenemy);
+            addClass("archenemy-button", "player-color-" + gameVars.mapInfo.mapSelect[1].deckPlayer);
         }
         //add card picture element
         addElement("battle-information", "div", "noContent", "card-picture");
@@ -1678,6 +1708,12 @@ function displayBattleInfo(battleDeckRef) {
     addElement("battle-information", "h3", battleText, "battle-player" + battleDeckRef, "battle-player");
     //add player number class to deck info space
     addClass("battle-player" + battleDeckRef, "player-" + currentPlayer + "-battle-info");
+    //add second head
+    if (gameVars.gameStatus.mode === "attack" && adminSettings.useTwoHeadedGiant === true) {
+        var secondHead = findSecondHead(currentPlayer, currentDeckName);
+
+        document.getElementById("battle-player" + battleDeckRef).innerHTML += "<br> and " + secondHead[0] + " (" + secondHead[1] + ")";
+    }
     //for each battle player show player, deck, life, cards
     for (var d = 0; d < gameMods.length; d++) {
         if (gameMods[d] !== "") {

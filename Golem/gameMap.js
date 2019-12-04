@@ -368,15 +368,22 @@ function countryMapName(currentCountry) {
 
     if (hasDeck) {
         var currentPlayerNumber = currentCountry.deck.deckPlayer,
-        curentDeckName = currentCountry.deck.deckName,
+        currentDeckName = currentCountry.deck.deckName,
         currentPlayerName = findPlayerName(currentPlayerNumber),
-        isHidden = findDeckWithPlayerNumberAndName(currentPlayerNumber, curentDeckName).deckHidden;  
+        isHidden = findDeckWithPlayerNumberAndName(currentPlayerNumber, currentDeckName).deckHidden;  
 
         if (isHidden) {
             return "<span>" + currentCountryName + "<br>" + currentPlayerName + "</span>";
         }
         else {
-            return "<span>" + currentCountryName + "<br>" + curentDeckName + "</span>";
+            if (adminSettings.useTwoHeadedGiant === true) {
+                var secondHeadDeckName = findSecondHead(currentPlayerNumber, currentDeckName);
+
+                return "<span>" + currentCountryName + "<br>" + currentDeckName  + "<br> and " + secondHeadDeckName[0] + "</span>";
+            }
+            else {
+                return "<span>" + currentCountryName + "<br>" + currentDeckName + "</span>";
+            }
         }
     }
     else {
@@ -591,11 +598,17 @@ function setupMapInformation() {
     countryListToAddTo = gameVars.mapInfo.countryList.concat();
 
     for (var p = 1; p <= playerCount; p++) {
+        //reset dugout
+        gameVars.playerInfo["player" + p].playerDugout = 0;
+        //add decks
         for (var i = 1; i <= countriesPerPlayer; i++) {
             var currentDeck = gameVars.playerInfo["player" + p].playerDecklist[i].deckUniqueId;
-            
+
             deckListToAdd.push(currentDeck);
-            gameVars.playerInfo["player" + p].playerDugout = countriesPerPlayer + 1;
+            rollUpPlayerDugout(p);
+            if (adminSettings.useTwoHeadedGiant === true) {
+                rollUpPlayerDugout(p);
+            }
         }
     }
     shuffleArray(deckListToAdd);
@@ -610,7 +623,14 @@ function setupMapInformation() {
         setupMapInformation();
     }
     else {
+        //complete setup
         orderArray(countryListToAddTo, "country")
         gameVars.mapInfo.countryList = countryListToAddTo;
+        //set second heads
+        if (adminSettings.useTwoHeadedGiant === true) {
+            addSecondHeadsToCountryList(countriesPerPlayer);
+        }
+        //update dugout
+        rollUpAllPlayerDugout();
     }
 }

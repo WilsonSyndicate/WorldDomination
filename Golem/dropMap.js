@@ -24,7 +24,12 @@ function dropDeckIntoGame(player, country) {
     //drop deck associated with dugout
     findFullCountryWithCountry(country).deck = {deckPlayer: newDeckPlayer, deckName: newDeckName}; 
     //increase player dugout by 1
-    fullPlayer.playerDugout += 1;
+    rollUpPlayerDugout(player);
+    //add second head            
+    if (adminSettings.useTwoHeadedGiant === true) {
+        addHeadToDeck(player, newDeckName, dugoutRef + 1);
+        rollUpPlayerDugout(player);
+    }
     //return deck name
     return newDeckName
 }
