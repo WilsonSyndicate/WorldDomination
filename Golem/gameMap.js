@@ -291,6 +291,11 @@ function mapCountryHover(country) {
         //player deck if not hidden
         if (isHidden === false) {
             document.getElementById("country-information").innerHTML += deckName + " (" + deckColors + ")<br>";
+            if (adminSettings.useTwoHeadedGiant === true) {
+                var secondDeckName = findSecondHead(countryPlayer, deckName);
+
+                document.getElementById("country-information").innerHTML += secondDeckName[0] + " (" + secondDeckName[1] + ")<br>";
+            }
             if (!!defensePlane) {
                 document.getElementById("country-information").innerHTML += "Defense Plane: " + defensePlane + "<br>";
                 removeElement("country-information", "map-defense-preview");

@@ -140,10 +140,17 @@ function findIntroLogText(currentLogEntry) {
             return currentLogEntry[1];
         }
         else {
-            var attackLogName = findPlayerName(currentLogEntry[2]),
-            attackLogDeckName = currentLogEntry[3][0].deckName;
+            var attackLogName = findPlayerName(currentLogEntry[3]),
+            attackLogDeckName = currentLogEntry[4][0].deckName;
 
-            return attackLogName + " attacks with " + attackLogDeckName;
+            if (adminSettings.useTwoHeadedGiant) {
+                var secondHead = findSecondHead(currentLogEntry[4][0].deckPlayer, currentLogEntry[4][0].deckName);
+
+                return attackLogName + " attacks with " + attackLogDeckName + " and " + secondHead[0];
+            }
+            else {
+                return attackLogName + " attacks with " + attackLogDeckName;
+            }
         }
     }
     else if (currentLogEntry[1].search("Complete") !== -1) {
@@ -225,9 +232,15 @@ function introScreenName(currentCountry) {
     if (!!currentCountry.deck) {
         var currentDeck = findFullDeckWithPlayerAndName(currentCountry.deck.deckPlayer, currentCountry.deck.deckName),
         playerName = findPlayerName(findCountryPlayer(currentCountry.country));
+        countryNameText = playerName + " playing " + currentCountry.deck.deckName + introScreenColor(currentCountry);
         
+        if (gameVars.gameStatus.mode === "attack" && adminSettings.useTwoHeadedGiant) {
+            secondHead = findSecondHead(currentCountry.deck.deckPlayer, currentCountry.deck.deckName);
+
+            countryNameText += " and " + secondHead[0] + "(" + secondHead[1] + ")";
+        }
         if (currentDeck.deckHidden) return playerName;
-        return playerName + " playing " + currentCountry.deck.deckName;
+        return countryNameText
     }
     return "-Empty-";
 }
@@ -276,23 +289,18 @@ function updateIntroScreen() {
         countryList.push({
             countryName: gameVars.mapInfo.countryList[c].countryName, 
             deckName: introScreenName(gameVars.mapInfo.countryList[c]),
-            deckColor: introScreenColor(gameVars.mapInfo.countryList[c]),
             deckGames: introScreenGames(gameVars.mapInfo.countryList[c]),
             deckBonuses: introScreenBonus(gameVars.mapInfo.countryList[c]),
             deckPenalties: introScreenPenalty(gameVars.mapInfo.countryList[c])
         }); 
     }
-
-    //future version 
-    //add defense plane
-
     //create table with above info
     var tableBody = document.getElementById("intro-information"), //reference for body
     tbl = document.createElement("table"), //table element
     tblBody = document.createElement("tbody"), //tbody element)
     tblHeader = document.createElement("thead");
 
-    var tblHeaderValues = ["Country", "Deck", "Color", "Games", "Bonuses", "Penalties"],
+    var tblHeaderValues = ["Country", "Deck", "Games", "Bonuses", "Penalties"],
     tblHeaderRow = document.createElement("tr");
 
     //remove previous list
@@ -305,13 +313,10 @@ function updateIntroScreen() {
         headerCell.appendChild(headerText);
         tblHeaderRow.appendChild(headerCell);
     }
-
     //creates all cells
     for (var i = 0; i < countryList.length; i++) { 
-        
         //creates a table row
         var row = document.createElement("tr"); 
-
         //create a td element and text node, make the text node the contents of td and put td at the end of table row
         for (var j = 0; j < tblHeaderValues.length; j++) { 
             var currentCountry = countryList[i],

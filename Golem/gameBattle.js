@@ -542,6 +542,15 @@ function playArchenemy() {
     }
 }
 
+function battleHoverCreatureModText(battleDeckReference) {
+    var creatureText = "Creature Mod Tally:";
+
+    for (var i = 0; i < gameVars.battleScreenInfo.battlePowerAndToughnessMods[battleDeckReference].length; i++) {
+        creatureText += "<br>" + gameVars.battleScreenInfo.battlePowerAndToughnessMods[battleDeckReference][i];
+    }
+    return creatureText;
+}
+
 function battleHoverLifeText(battleDeckReference) {
     var lifeText = "Life Tally:";
 
@@ -587,6 +596,7 @@ function battleHoverContinentText(currentPlayer, battleDeckReference) {
 function battlePictureOffHover(mod) {
     if (gameVars.gameStatus.mode === "attack") {
         document.getElementById("card-picture").innerHTML = "";
+        addClass("card-picture", "hide-item-class");
         removeClass("card-picture", "player-color-1");
         removeClass("card-picture", "player-color-2");
         removeClass("card-picture", "player-color-3");
@@ -602,6 +612,7 @@ function battlePictureHover(mod) {
     currentPlayer = gameVars.battleScreenInfo.battleDecks[battleDeckReference].deckPlayer;
 
     if (gameVars.gameStatus.mode === "attack") {
+        removeClass("card-picture", "hide-item-class");
         if (pictureType === "vanguard" && pictureType !== "noVanguard") {
             var vanguardToShowName = gameVars.battleScreenInfo.battleVanguards[battleDeckReference],
             vanguardRef = findVanguardRef(vanguardToShowName),
@@ -661,6 +672,21 @@ function battlePictureHover(mod) {
             addClass("card-picture", "player-color-" + currentPlayer);
             addClass("card-picture", "toolbar");
             document.getElementById("card-picture").innerHTML = handText;
+        }
+        else if (pictureType === "power-and-toughness") {
+            var creatureModText = battleHoverCreatureModText(battleDeckReference);
+
+            for (i = 1; i < 6; i++) {
+                removeClass("card-picture", 'player-color-' + i);
+            }
+            removeClass("card-picture", "toolbar");
+            document.getElementById("card-picture").style.backgroundImage = "none";
+            addClass("card-picture", "player-color-" + currentPlayer);
+            addClass("card-picture", "toolbar");
+            document.getElementById("card-picture").innerHTML = creatureModText;
+        }
+        else {
+            console.log(mod);
         }
     }
 }
@@ -751,25 +777,46 @@ function endOfGame(winningPlayer) {
 
 function countBattleLife(bonuses, penalties, countrySupport, battleDeckRef) {
     var lifeTotal = 20,
-    lifeTotalMods = [];
+    lifeTotalMods = [],
+    lifeBonuses = 0,
+    lifePenalties = 0;
 
-    lifeTotalMods.push("Unmodified Life: 20");
+    //unmodified
+    if (gameVars.gameStatus.mode === "attack" && adminSettings.useTwoHeadedGiant === true) {
+        lifeTotalMods.push("Unmodified Life: 40");
+        lifeTotal += 20;
+    }
+    else {
+        lifeTotalMods.push("Unmodified Life: 20");
+    }
+    //initiation for last deck
+    if (gameVars.gameStatus.mode === "attack" && battleDeckRef === 1 && playerDeckCount(gameVars.battleScreenInfo.battleDecks[battleDeckRef].deckPlayer) === 1) {
+        lifeTotalMods.push("Initiation Deck Life: +20");
+        lifeTotal += 20;
+    }
+    //bonus life
     for (var b = 0; b < bonuses.length; b++) {
         if (bonuses[b] === 0) {
             lifeTotal += adminSettings.gameBonuses[0].life;
+            lifeBonuses += 1;
         }
-        lifeTotalMods.push(b + " Life Bonuses: +" + adminSettings.gameBonuses[0].life);
     }
+    if (lifeBonuses > 0) {
+        lifeTotalMods.push(lifeBonuses + " Life Bonuses (+" + adminSettings.gameBonuses[0].life + "): " + (adminSettings.gameBonuses[0].life * lifeBonuses));
+    }
+    //penalty life
     for (var p = 0; p < penalties.length; p++) {
         if (penalties[p] === 0) {
             lifeTotal += adminSettings.gamePenalties[0].life;
+            lifePenalties += 1;
         }
-        lifeTotalMods.push(p + " Life Penalties: -" + adminSettings.gamePenalties[0].life);
+    }
+    if (lifePenalties > 0) {
+        lifeTotalMods.push(lifePenalties + " Life Penalties (" + adminSettings.gamePenalties[0].life + "): " + (adminSettings.gamePenalties[0].life * lifePenalties));
     }
     //hero
-    if (gameVars.gameStatus.mode === "attack" && gameVars.battleScreenInfo.battleHero[battleDeckRef] !== "noHero") {
+    if (gameVars.gameStatus.mode === "attack" && gameVars.battleScreenInfo.battleHero[battleDeckRef] !== "noHero" && findFullHeroWithName(gameVars.battleScreenInfo.battleHero[battleDeckRef]).heroLife !== 0) {
         lifeTotal += findFullHeroWithName(gameVars.battleScreenInfo.battleHero[battleDeckRef]).heroLife;
-
         lifeTotalMods.push("Hero Life: +" + findFullHeroWithName(gameVars.battleScreenInfo.battleHero[battleDeckRef]).heroLife);
     }
     //vanguard
@@ -780,12 +827,12 @@ function countBattleLife(bonuses, penalties, countrySupport, battleDeckRef) {
         if (vanguardDeck[vanguardRef].vanguardLife < 0) {
             lifeTotalMods.push("Vanguard Life: " + vanguardDeck[vanguardRef].vanguardLife);
         }
-        else {
+        else if (vanguardDeck[vanguardRef].vanguardLife > 0) {
             lifeTotalMods.push("Vanguard Life: +" + vanguardDeck[vanguardRef].vanguardLife);
         }
     }
     //country support
-    if (adminSettings.supportBonus.useSupportBonusInGame === true && gameVars.gameStatus.mode !== "setup" && countrySupport[0] !== 0) {
+    if (adminSettings.supportBonus.useSupportBonusInGame === true && gameVars.gameStatus.mode !== "setup" && Math.floor(adminSettings.supportBonus.defendingLife * countrySupport[0]) > 0) {
         if (countrySupport[1] === true) {
             lifeTotal += Math.floor(adminSettings.supportBonus.defendingLife * countrySupport[0]);
             lifeTotalMods.push(countrySupport[0] + " Defense Support Bonuses: +" + Math.floor(adminSettings.supportBonus.defendingLife * countrySupport[0]));
@@ -807,23 +854,34 @@ function countBattleLife(bonuses, penalties, countrySupport, battleDeckRef) {
 
 function countBattleHand(bonuses, penalties, countrySupport, battleDeckRef) {
     var handTotal = 7,
-    handTotalMods = [];
+    handTotalMods = [],
+    handBonuses = 0,
+    handPenalties = 0;
 
+    //unmodified
     handTotalMods.push("Unmodified Hand: 7");
+    //bonuses
     for (var b = 0; b < bonuses.length; b++) {
         if (bonuses[b] === 1) {
             handTotal += adminSettings.gameBonuses[1].hand;
+            handBonuses += 1;
         }
-        handTotalMods.push(b + " Hand Bonuses: +" + adminSettings.gameBonuses[0].hand);
     }
+    if (handBonuses > 0) {
+        handTotalMods.push(handBonuses + " Hand Bonuses (+" + adminSettings.gameBonuses[1].hand + "): " + (adminSettings.gameBonuses[1].hand * handBonuses));
+    }
+    //penalties
     for (var p = 0; p < penalties.length; p++) {
         if (penalties[p] === 1) {
             handTotal += adminSettings.gamePenalties[1].hand;
+            handPenalties += 1;
         }
-        handTotalMods.push(p + " Hand Penalties: +" + adminSettings.gamePenalties[0].hand);
+    }
+    if (handPenalties > 0) {
+        handTotalMods.push(handPenalties + " Hand Penalties (+" + adminSettings.gamePenalties[1].hand + "): " + (adminSettings.gamePenalties[1].hand * handPenalties));
     }
     //hero
-    if (gameVars.gameStatus.mode === "attack" && gameVars.battleScreenInfo.battleHero[battleDeckRef] !== "noHero") {
+    if (gameVars.gameStatus.mode === "attack" && gameVars.battleScreenInfo.battleHero[battleDeckRef] !== "noHero" && findFullHeroWithName(gameVars.battleScreenInfo.battleHero[battleDeckRef]).heroHand !== 0) {
         handTotal += findFullHeroWithName(gameVars.battleScreenInfo.battleHero[battleDeckRef]).heroHand;
         handTotalMods.push("Hero Hand: +" + findFullHeroWithName(gameVars.battleScreenInfo.battleHero[battleDeckRef]).heroHand);
     }
@@ -835,12 +893,12 @@ function countBattleHand(bonuses, penalties, countrySupport, battleDeckRef) {
         if (vanguardDeck[findVanguardRef(gameVars.battleScreenInfo.battleVanguards[battleDeckRef])].vanguardHand < 0) {
             handTotalMods.push("Vanguard Hand: " + vanguardDeck[vanguardRef].vanguardHand);
         }
-        else {
+        else if (vanguardDeck[findVanguardRef(gameVars.battleScreenInfo.battleVanguards[battleDeckRef])].vanguardHand > 0) {
             handTotalMods.push("Vanguard Hand: +" + vanguardDeck[vanguardRef].vanguardHand);
         }
     }
     //country support
-    if (adminSettings.supportBonus.useSupportBonusInGame === true && gameVars.gameStatus.mode !== "setup" && countrySupport[0] !== 0) {
+    if (adminSettings.supportBonus.useSupportBonusInGame === true && gameVars.gameStatus.mode !== "setup" && Math.floor(adminSettings.supportBonus.defendingHand * countrySupport[0]) > 0) {
         if (countrySupport[1] === true) {
             handTotal += Math.floor(adminSettings.supportBonus.defendingHand * countrySupport[0]);
             handTotalMods.push(countrySupport[0] + " Defense Support Bonuses: +" + Math.floor(adminSettings.supportBonus.defendingHand * countrySupport[0]));
@@ -871,48 +929,60 @@ function countBattleHand(bonuses, penalties, countrySupport, battleDeckRef) {
 }
 
 function countBattlePower(bonuses, penalties, countrySupport, battleDeckRef) {
-    var creaturePower = 0;
+    var creaturePower = 0,
+    creatureMods = [],
+    creatureBonuses = 0,
+    creaturePenalties = 0;
     
+    //bonuses
     for (var b = 0; b < bonuses.length; b++) {
         if (bonuses[b] === 2) {
             creaturePower += adminSettings.gameBonuses[2].creatureMods[0];
+            creatureBonuses += 1;
+        }
+    }
+    //penalties
+    for (var p = 0; p < penalties.length; p++) {
+        if (penalties[p] === 2) {
+            creaturePower += adminSettings.gamePenalties[2].creatureMods[0];
+            creaturePenalties += 1;
+        }
+    }
+    //vanguard
+    if (gameVars.gameStatus.mode === "attack" && gameVars.battleScreenInfo.battleVanguards[battleDeckRef] !== "noVanguard" && vanguardDeck[findVanguardRef(gameVars.battleScreenInfo.battleVanguards[battleDeckRef])].vanguardPower !== 0) {
+        creaturePower += vanguardDeck[findVanguardRef(gameVars.battleScreenInfo.battleVanguards[battleDeckRef])].vanguardPower;
+        creatureMods.push("Vanguard Creature Modification: " + vanguardDeck[findVanguardRef(gameVars.battleScreenInfo.battleVanguards[battleDeckRef])].vanguardPower);
+    }
+    //country support
+    if (adminSettings.supportBonus.useSupportBonusInGame === true && gameVars.gameStatus.mode === "attack" && Math.floor(adminSettings.supportBonus.defendingPower * countrySupport[0]) !== 0) {
+        if (countrySupport[1] === true) {
+            creaturePower += Math.floor(adminSettings.supportBonus.defendingPower * countrySupport[0]);
+            creatureMods.push("Defending Country Support: " + Math.floor(adminSettings.supportBonus.defendingPower * countrySupport[0]));
+        }
+        else {
+            creaturePower += Math.floor(adminSettings.supportBonus.attackingPower * countrySupport[0]);
+            creatureMods.push("Attacking Country Support: " + Math.floor(adminSettings.supportBonus.attackingPower * countrySupport[0]));
+        }
+    }
+    return [creaturePower, creatureBonuses, creaturePenalties, creatureMods];
+}
+
+function countBattleToughness(bonuses, penalties, countrySupport, battleDeckRef) {
+    var creatureToughness = 0,
+    creatureMods = [],
+    creatureBonuses = 0,
+    creaturePenalties = 0;
+    
+    for (var b = 0; b < bonuses.length; b++) {
+        if (bonuses[b] === 2) {
+            creatureToughness += adminSettings.gameBonuses[2].creatureMods[1];
+            creatureBonuses += 1;
         }
     }
     for (var p = 0; p < penalties.length; p++) {
         if (penalties[p] === 2) {
-            creaturePower += adminSettings.gamePenalties[2].creatureMods[0];
-        }
-    }
-    //vanguard
-    if (gameVars.gameStatus.mode === "attack" && gameVars.battleScreenInfo.battleVanguards[battleDeckRef] !== "noVanguard") {
-        creaturePower += vanguardDeck[findVanguardRef(gameVars.battleScreenInfo.battleVanguards[battleDeckRef])].vanguardPower;
-    }
-    //country support
-    if (adminSettings.supportBonus.useSupportBonusInGame === true && gameVars.gameStatus.mode !== "setup") {
-        if (countrySupport[1] === true) {
-            creaturePower += Math.floor(adminSettings.supportBonus.defendingPower * countrySupport[0]);
-        }
-        else {
-            creaturePower += Math.floor(adminSettings.supportBonus.attackingPower * countrySupport[0]);
-        }
-    }
-    if (creaturePower >= 0) {
-        creaturePower = "+" + creaturePower;
-    }
-    return creaturePower;
-}
-
-function countBattleToughness(bonuses, penalties, countrySupport, battleDeckRef) {
-    var creatureToughness = 0;
-    
-    for (var b = 0; b < bonuses.length; b++) {
-        if (bonuses[b][0] === "creatureMods") {
-            creatureToughness += adminSettings.gameBonuses.creatureMods[1];
-        }
-    }
-    for (var p = 0; p < penalties.length; p++) {
-        if (penalties[p][0] === "creatureMods") {
-            creatureToughness += adminSettings.gamePenalties.creatureMods[1];
+            creatureToughness += adminSettings.gamePenalties[2].creatureMods[1];
+            creaturePenalties += 1;
         }
     }
     //vanguard
@@ -920,7 +990,7 @@ function countBattleToughness(bonuses, penalties, countrySupport, battleDeckRef)
         creatureToughness += vanguardDeck[findVanguardRef(gameVars.battleScreenInfo.battleVanguards[battleDeckRef])].vanguardToughness;
     }
     //country support
-    if (adminSettings.supportBonus.useSupportBonusInGame === true && gameVars.gameStatus.mode !== "setup") {
+    if (adminSettings.supportBonus.useSupportBonusInGame === true && gameVars.gameStatus.mode === "attack") {
         if (countrySupport[1] === true) {
             creatureToughness += Math.floor(adminSettings.supportBonus.defendingToughness * countrySupport[0]);
         }
@@ -928,17 +998,69 @@ function countBattleToughness(bonuses, penalties, countrySupport, battleDeckRef)
             creatureToughness += Math.floor(adminSettings.supportBonus.attackingToughness * countrySupport[0]);
         }
     }
-    if (creatureToughness >= 0) {
-        creatureToughness = "+" + creatureToughness;
+    return [creatureToughness, creatureBonuses, creaturePenalties, creatureMods];
+}
+
+function findCreatureMod(power, toughness) {
+    var powerString = String(power),
+    toughnessString = String(toughness),
+    creatureModText = "";
+
+    if (power >= 0) {
+        creatureModText += "+" + powerString + "/";
     }
-    return creatureToughness;
+    else {
+        creatureModText += powerString + "/";
+    }
+    if (toughness === 0) {
+        if (power < 0) {
+            creatureModText += "-" + toughnessString;
+        }
+        else {
+            creatureModText += "+" + toughnessString;
+        }
+    }
+    else {
+        if (toughness >= 0) {
+            creatureModText += "+" + toughnessString;
+        }
+        else {
+            creatureModText += toughnessString;
+        }
+    }
+    return creatureModText;
 }
 
 function countBattlePowerAndToughness(bonuses, penalties, countrySupport, battleDeckRef) {
     var powerCalc = countBattlePower(bonuses, penalties, countrySupport, battleDeckRef),
     toughnessCalc = countBattleToughness(bonuses, penalties, countrySupport, battleDeckRef),
-    creatureMod = powerCalc + "/" + toughnessCalc;
+    creatureMod = findCreatureMod(powerCalc[0], toughnessCalc[0]),
+    hoverMods = [];
 
+    //bonus hover message
+    if (powerCalc[1] === 1) {
+        hoverMods.push("1 Creature Bonus (+1/+1): +1/+1");
+    }
+    if (powerCalc[1] > 1) {
+        hoverMods.push(powerCalc[1] + " Creature Bonuses (+1/+1): +" + (adminSettings.gameBonuses[2].creatureMods[0] * powerCalc[1]) + "/+" + (adminSettings.gameBonuses[2].creatureMods[1] * powerCalc[1]));
+    }
+    //penalty hover message
+    if (powerCalc[2] === 1) {
+        hoverMods.push("1 Creature Penalty (-2/-0): -2/-0");
+    }
+    if (powerCalc[2] > 1) {
+        hoverMods.push(powerCalc[2] + " Creature Penalties (-2/-0): " + (adminSettings.gamePenalties[2].creatureMods[0] * powerCalc[2]) + "/-" + (adminSettings.gamePenalties[2].creatureMods[1] * powerCalc[2]));
+    }
+    //other hover messages
+    for (var p = 0; p < powerCalc[3].length; p++) {
+        hoverMods.push(powerCalc[3][p]);
+    }
+    for (var t = 0; t < toughnessCalc[3].length; t++) {
+        hoverMods.push(toughnessCalc[3][p]);
+    }
+    hoverMods.push("Creature Mod Totals: " + creatureMod);
+    gameVars.battleScreenInfo.battlePowerAndToughnessMods.push(hoverMods);
+    //mod tally
     if (creatureMod === "+0/+0") {
         return "";
     }
@@ -946,6 +1068,89 @@ function countBattlePowerAndToughness(bonuses, penalties, countrySupport, battle
         return ["Your Creatures Get: ", creatureMod, "power-and-toughness"]
     }
 }
+
+function countBonusTutorLand(bonuses) {
+    var bonusTutorLand = 0,
+    tutorLandAmount = adminSettings.gameBonuses[3].tutorLand;
+    
+    //tutor land
+    for (var b = 0; b < bonuses[b].length; b++) {
+        if (bonuses[b] === 3) {
+            bonusTutorLand += 1;
+        }
+    }
+    if (bonusTutorLand > 0) {
+        if (bonusTutorLand > 1) {
+            return ["Tutor for " + (tutorLandAmount * bonusTutorLand) + " lands and put into play tapped."];
+        }
+        else {
+            return ["Tutor for 1 land and put into play tapped."];
+
+        }
+    }
+}
+
+function countBonusCheaperSpells(bonuses) {
+    var bonusCheaperSpells = 0,
+    cheaperSpellsAmount = adminSettings.gameBonuses[4].spellsCheaper;
+
+    //spells cheaper
+    for (var b = 0; b < bonuses[b].length; b++) {
+        if (bonuses[b] === 4) {
+            bonusCheaperSpells += 1;
+        }
+    }
+    if (bonusCheaperSpells > 0) {
+        return ["Your spells cost " + (cheaperSpellsAmount + bonusCheaperSpells) + " cheaper for the first " (cheaperSpellsAmount + bonusCheaperSpells) + " turns."];
+    }
+}
+
+function countBonusPermanentInPlay(bonuses) {
+    var bonusPermanentInPlay = 0,
+    permanentInPlayAmount = adminSettings.gameBonuses[5].permanentIntoPlay;
+
+    //spells cheaper
+    for (var b = 0; b < bonuses[b].length; b++) {
+        if (bonuses[b] === 5) {
+            bonusPermanentInPlay += 1;
+        }
+    }
+    if (bonusCheaperSpells > 0) {
+        if (bonusCheaperSpells > 1) {
+            return ["You may start the game with " + (permanentInPlayAmount + bonusPermanentInPlay) + " permanents from your hand in play."];
+        }
+        else {
+            return ["You may start the game with 1 permanent from your hand in play"];
+        }
+    }
+}
+
+
+
+
+function countPenaltyLandsTapped(penalties) {
+    if (penalties[p] === 3) {
+        //lands tapped
+        penaltyLandsTapped += 1;
+    }
+}
+function countPenaltyCounterSpell(penalties) {
+    if (penalties[p] === 4) {
+        //counter spell
+        penaltyCounterSpell += 1;
+    }
+}
+
+function countPenaltyExile(penalties) {
+    if (penalties[p] === 5) {
+        //exile
+        penaltyExile += 1;
+    }
+}
+
+
+
+
 
 function battleVanguard(battleDeckRef) {
     if (gameVars.gameStatus.mode === "setup" || gameVars.battleScreenInfo.battleVanguards[battleDeckRef] === "noVanguard") {
@@ -1104,7 +1309,7 @@ function attackChosen() {
         //set info locations
         setPlayerInfoLocation();
         //update log
-        updateLog([countGames + " Game Begins"]);
+        updateLog([countGames + " Game Begins", groundZero]);
         //add attacking country to already attacked list
         gameVars.mapInfo.alreadyAttacked.push(findFullCountryWithDeckPlayerAndDeckName(attackingPlayer, attackingDeckName).country);
         //unhide all decks
@@ -1295,6 +1500,7 @@ function battleScreenCleanup() {
     gameVars.battleScreenInfo.battleContinentBonuses = [];
     gameVars.battleScreenInfo.battleLifeMods = [];
     gameVars.battleScreenInfo.battleHandMods = [];
+    gameVars.battleScreenInfo.battlePowerAndToughnessMods = [];
     gameVars.battleScreenInfo.planePromptText = "";
     gameVars.battleScreenInfo.planarDeck = [];
     gameVars.battleScreenInfo.currentPlanarCard = 0;
@@ -1526,6 +1732,7 @@ function battleWinner(winningPlayerButton) {
             winnerDesignation = findWinningPlayerDesignation(winningPlayerId),
             logTempNote = [],
             logNote = [];
+
             //update joiner list
             if (gameVars.battleScreenInfo.battleDecks.length > 2) {
                 for (var i = 2; i < gameVars.battleScreenInfo.battleDecks.length; i++) {
@@ -1534,7 +1741,15 @@ function battleWinner(winningPlayerButton) {
             }
             //update battle winners
             markDeckAsWinner(winningDeck.deckPlayer, winningDeck.deckName);
-            logTempNote.push(winningPlayerName + " playing " + winningDeck.deckName + " wins");
+
+            if (adminSettings.useTwoHeadedGiant) {
+                var secondHead = findSecondHead(winningDeck.deckPlayer, winningDeck.deckName);
+
+                logTempNote.push(winningPlayerName + " playing " + winningDeck.deckName + " and " + secondHead[0] + " wins");
+            }
+            else {
+                logTempNote.push(winningPlayerName + " playing " + winningDeck.deckName + " wins");
+            }
             //update battle losers
             for (var i = 0; i < losingDecks.length; i++) {
                 markDeckAsLoser(losingDecks[i].deckPlayer, losingDecks[i].deckName, battleDefender.deckPlayer);
@@ -1573,6 +1788,7 @@ function battleWinner(winningPlayerButton) {
             gameVars.battleScreenInfo.battleContinentBonuses = [];
             gameVars.battleScreenInfo.battleLifeMods = [];
             gameVars.battleScreenInfo.battleHandMods = [];
+            gameVars.battleScreenInfo.battlePowerAndToughnessMods = [];
             gameVars.battleScreenInfo.planePromptText= "";
             gameVars.battleScreenInfo.planarDeck = [];
             gameVars.battleScreenInfo.currentPlanarCard = 0;
@@ -1702,7 +1918,13 @@ function displayBattleInfo(battleDeckRef) {
         battleConspiracy(battleDeckRef),
         countBattleLife(bonuses, penalties, countrySupport, battleDeckRef),
         countBattleHand(bonuses, penalties, countrySupport, battleDeckRef),
-        countBattlePowerAndToughness(bonuses, penalties, countrySupport, battleDeckRef)
+        countBattlePowerAndToughness(bonuses, penalties, countrySupport, battleDeckRef),
+        countBonusTutorLand(bonuses),
+        countBonusCheaperSpells(bonuses),
+        countBonusPermanentInPlay(bonuses),
+        countPenaltyLandsTapped(penalties),
+        countPenaltyCounterSpell(penalties),
+        countPenaltyExile(penalties)
     ];
     //add player and deck name (color)
     addElement("battle-information", "h3", battleText, "battle-player" + battleDeckRef, "battle-player");
@@ -1713,6 +1935,11 @@ function displayBattleInfo(battleDeckRef) {
         var secondHead = findSecondHead(currentPlayer, currentDeckName);
 
         document.getElementById("battle-player" + battleDeckRef).innerHTML += "<br> and " + secondHead[0] + " (" + secondHead[1] + ")";
+    }
+    if (gameVars.gameStatus.mode === "attack" && battleDeckRef === 1 && playerDeckCount(currentPlayer) === 1) {
+        var initiationDeck = playerFullInitiationDeck(currentPlayer);
+
+        document.getElementById("battle-player" + battleDeckRef).innerHTML += "<br> and " + initiationDeck.deckName + " (" + initiationDeck.deckColors + ")";
     }
     //for each battle player show player, deck, life, cards
     for (var d = 0; d < gameMods.length; d++) {

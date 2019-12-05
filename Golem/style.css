@@ -538,11 +538,11 @@
     position: fixed;
 }
 #card-picture {
-    position: relative;
+    position: fixed;
     z-index: 1;
     background-repeat: no-repeat;
     background-size: cover;
-    top: 520px;
+    top: 150px;
     margin: auto;
     width: 282px;
     height: 404px;

@@ -2,28 +2,32 @@
 //toolbar messed up on large screen
 //plane menus need to look better
 //battle screen
-
-//hover not working on battle screen, maybe because div gets removed
-
-//two headed giant option, need to display second head on map hover
 //change map font size
+
+//handle running out of decks
+//add deck prompt, check for same name deck
 
 
 //future game versions
+
 //continent moves
+
 //drop type specific
+
 //more bonuses and penalties
 //  bonuses: tutor for 1 land, spells x cheaper for x turns, begin with 1 permanent in play
 //  penalties: first 3 lands come into play tapped, counter 1 spell, exile top 10
+
 //initiative game evey earth shaking event
-//last deck is extra headed giant
+
+
 
 //ability to save game state through browser restart
 //ability to upload new decklists
 //map hover rewrite & animate country
 
 //Admin Settings
-const adminSettings = {
+var adminSettings = {
     supportBonus: {
         useSupportBonusInGame: true,//true uses below suppport bonuses
         defendingLife: 3.2,
@@ -68,12 +72,18 @@ const adminSettings = {
     gameBonuses: [
         {"life": 13},
         {"hand": 1},
-        {"creatureMods": [1, 1]}
+        {"creatureMods": [1, 1]},
+        {"tutorLand": 1},
+        {"spellsCheaper": 1},
+        {"permanentIntoPlay": 1}
     ],
     gamePenalties: [
         {"life": -7},
         {"hand": -1},
-        {"creatureMods": [-2, 0]}
+        {"creatureMods": [-2, 0]},
+        {"landsTapped": 3},
+        {"counterSpell": 1},
+        {"exile": 10}
     ],
     continentMoves: {
         "moveAfrica": 3,
@@ -208,7 +218,6 @@ var gameVars = {
                 {deckName: "Fat Cobra", deckColors: "G"},
                 {deckName: "Ferngully's Payback", deckColors: "UBG"},
                 {deckName: "Float like a Butterfly, Sting like a Bee", deckColors: "WUBRG"},
-                {deckName: "another deck", deckColors: "WUBRG"},
                 {deckName: "For Honor and Valor", deckColors: "W"},
                 {deckName: "For the Cause", deckColors: "W"},
                 {deckName: "Forged in Stone", deckColors: "W"},
@@ -217,7 +226,6 @@ var gameVars = {
                 {deckName: "Ghave's Growth", deckColors: "WBG"},
                 {deckName: "Gin", deckColors: "WR"},
                 {deckName: "Goblins Vs", deckColors: "R"},
-                {deckName: "apl1 Golgari", deckColors: "BG"},
                 {deckName: "Good Will", deckColors: "U"},
                 {deckName: "Graveborn", deckColors: "WUBRG"},
                 {deckName: "Great Forest Emergence", deckColors: "G"},
@@ -319,11 +327,9 @@ var gameVars = {
                 {deckName: "Northern Horde", deckColors: "R"},
                 {deckName: "Obsessive Madness", deckColors: "BRG"},
                 {deckName: "One For All", deckColors: "WUBRG"},
-                {deckName: "aOrc Hordes", deckColors: "WBRG"},
                 {deckName: "Ordeals Aplenty", deckColors: "WUBRG"},
                 {deckName: "Pack Hunt", deckColors: "BG"},
                 {deckName: "Pain Scramble", deckColors: "BR"},
-                {deckName: "apl2 Peer Through Time", deckColors: "U"},
                 {deckName: "Phyrexia", deckColors: "B"},
                 {deckName: "Pianna Roams", deckColors: "W"},
                 {deckName: "Political Puppets", deckColors: "WUR"},
@@ -460,8 +466,6 @@ var gameVars = {
                 {deckName: "Blitz Kreig", deckColors: "RG"},
                 {deckName: "Blood Carnival", deckColors: "BR"},
                 {deckName: "Bones", deckColors: "WUBRG"},
-                {deckName: "apl3 Brain Scramble", deckColors: "UR"},
-                {deckName: "aBruna", deckColors: "WU"},
                 {deckName: "Built From Scratch", deckColors: "R"},
                 {deckName: "Bump in the Night", deckColors: "B"},
                 {deckName: "Burn the Earth", deckColors: "R"},
@@ -487,7 +491,6 @@ var gameVars = {
                 {deckName: "Dakkon Blackblade", deckColors: "WUB"},
                 {deckName: "Damage for Breakfast", deckColors: "WR"},
                 {deckName: "Darien's Legacy", deckColors: "W"},
-                {deckName: "aDark Devotion", deckColors: "UBR"},
                 {deckName: "Deal With the Devil", deckColors: "R"},
                 {deckName: "Deathklok", deckColors: "UBR"},
                 {deckName: "Deckmaster Jon Finkel", deckColors: "BR"},
@@ -831,8 +834,6 @@ var gameVars = {
                 {deckName: "Mind Seize", deckColors: "UBR"},
                 {deckName: "Mirror Mastery", deckColors: "URG"},
                 {deckName: "Mirror Mirror", deckColors: "WUBRG"},
-                {deckName: "apl5 Miscalculation", deckColors: "UB"},
-                {deckName: "aMishra", deckColors: "UBR"},
                 {deckName: "Monkey Business", deckColors: "RG"},
                 {deckName: "Monks Of The Full Palm", deckColors: "URG"},
                 {deckName: "Mythical Proportions", deckColors: "WUBRG"},
@@ -875,7 +876,6 @@ var gameVars = {
                 {deckName: "Savage Auras", deckColors: "WG"},
                 {deckName: "Scalpelexis Exists", deckColors: "U"},
                 {deckName: "Scrambled Eggs", deckColors: "WR"},
-                {deckName: "aSecret Scrolls", deckColors: "U"},
                 {deckName: "Senju Hashirama Clan", deckColors: "UG"},
                 {deckName: "Serra Angel Speed Bump", deckColors: "UBR"},
                 {deckName: "Seven Seas", deckColors: "U"},
@@ -887,7 +887,6 @@ var gameVars = {
                 {deckName: "Slip and Slide", deckColors: "WUG"},
                 {deckName: "Slumgolem Casserole", deckColors: "WUBG"},
                 {deckName: "Snakes on a Bow", deckColors: "UBG"},
-                {deckName: "aSparkley Bits", deckColors: "U"},
                 {deckName: "SPECTRE", deckColors: "B"},
                 {deckName: "Speed Vs", deckColors: "WBR"},
                 {deckName: "Spread the Sickness", deckColors: "BRG"},
@@ -926,7 +925,6 @@ var gameVars = {
                 {deckName: "Whimsical Musings of Delight", deckColors: "URG"},
                 {deckName: "Who's The Bosh", deckColors: "R"},
                 {deckName: "Wild BBQ", deckColors: "RG"},
-                {deckName: "aDeckmaster Richard Garfield", deckColors: "RG"},
                 {deckName: "Democratic Conspiracy", deckColors: "WUBRG"},
                 {deckName: "Denial of Will", deckColors: "UB"},
                 {deckName: "Devour for Power", deckColors: "WBG"},
@@ -1124,7 +1122,7 @@ vanguardDeck = [
     {vanguardName: "Jaya Ballard", vanguardAbility: "x: Jaya Ballard Avatar deals an amount of damage chosen at random from 0 to X to target creature or player (Activate this ability only once each turn).", vanguardLife: 1, vanguardHand: 0, vanguardPower: 0, vanguardToughness: 0, vanguardPicture: "url(art/cards-vanguard/jaya-ballard.jpg"},
     {vanguardName: "Jhoira of the Ghitu", vanguardAbility: "3, Discard a card: Copy three instant cards chosen at random. You may cast one of the copies without paying its mana cost. 3, Discard a card: Copy three sorcery cards chosen at random. You may cast one of the copies without paying its mana cost. Activate this ability only any time you could cast a sorcery.", vanguardLife: 0, vanguardHand: 1, vanguardPower: 0, vanguardToughness: 0, vanguardPicture: "url(art/cards-vanguard/jhoira-of-the-ghitu.jpg"},
     {vanguardName: "Karn", vanguardAbility: "Each noncreature artifact you control is an artifact creature with power and toughness each equal to its converted mana cost.", vanguardLife: 6, vanguardHand: 1, vanguardPower: 0, vanguardToughness: 0, vanguardPicture: "url(art/cards-vanguard/karn.jpg"},
-    {vanguardName: "Korona False God", vanguardAbility: "At the beginning of your upkeep, exchange control of a permanent you control chosen at random and a permanent target opponent controls chosen at random.", vanguardLife: 8, vanguardHand: -1, vanguardPower: 0, vanguardToughness: 0, vanguardPicture: "url(art/cards-vanguard/korona-false-god.jpg"},
+    {vanguardName: "Karona False God", vanguardAbility: "At the beginning of your upkeep, exchange control of a permanent you control chosen at random and a permanent target opponent controls chosen at random.", vanguardLife: 8, vanguardHand: -1, vanguardPower: 0, vanguardToughness: 0, vanguardPicture: "url(art/cards-vanguard/karona-false-god.jpg"},
     {vanguardName: "Kresh the Bloodbraided", vanguardAbility: "Whenever a creature you control is devoured, create an X/X green Ooze creature token, where X is the devoured creature's power.", vanguardLife: -3, vanguardHand: 1, vanguardPower: 0, vanguardToughness: 0, vanguardPicture: "url(art/cards-vanguard/kresh-the-bloodbraided.jpg"},
     {vanguardName: "Loxodon Hirearch", vanguardAbility: "Sacrifice a permanent: Regenerate target creature you control.", vanguardLife: 12, vanguardHand: 0, vanguardPower: 0, vanguardToughness: 0, vanguardPicture: "url(art/cards-vanguard/loxodon-hirearch.jpg"},
     {vanguardName: "Lyna", vanguardAbility: "Creatures you control have shadow. (They can block and be blocked only by creatures with shadow.)", vanguardLife: -4, vanguardHand: 2, vanguardPower: 0, vanguardToughness: 0, vanguardPicture: "url(art/cards-vanguard/lyna.jpg"},

@@ -1,4 +1,8 @@
 //Code Masters
+function playerFullInitiationDeck(playerNumber) {
+    return gameVars.playerInfo["player" + playerNumber].playerDecklist[0];
+}
+
 function findSecondHead(currentPlayer, currentDeckName) {
     for (var i = 0; i < gameVars.playerInfo["player" + currentPlayer].secondHead.length; i++) {
         if (gameVars.playerInfo["player" + currentPlayer].secondHead[i][0] === currentDeckName) {
@@ -742,8 +746,10 @@ function gameCount() {
 function updateLog(text) {
     var logText = [],
     logLength = gameVars.gameLog.length,
-    lastLog = gameVars.gameLog[logLength - 1];
+    lastLog = gameVars.gameLog[logLength - 1],
+    logBattleDecks = [];
 
+    logBattleDecks = gameVars.battleScreenInfo.battleDecks;
     logText.push(Date.parse(Date()));
     for (var i = 0; i < text.length; i++) {
         logText.push(text[i]);
@@ -753,7 +759,7 @@ function updateLog(text) {
     }
     if (logLength > 0 && logText[1].search("Begins") !== -1) {
         logText.push(gameVars.gameStatus.turn);
-        logText.push(gameVars.battleScreenInfo.battleDecks);
+        logText.push(logBattleDecks);
     }
     gameVars.gameLog.push(logText);
 }
@@ -867,4 +873,14 @@ function testImages() {
         var pictureToShow = archenemyDeck[i].archenemyPicture;
         document.getElementById("card-picture").style.backgroundImage = pictureToShow
     }
+}
+
+function giveAllDecksBonusesAndPenalties() {
+    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
+        if (!!gameVars.mapInfo.countryList[i].deck) {
+            gameVars.playerInfo["player" + gameVars.mapInfo.countryList[i].deck.deckPlayer].playerDecklist[findDeckRef(gameVars.mapInfo.countryList[i].deck.deckPlayer, gameVars.mapInfo.countryList[i].deck.deckName)].deckPenalties = 10;
+            gameVars.playerInfo["player" + gameVars.mapInfo.countryList[i].deck.deckPlayer].playerDecklist[findDeckRef(gameVars.mapInfo.countryList[i].deck.deckPlayer, gameVars.mapInfo.countryList[i].deck.deckName)].deckBonuses = 10;
+        }
+    }
+    return "Bonuses and Penalties Added";
 }
