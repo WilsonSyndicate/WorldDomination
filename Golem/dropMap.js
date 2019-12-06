@@ -37,12 +37,10 @@ function dropDeckIntoGame(player, country) {
 function dropWildCard(card) {
     //only if queue is less than3
     if (gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length < 3) {
-    //count wild cards used
-    var wildCardsPlayed = countItemsInArray("none", gameVars.globalGameOptions.supplyInfo.supplyDropQueue);
-    //remove button for corresponding count
-    removeElement("map-screen-toolbar", card);
-    //mark as chosen
-    chooseSupplyDrop("none");
+        //remove button for corresponding count
+        removeElement("map-screen-toolbar", card);
+        //mark as chosen
+        chooseSupplyDrop("none");
     }
 }
 
@@ -222,6 +220,8 @@ function chooseSupplyDrop(country) {
             }
             //add country to queue
             gameVars.globalGameOptions.supplyInfo.supplyDropQueue.push(country);
+            //grey out undroppables
+            checkUndroppable();
             //map note
             document.getElementById("map-note").innerHTML = "Drops Remaining: ".concat(3 - gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length);
             //create make drop button after 3 drops
@@ -231,15 +231,93 @@ function chooseSupplyDrop(country) {
             }
         }
     }
-} 
+}
+
+function isWildCardPlayed() {
+    for (var i = 0; i < gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length; i++) {
+        if (gameVars.globalGameOptions.supplyInfo.supplyDropQueue[i] === "none") {
+            return true;
+        }
+    }
+    return false;
+}
+
+function findCountrySupplyType(country) {
+    var supplyList = [];
+    
+    //count list to draw from
+    for (var d = 0; d < gameVars.globalGameOptions.supplyInfo.supplyDropCardsToDraw.length; d++) {
+        supplyList.push(gameVars.globalGameOptions.supplyInfo.supplyDropCardsToDraw[d]);
+    }
+    //count list played
+    for (var t = 0; t < gameVars.globalGameOptions.supplyInfo.supplyDropCardsTurnedIn.length; t++) {
+        supplyList.push(gameVars.globalGameOptions.supplyInfo.supplyDropCardsTurnedIn[t]);
+    }
+    //count players hands
+    for (var p = 1; p <= gameVars.gameStatus.turnOrder.length; p++) {
+        for (var s = 0; s < gameVars.playerInfo["player" + p].playerSupplyPoints.length; s++) {
+            supplyList.push(gameVars.playerInfo["player" + p].playerSupplyPoints[s]);
+        }
+    }
+    //check for match
+    for (var c = 0; c < supplyList.length; c++) {
+        if (country === supplyList[c].supplyCountry) {
+            return supplyList[c].supplyType;
+        }
+    }
+}
+
+function greyOutCountriesInCurrentPlayerQueueWithSupply(supplyNumber) {
+
+
+
+
+
+}
+
+function checkUndroppable() {
+    //mark any undroppables
+    if (isWildCardPlayed() === false) {
+        if (gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length === 1) {
+            //grey out any supply hand countries of the same with only one left
+
+
+
+
+
+            
+        }
+        if (gameVars.globalGameOptions.supplyInfo.supplyDropQueue.length === 2) {
+            var queue1 = gameVars.globalGameOptions.supplyInfo.supplyDropQueue[0],
+            queue2 = gameVars.globalGameOptions.supplyInfo.supplyDropQueue[1];
+
+            if (findCountrySupplyType(queue1) === findCountrySupplyType(queue2)) {
+                //if first two are same grey out any supply hand countries that are different
+
+
+
+
+
+            }
+            else {
+                //if first two are different grey out any that is same
+                greyOutCountriesInPlayerQueueWithSupply(queue1);
+                greyOutCountriesInPlayerQueueWithSupply(queue2);
+            }
+        }
+    }
+
+
+    //addClass(currentCountry, "not-supplyable");
+
+
+
+}
 
 function isSupplyable(currentCountry) {
     var currentPlayer = gameVars.gameStatus.turn,
     currentPlayerSupplyHand = gameVars.playerInfo["player" + currentPlayer].playerSupplyPoints,
     currentSupplyHandPlayableCountries = [];
-
-    //future version
-    //make the drop type specific
 
     for (var i = 0; i < currentPlayerSupplyHand.length; i++) {
         if (!!currentPlayerSupplyHand[i]) {
@@ -328,21 +406,16 @@ function supplyDropAvailable(currentSupplyHand) {
     countTypes = countSupplyTypes(currentSupplyHand),
     supplyNeeded = gameVars.globalGameOptions.supplyInfo.droppedPerSession;
 
-    /*future version to check supply types
-    if (currentSupplyHand.length >= supplyNeeded && countWild >= 1) {
+    //check for 3 types
+    if (currentSupplyHand.length >= supplyNeeded && countTypes >= 3) {
         return true;
     }
-    else if (currentSupplyHand.length >= supplyNeeded && countTypes === 3) {
-        return true;
-    }
+    //check for 3 of a kind
     else if (currentSupplyHand.length >= supplyNeeded && countTypes === 1) {
         return true;
     }
-    */
-
-    if (currentSupplyHand.length >= supplyNeeded) {
-        //future version
-        //remove this when drop is type specific
+    //check for wild
+    else if (currentSupplyHand.length >= supplyNeeded && countWild >= 1) {
         return true;
     }
     return false;

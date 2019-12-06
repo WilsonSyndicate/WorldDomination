@@ -504,9 +504,6 @@ function buildMapButtons() {
                 addClass(currentCountry, "is-supplyable");
             }
         }
-        else if (gameVars.gameStatus.mode === "placement") {
-            //future version to set up map
-        }
     }
 }
 

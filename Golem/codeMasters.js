@@ -876,11 +876,24 @@ function testImages() {
 }
 
 function giveAllDecksBonusesAndPenalties() {
+    var modsToAdd = 20;
+
     for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
         if (!!gameVars.mapInfo.countryList[i].deck) {
-            gameVars.playerInfo["player" + gameVars.mapInfo.countryList[i].deck.deckPlayer].playerDecklist[findDeckRef(gameVars.mapInfo.countryList[i].deck.deckPlayer, gameVars.mapInfo.countryList[i].deck.deckName)].deckPenalties = 10;
-            gameVars.playerInfo["player" + gameVars.mapInfo.countryList[i].deck.deckPlayer].playerDecklist[findDeckRef(gameVars.mapInfo.countryList[i].deck.deckPlayer, gameVars.mapInfo.countryList[i].deck.deckName)].deckBonuses = 10;
+            gameVars.playerInfo["player" + gameVars.mapInfo.countryList[i].deck.deckPlayer].playerDecklist[findDeckRef(gameVars.mapInfo.countryList[i].deck.deckPlayer, gameVars.mapInfo.countryList[i].deck.deckName)].deckPenalties = modsToAdd;
+            gameVars.playerInfo["player" + gameVars.mapInfo.countryList[i].deck.deckPlayer].playerDecklist[findDeckRef(gameVars.mapInfo.countryList[i].deck.deckPlayer, gameVars.mapInfo.countryList[i].deck.deckName)].deckBonuses = modsToAdd;
         }
     }
     return "Bonuses and Penalties Added";
+}
+
+function giveAllPlayersSupplyCards() {
+    var cardsToGive = 5;
+
+    for (var i = 0; i < gameVars.gameStatus.turnOrder.length; i++) {
+        for (var c = 0; c < cardsToGive; c++) {
+            getSupplyCard(gameVars.gameStatus.turnOrder[i]);
+            console.log("Supply Given to " + gameVars.gameStatus.turnOrder[i]);
+        }
+    }
 }

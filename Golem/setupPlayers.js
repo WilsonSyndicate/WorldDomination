@@ -1,11 +1,11 @@
 //Player Setup
 function shuffleArchenemy() {
-    gameVars.battleScreenInfo.archenemyDecklist = [];
+    gameVars.gameStatus.archenemyDecklist = [];
     for (var i = 0; i < archenemyDeck.length; i++) {
-        gameVars.battleScreenInfo.archenemyDecklist.push(i);
+        gameVars.gameStatus.archenemyDecklist.push(i);
     }
-    shuffleArray(gameVars.battleScreenInfo.archenemyDecklist);
-    gameVars.battleScreenInfo.archenemyCount = 0;
+    shuffleArray(gameVars.gameStatus.archenemyDecklist);
+    gameVars.gameStatus.archenemyCount = 0;
 }
 
 function shuffleHeroAndConspiracy() {

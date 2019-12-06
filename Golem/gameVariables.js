@@ -3,20 +3,20 @@
 //plane menus need to look better
 //battle screen
 //change map font size
+//hard to see which drops available
+
 
 //handle running out of decks
 //add deck prompt, check for same name deck
 
 
-//future game versions
-
 //continent moves
 
 //drop type specific
+//after first drop, grey out any of the same with only one left (ignore if a wild is used)
+//after second drop, if first two are same grey out any different, if first two are different grey out any that is not third (ignore if a wild is used)
 
-//more bonuses and penalties
-//  bonuses: tutor for 1 land, spells x cheaper for x turns, begin with 1 permanent in play
-//  penalties: first 3 lands come into play tapped, counter 1 spell, exile top 10
+//attack drop
 
 //initiative game evey earth shaking event
 
@@ -118,9 +118,7 @@ var gameVars = {
         battleContinentBonuses: [],
         battleLifeMods: [],
         battleHandMods: [],
-        battlePowerAndToughnessMods: [],
-        archenemyCount: 0,
-        archenemyDecklist: []
+        battlePowerAndToughnessMods: []
     },
     gameLog: [],
     globalGameOptions: {
@@ -141,7 +139,9 @@ var gameVars = {
         turn: 1,
         turnOrder: [],
         currentAttack: 1,
-        availableSupplyPoints: []
+        availableSupplyPoints: [],
+        archenemyCount: 0,
+        archenemyDecklist: []
     },
     mapInfo: {
         mapMoves: 0,
