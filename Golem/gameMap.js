@@ -53,8 +53,10 @@ function resetMapScreen() {
     disableId("confirm-attack");
     //clear map select
     gameVars.mapInfo.mapSelect = [];
-    //update reset map button
-    document.getElementById("decline-attack").innerHTML = "Decline Attack";
+    if (!!document.getElementById("decline-attack")) {
+        //update reset map button
+        document.getElementById("decline-attack").innerHTML = "Decline Attack";
+    }
 }
 
 function removeAllClassFromMapbuttons(classToRemove) {
@@ -361,7 +363,7 @@ function mapCountryClick(country) {
             placementClick(country);
         break;        
         case "drop":
-            chooseSupplyDrop(country);
+                chooseSupplyDrop(country);
         break;
         default: console.log("Mode not found in mapCountryClick");
     }
@@ -378,16 +380,16 @@ function countryMapName(currentCountry) {
         isHidden = findDeckWithPlayerNumberAndName(currentPlayerNumber, currentDeckName).deckHidden;  
 
         if (isHidden) {
-            return "<span>" + currentCountryName + "<br>" + currentPlayerName + "</span>";
+            return "<span>" + currentCountryName + "<br>" + currentPlayerName + addDropInfoToMapName(currentCountry.country) + "</span>";
         }
         else {
             if (adminSettings.useTwoHeadedGiant === true) {
                 var secondHeadDeckName = findSecondHead(currentPlayerNumber, currentDeckName);
 
-                return "<span>" + currentCountryName + "<br>" + currentDeckName  + "<br> and " + secondHeadDeckName[0] + "</span>";
+                return "<span>" + currentCountryName + "<br>" + currentDeckName  + "<br> and " + secondHeadDeckName[0] + addDropInfoToMapName(currentCountry.country) + "</span>";
             }
             else {
-                return "<span>" + currentCountryName + "<br>" + currentDeckName + "</span>";
+                return "<span>" + currentCountryName + "<br>" + currentDeckName + addDropInfoToMapName(currentCountry.country) + "</span>";
             }
         }
     }
@@ -503,6 +505,9 @@ function buildMapButtons() {
             else {
                 addClass(currentCountry, "is-supplyable");
             }
+            if (isItemInArray(currentCountry, gameVars.globalGameOptions.supplyInfo.supplyDropQueue)) {
+                addClass(currentCountry, "map-select");
+            }
         }
     }
 }
@@ -518,14 +523,8 @@ function beginAttack() {
         showMap();
         //build map buttons
         buildMapButtons();
-        //create skip attack button
-        addElement("map-screen-toolbar", "button", "Decline Attack", "decline-attack", "map-button", declineAttack);
-        addClass("decline-attack", "btn");
-        addClass("decline-attack", "btn-danger");
-        //create confirm attack button and disable
-        addElement("map-screen-toolbar", "button", "Confirm Attack", "confirm-attack", "map-button", attackChosen);
-        addClass("confirm-attack", "btn");
-        addClass("confirm-attack", "btn-primary");
+        //create attack buttons
+        rebuildAttackButtons();
         disableId("confirm-attack");
         //update message and note
         document.getElementById("map-message").innerHTML = currentTurnPlayerName + " Choose Your Attack";
@@ -549,6 +548,8 @@ function topOfTurn() {
     gameVars.gameStatus.mode = "attack";
     //go to intro screen
     showIntro();
+    //update supply view button
+    showSupplyViewButton();
 }
 
 function playerCountOnContinent(continent) {

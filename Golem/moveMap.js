@@ -186,7 +186,6 @@ function moveComplete() {
         }
         else {
             setEndOfTurn();
-
         }
     }
 }

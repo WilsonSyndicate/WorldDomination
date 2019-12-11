@@ -344,6 +344,7 @@ function findVanguardRef(currentVanguardName) {
     }
 }
 
+/*
 function endAnimateCountry(country) {
     var oldMatrixA = gameVars.mapInfo.backupCountryMatrix[0],
     oldMatrixD = gameVars.mapInfo.backupCountryMatrix[1],
@@ -391,16 +392,16 @@ function animateCountry(country) {
             interval = 0;
         }
         else {
-    */
+ 
             //set new matrix
             document.getElementById(country).style.transform = "matrix(" + newMatrixA + ", 0, 0, " + newMatrixD + ", " + newMatrixE + ", " +newMatrixF + ")";
-    /*
+  
             //count interval
             interval += 1;
         }
     }
-    */
 }
+*/
 
 function stringToDate(string) {
     var newDate = Date(string),
@@ -590,13 +591,17 @@ function findUniqueValuesInArray(array) {
 }
 
 function disableId(id) {
-    document.getElementById(id).disabled = true;
-    addClass(id, 'disabled');
+    if (!!document.getElementById(id)) {
+        document.getElementById(id).disabled = true;
+        addClass(id, 'disabled');
+    }
 }
 
 function undisableId(id) {
-    document.getElementById(id).disabled = false;
-    removeClass(id, 'disabled');
+    if (!!document.getElementById(id)) {
+        document.getElementById(id).disabled = false;
+        removeClass(id, 'disabled');
+    }
 }
 
 function numberSuffix(number) {
@@ -888,12 +893,13 @@ function giveAllDecksBonusesAndPenalties() {
 }
 
 function giveAllPlayersSupplyCards() {
-    var cardsToGive = 5;
+    var cardsToGive = 8;
 
     for (var i = 0; i < gameVars.gameStatus.turnOrder.length; i++) {
         for (var c = 0; c < cardsToGive; c++) {
             getSupplyCard(gameVars.gameStatus.turnOrder[i]);
-            console.log("Supply Given to " + gameVars.gameStatus.turnOrder[i]);
+            findFullPlayerWithPlayerNumber(gameVars.gameStatus.turn).playerSupplyPoints.push({supplyType: "wild", supplyCountry: "none"});
         }
     }
+    return (cardsToGive + 1) + " Supply Cards Given"
 }

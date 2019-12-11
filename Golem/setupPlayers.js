@@ -369,7 +369,7 @@ function buildSupplyPointList() {
     randomCountryList = [],
     supplyPointList = [],
     currentSupplyType = 0;
-
+    
     //create random country list
     for (var c = 0; c < gameVars.mapInfo.countryList.length; c++) {
         randomCountryList.push(gameVars.mapInfo.countryList[c].country);

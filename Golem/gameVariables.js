@@ -4,7 +4,8 @@
 //battle screen
 //change map font size
 //hard to see which drops available
-
+//wild card button
+//drop note to say something about types
 
 //handle running out of decks
 //add deck prompt, check for same name deck
@@ -12,15 +13,11 @@
 
 //continent moves
 
-//drop type specific
-//after first drop, grey out any of the same with only one left (ignore if a wild is used)
-//after second drop, if first two are same grey out any different, if first two are different grey out any that is not third (ignore if a wild is used)
-
-//attack drop
+//game start on option screen instead of information screen
 
 //initiative game evey earth shaking event
 
-
+//player info screen
 
 //ability to save game state through browser restart
 //ability to upload new decklists
@@ -59,9 +56,9 @@ var adminSettings = {
         "North America": "W",
         "Asia": "G",
         "Australia": "R",
-        continentCardPerDeckBonus: 0.34,
-        continentCardMinimum: 3,
-        continentLifeBonus: 40,
+        "continentCardPerDeckBonus": 0.34,
+        "continentCardMinimum": 3,
+        "continentLifeBonus": 40,
         "bonusAfrica": "At the beggining of your upkeep put a 2/2 black zombie with defender in play.",
         "bonusSouth America": "Your Artifacts cost 1 less to cast. If your deck has all five colors you get double rolls.",
         "bonusNorth America": "Your starting life increases by ",
@@ -130,11 +127,13 @@ var gameVars = {
             supplyDropCardsTurnedIn: [],
             supplyDropQueue: [],
             maxSupplyPerPerson: 5,
+            showSupplyDrops: false,
             droppedPerSession: 3//do not change
         }
     },
     gameStatus: {
         mode: "setup", //setup placement attack move
+        modeType: "",
         focus: "setup", //setup map battle log
         turn: 1,
         turnOrder: [],

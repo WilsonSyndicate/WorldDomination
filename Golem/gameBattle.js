@@ -1,4 +1,44 @@
+function rebuildAttackButtons() {
+    //remove reset map button
+    removeElement("map-screen-toolbar", "decline-attack");
+    //remove confirm attack button
+    removeElement("map-screen-toolbar", "confirm-attack");
+    //create skip attack button
+    addElement("map-screen-toolbar", "button", "Decline Attack", "decline-attack", "map-button", declineAttack);
+    addClass("decline-attack", "btn");
+    addClass("decline-attack", "btn-danger");
+    //create confirm attack button
+    addElement("map-screen-toolbar", "button", "Confirm Attack", "confirm-attack", "map-button", attackChosen);
+    addClass("confirm-attack", "btn");
+    addClass("confirm-attack", "btn-primary");
+}
 
+function afterBattleCleanup() {
+        //clear deck info and buttons
+        clearBattleScreenInformation();
+        //clear battle variables
+        gameVars.battleScreenInfo.battlePlayersCount = [];
+        gameVars.battleScreenInfo.battleDecks = [];
+        gameVars.battleScreenInfo.battleWinner = [];
+        gameVars.battleScreenInfo.groundZero = "";
+        gameVars.battleScreenInfo.battleBonuses = [];
+        gameVars.battleScreenInfo.battlePenalties = [];
+        gameVars.battleScreenInfo.battleVanguards = [];
+        gameVars.battleScreenInfo.battleHero = [];
+        gameVars.battleScreenInfo.battleConspiracy = [];
+        gameVars.battleScreenInfo.battleContinentBonuses = [];
+        gameVars.battleScreenInfo.battleLifeMods = [];
+        gameVars.battleScreenInfo.battleHandMods = [];
+        gameVars.battleScreenInfo.battlePowerAndToughnessMods = [];
+        gameVars.battleScreenInfo.planePromptText = "";
+        gameVars.battleScreenInfo.planarDeck = [];
+        gameVars.battleScreenInfo.currentPlanarCard = 0;
+        gameVars.globalGameOptions.supplyInfo.showSupplyDrops = false;
+        removeElement("country-information", "map-defense-preview");
+        removeElement("battle-information", "battle-defense-plane");
+        //update supply view button
+        showSupplyViewButton();
+}
 
 function setPlayerInfoLocation() {
     var battlePlayerCount = gameVars.battleScreenInfo.battlePlayersCount;
@@ -564,8 +604,13 @@ function unhideAllBattleDecks() {
     }
 }
 
-function attackChosen() {
-    var attackChoiceConfirmed = confirm("Confirm Attack?");
+function proceedWithAttack() {
+    if (gameVars.gameStatus.modeType === "attack") {
+        var attackChoiceConfirmed = true;
+    }
+    else {
+        var attackChoiceConfirmed = confirm("Confirm Attack?");
+    }
 
     if (attackChoiceConfirmed) {
         var attackingPlayer = gameVars.mapInfo.mapSelect[0].deckPlayer,
@@ -615,6 +660,41 @@ function attackChosen() {
             //remove supply drop button
             removeElement("map-screen-toolbar", "supply-drop-button");
         }
+    }
+}
+
+function attackChosen() {
+    var currentPlayerSupplyHand = currentPlayerUnplayedSupplyHand(),
+    groundZero = findFullCountryWithCountry(gameVars.battleScreenInfo.groundZero);
+
+    //prompt for attack drop if current player has wild card and supply card of ground zero
+    if (countWildSupply(currentPlayerSupplyHand) >= 1 && isItemInArray(groundZero.country, possibleDrops()) && currentPlayerUnplayedSupplyHand().length >= 3) {
+        var goToAttackDrop = confirm("Would You Like to Make an Attack Supply Drop On " + groundZero.countryName + "?"),
+        currentPlayer = findPlayerName(gameVars.gameStatus.turn);
+
+        if (goToAttackDrop) {
+            //remove reset map button
+            removeElement("map-screen-toolbar", "decline-attack");
+            //remove confirm attack button
+            removeElement("map-screen-toolbar", "confirm-attack");
+            //remove supply view
+            removeElement("map-screen-toolbar", "view-supply");
+            //show wild card buttons
+            buildWildCardButtons();
+            //update message to choose one more country
+            document.getElementById("map-message").innerHTML = currentPlayer + " Choose the Remaining Supply Drop"
+            //change mode to attack-drop
+            gameVars.gameStatus.mode = "drop";
+            gameVars.gameStatus.modeType = "attack";
+            chooseSupplyDrop("none");
+            chooseSupplyDrop(gameVars.battleScreenInfo.groundZero);
+        }
+        else {
+            proceedWithAttack();
+        }
+    }
+    else {
+        proceedWithAttack();
     }
 }
 
@@ -771,30 +851,8 @@ function battleScreenCleanup() {
     //clear cancel and win buttons
     removeElement("battle-screen-toolbar", "reset-winners");
     removeElement("battle-screen-toolbar", "confirm-winners");
-    //clear deck info and buttons
-    clearBattleScreenInformation();
-    //clear battle variables
-    gameVars.battleScreenInfo.battlePlayersCount = [];
-    gameVars.battleScreenInfo.battleDecks = [];
-    gameVars.battleScreenInfo.battleWinner = [];
-    gameVars.battleScreenInfo.groundZero = "";
-    gameVars.battleScreenInfo.battleBonuses = [];
-    gameVars.battleScreenInfo.battlePenalties = [];
-    gameVars.battleScreenInfo.battleVanguards = [];
-    gameVars.battleScreenInfo.battleHero = [];
-    gameVars.battleScreenInfo.battleConspiracy = [];
-    gameVars.battleScreenInfo.battleContinentBonuses = [];
-    gameVars.battleScreenInfo.battleLifeMods = [];
-    gameVars.battleScreenInfo.battleHandMods = [];
-    gameVars.battleScreenInfo.battlePowerAndToughnessMods = [];
-    gameVars.battleScreenInfo.planePromptText = "";
-    gameVars.battleScreenInfo.planarDeck = [];
-    gameVars.battleScreenInfo.currentPlanarCard = 0;
-    removeElement("country-information", "map-defense-preview");
-    //remove defense plane
-    removeElement("battle-information", "battle-defense-plane");
-    //clear deck info and buttons
-    clearBattleScreenInformation();
+    //after battle cleanup
+    afterBattleCleanup();
     //cleanup continent owned and controlled list
     cleanupContinentOwnedList();
     cleanupContinentControlledList();
@@ -919,7 +977,14 @@ function getSupplyCard(player) {
     if (gameVars.globalGameOptions.supplyInfo.supplyDropCardsToDraw.length === 0) {
         reshuffleSupplyDeck();
     }
-    var nextSupplyCard = gameVars.globalGameOptions.supplyInfo.supplyDropCardsToDraw.pop();
+    //if no supply cards are outstanding, give player a wild card
+    if (gameVars.globalGameOptions.supplyInfo.supplyDropCardsToDraw.pop() === undefined) {
+        var nextSupplyCard = {supplyType: "wild", supplyCountry: "none"};
+    }
+    else {
+        var nextSupplyCard = gameVars.globalGameOptions.supplyInfo.supplyDropCardsToDraw.pop();
+    }
+
     findFullPlayerWithPlayerNumber(player).playerSupplyPoints.push(nextSupplyCard);
     shuffleArray(gameVars.globalGameOptions.supplyInfo.supplyDropCardsToDraw);
 
@@ -1054,34 +1119,18 @@ function battleWinner(winningPlayerButton) {
             logNote = ["Battle Game Complete"];
             logNote.push(logTempNote);
             updateLog(logNote);
+            //rebuild attack buttons
+            rebuildAttackButtons();
             //if attacker wins
             if (winnerDesignation === "attackerWins") {
                 //change mode to move
                 setToMove();
             }
-            // clear battle screen infomration
-            clearBattleScreenInformation();
-            //clear game variables and go to map
-            gameVars.battleScreenInfo.battleDecks = [];
-            gameVars.battleScreenInfo.battlePlayersCount = 0;
-            gameVars.battleScreenInfo.battleWinner = [];
-            gameVars.battleScreenInfo.groundZero = "";
-            gameVars.battleScreenInfo.battleBonuses = [];
-            gameVars.battleScreenInfo.battlePenalties = [];
-            gameVars.battleScreenInfo.battleVanguards = [];
-            gameVars.battleScreenInfo.battleHero = [];
-            gameVars.battleScreenInfo.battleConspiracy = [];
-            gameVars.battleScreenInfo.battleContinentBonuses = [];
-            gameVars.battleScreenInfo.battleLifeMods = [];
-            gameVars.battleScreenInfo.battleHandMods = [];
-            gameVars.battleScreenInfo.battlePowerAndToughnessMods = [];
-            gameVars.battleScreenInfo.planePromptText= "";
-            gameVars.battleScreenInfo.planarDeck = [];
-            gameVars.battleScreenInfo.currentPlanarCard = 0;
-            removeElement("country-information", "map-defense-preview");
-            //remove defense plane
-            removeElement("battle-information", "battle-defense-plane");
+            //after battle cleanup
+            afterBattleCleanup();
+            //show map
             showMap();
+            //build map
             buildMapButtons();
             if (winningPlayerId !== gameVars.gameStatus.turn) {  
                 earthShakingEventCheck();
