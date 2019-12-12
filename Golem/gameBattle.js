@@ -1,3 +1,4 @@
+
 function rebuildAttackButtons() {
     //remove reset map button
     removeElement("map-screen-toolbar", "decline-attack");
@@ -974,20 +975,21 @@ function eliminateDeck(deckPlayer, deckName) {
 }
 
 function getSupplyCard(player) {
+    //if supply deck is empty, reshuffle discard pile
     if (gameVars.globalGameOptions.supplyInfo.supplyDropCardsToDraw.length === 0) {
         reshuffleSupplyDeck();
     }
-    //if no supply cards are outstanding, give player a wild card
-    if (gameVars.globalGameOptions.supplyInfo.supplyDropCardsToDraw.pop() === undefined) {
-        var nextSupplyCard = {supplyType: "wild", supplyCountry: "none"};
-    }
-    else {
-        var nextSupplyCard = gameVars.globalGameOptions.supplyInfo.supplyDropCardsToDraw.pop();
-    }
 
+    var nextSupplyCard = gameVars.globalGameOptions.supplyInfo.supplyDropCardsToDraw.pop();
+
+    //if no supply cards are outstanding, create a wild card
+    if (nextSupplyCard === undefined) {
+        nextSupplyCard = {supplyType: "wild", supplyCountry: "none"};
+    }
+    //give player card
     findFullPlayerWithPlayerNumber(player).playerSupplyPoints.push(nextSupplyCard);
+    //shuffle draw pile
     shuffleArray(gameVars.globalGameOptions.supplyInfo.supplyDropCardsToDraw);
-
     //for testing
     return nextSupplyCard;
 }
@@ -1040,7 +1042,8 @@ function eliminatedPlayerCheck(winningDeck, defendingDeck) {
                 //end of game
                 endOfGame(winningDeck.deckPlayer);
             }
-            //player eliminated
+            //player defeated message
+            alert(findPlayerName(defendingDeck.deckPlayer) + " Has Been Defeated");
             //transfer supply
             supplyCardsFromTo(defendingDeck.deckPlayer, winningDeck.deckPlayer);
             //remove from turn and count

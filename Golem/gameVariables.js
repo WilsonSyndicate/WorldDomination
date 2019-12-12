@@ -7,15 +7,7 @@
 //wild card button
 //drop note to say something about types
 
-//handle running out of decks
-//add deck prompt, check for same name deck
-
-
-//continent moves
-
 //game start on option screen instead of information screen
-
-//initiative game evey earth shaking event
 
 //player info screen
 
@@ -143,7 +135,15 @@ var gameVars = {
         archenemyDecklist: []
     },
     mapInfo: {
-        mapMoves: 0,
+        mapMoves: {
+            "moveAfrica": 0,
+            "moveSouth America": 0,
+            "moveNorth America": 0,
+            "moveAsia": 0,
+            "moveEurope": 0,
+            "moveAustralia": 0,
+            "moveAny": 0
+        },
         mapSelect: [],
         possibleBattle: [],
         joinThreat: [],

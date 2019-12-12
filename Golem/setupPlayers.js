@@ -282,61 +282,66 @@ function introScreenPenalty(currentCountry) {
 }
 
 function updateIntroScreen() {
-    //show country list with player, deck, bonuses and penalties
-    var countryList = [];
-
-    for (var c = 0; c < gameVars.mapInfo.countryList.length; c++) {
-        countryList.push({
-            countryName: gameVars.mapInfo.countryList[c].countryName, 
-            deckName: introScreenName(gameVars.mapInfo.countryList[c]),
-            deckGames: introScreenGames(gameVars.mapInfo.countryList[c]),
-            deckBonuses: introScreenBonus(gameVars.mapInfo.countryList[c]),
-            deckPenalties: introScreenPenalty(gameVars.mapInfo.countryList[c])
-        }); 
+    if (gameVars.gameStatus.mode === "setup") {
+        showOptionScreen();
     }
-    //create table with above info
-    var tableBody = document.getElementById("intro-information"), //reference for body
-    tbl = document.createElement("table"), //table element
-    tblBody = document.createElement("tbody"), //tbody element)
-    tblHeader = document.createElement("thead");
-
-    var tblHeaderValues = ["Country", "Deck", "Games", "Bonuses", "Penalties"],
-    tblHeaderRow = document.createElement("tr");
-
-    //remove previous list
-    removeElement("intro-information", "known-info");
-    tblHeader.appendChild(tblHeaderRow);
-    for (var h = 0; h < tblHeaderValues.length; h++) {
-        var headerValue = tblHeaderValues[h],
-        headerCell = document.createElement("th"),
-        headerText = document.createTextNode(headerValue);
-        headerCell.appendChild(headerText);
-        tblHeaderRow.appendChild(headerCell);
-    }
-    //creates all cells
-    for (var i = 0; i < countryList.length; i++) { 
-        //creates a table row
-        var row = document.createElement("tr"); 
-        //create a td element and text node, make the text node the contents of td and put td at the end of table row
-        for (var j = 0; j < tblHeaderValues.length; j++) { 
-            var currentCountry = countryList[i],
-            values = Object.values(currentCountry),
-            cell = document.createElement("td"),
-            cellText = document.createTextNode(values[j]);
-
-            cell.appendChild(cellText);    
-            row.appendChild(cell);        
+    else {
+        //show country list with player, deck, bonuses and penalties
+        var countryList = [];
+    
+        for (var c = 0; c < gameVars.mapInfo.countryList.length; c++) {
+            countryList.push({
+                countryName: gameVars.mapInfo.countryList[c].countryName, 
+                deckName: introScreenName(gameVars.mapInfo.countryList[c]),
+                deckGames: introScreenGames(gameVars.mapInfo.countryList[c]),
+                deckBonuses: introScreenBonus(gameVars.mapInfo.countryList[c]),
+                deckPenalties: introScreenPenalty(gameVars.mapInfo.countryList[c])
+            }); 
         }
-        tblBody.appendChild(row);
+        //create table with above info
+        var tableBody = document.getElementById("intro-information"), //reference for body
+        tbl = document.createElement("table"), //table element
+        tblBody = document.createElement("tbody"), //tbody element)
+        tblHeader = document.createElement("thead");
+    
+        var tblHeaderValues = ["Country", "Deck", "Games", "Bonuses", "Penalties"],
+        tblHeaderRow = document.createElement("tr");
+    
+        //remove previous list
+        removeElement("intro-information", "known-info");
+        tblHeader.appendChild(tblHeaderRow);
+        for (var h = 0; h < tblHeaderValues.length; h++) {
+            var headerValue = tblHeaderValues[h],
+            headerCell = document.createElement("th"),
+            headerText = document.createTextNode(headerValue);
+            headerCell.appendChild(headerText);
+            tblHeaderRow.appendChild(headerCell);
+        }
+        //creates all cells
+        for (var i = 0; i < countryList.length; i++) { 
+            //creates a table row
+            var row = document.createElement("tr"); 
+            //create a td element and text node, make the text node the contents of td and put td at the end of table row
+            for (var j = 0; j < tblHeaderValues.length; j++) { 
+                var currentCountry = countryList[i],
+                values = Object.values(currentCountry),
+                cell = document.createElement("td"),
+                cellText = document.createTextNode(values[j]);
+    
+                cell.appendChild(cellText);    
+                row.appendChild(cell);        
+            }
+            tblBody.appendChild(row);
+        }
+        tbl.id = "known-info";
+        tbl.appendChild(tblHeader);
+        tbl.appendChild(tblBody);
+        tableBody.appendChild(tbl);
+        //add class for bootstrap
+        document.getElementById("known-info").classList.add("table-striped");
+        //display log information
+        showLogInfo();
     }
-    tbl.id = "known-info";
-    tbl.appendChild(tblHeader);
-    tbl.appendChild(tblBody);
-    tableBody.appendChild(tbl);
-    //add class for bootstrap
-    document.getElementById("known-info").classList.add("table-striped");
-    //display log information
-    showLogInfo();
 }
 
 function cleanupPlayerDeckLists() {
@@ -439,6 +444,8 @@ function setupComplete() {
     }
     //build supply point list
     buildSupplyPointList();
+    //run test function
+    runTestFunction();
 }
 
 function toIniGame() {
@@ -577,6 +584,47 @@ function setupPlayerName() {
     updateDOMElement("display-name", changePlayerNameTo);
     //shuffledecklists
     shuffleAllDecklists();
+}
+
+function showOptionScreen() {
+    console.log("show option screen");
+
+
+    //support bonus
+    //adminSettings.supportBonus.useSupportBonusInGame
+    //make support bonuses modifyable
+
+    //placement setup
+    //adminSettings.placementSetup.usePlacementSetup
+
+    //two headed giant
+    //adminSettings.useTwoHeadedGiant
+
+    //archenemy
+    //adminSettings.useArchenemy
+
+    //defense plane
+    //adminSettings.useDefensePlane
+
+    //additional deck drops
+    //adminSettings.useAdditionalDeckDrops
+
+    //vanguard
+    //adminSettings.useVanguard
+
+    //hero
+    //adminSettings.useHero
+
+    //conspiracy
+    //adminSettings.useConspiracy
+
+    //continent bonuses
+    //adminSettings.continentBonuses.useContinentBonuses
+    //make continent bonuses modifyable
+
+    //make bonus and penalty amounts adjustable
+
+    //continent moves adjustable
 }
 
 function initialStartup() {

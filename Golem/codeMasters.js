@@ -1,4 +1,12 @@
 //Code Masters
+function removeAllPlayerDecksFromCountryList(playerNumber) {
+    for (var i = 0; i < gameVars.mapInfo.countryList.length; i++) {
+        if (!!gameVars.mapInfo.countryList[i].deck && gameVars.mapInfo.countryList[i].deck.deckPlayer === playerNumber) {
+            delete gameVars.mapInfo.countryList[i].deck;
+        }
+    }
+}
+
 function playerFullInitiationDeck(playerNumber) {
     return gameVars.playerInfo["player" + playerNumber].playerDecklist[0];
 }
@@ -134,7 +142,9 @@ function findContinentColor(continent) {
 }
 
 function cleanupHeroAndConspiracy() {
-    gameVars.mapInfo.heroConspiracyPlayed = findUniqueValuesInArray(gameVars.mapInfo.heroConspiracyPlayed)
+    if (gameVars.gameStatus.mode !== "setup") {
+        gameVars.mapInfo.heroConspiracyPlayed = findUniqueValuesInArray(gameVars.mapInfo.heroConspiracyPlayed);
+    }
 }
 
 function playerDeckCount(player) {
@@ -901,5 +911,9 @@ function giveAllPlayersSupplyCards() {
             findFullPlayerWithPlayerNumber(gameVars.gameStatus.turn).playerSupplyPoints.push({supplyType: "wild", supplyCountry: "none"});
         }
     }
-    return (cardsToGive + 1) + " Supply Cards Given"
+    return (cardsToGive + 1) + " Supply Cards Given";
+}
+
+function runTestFunction() {
+    //test function to run after setup complete
 }

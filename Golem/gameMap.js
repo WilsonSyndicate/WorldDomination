@@ -394,7 +394,7 @@ function countryMapName(currentCountry) {
         }
     }
     else {
-        return currentCountryName;
+        return "<span>" + currentCountryName + addDropInfoToMapName(currentCountry.country) + "</span>";
     }
 }
 

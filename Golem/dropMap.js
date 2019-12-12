@@ -29,21 +29,28 @@ function returnSupplyDropCard(country) {
 function dropDeckIntoGame(player, country) {
     var fullPlayer = gameVars.playerInfo["player" + player],
     dugoutRef = fullPlayer.playerDugout,
-    deckToDrop = fullPlayer.playerDecklist[dugoutRef],
     newDeckPlayer = player,
-    newDeckName = deckToDrop.deckName;
+    lastDeck = fullPlayer.playerDecklist.length;
 
-    //drop deck associated with dugout
-    findFullCountryWithCountry(country).deck = {deckPlayer: newDeckPlayer, deckName: newDeckName}; 
-    //increase player dugout by 1
-    rollUpPlayerDugout(player);
-    //add second head            
-    if (adminSettings.useTwoHeadedGiant === true) {
-        addHeadToDeck(player, newDeckName, dugoutRef + 1);
-        rollUpPlayerDugout(player);
+    if (adminSettings.useTwoHeadedGiant) {
+        lastDeck -= 1;
     }
-    //return deck name
-    return newDeckName
+    if (dugoutRef < lastDeck) {
+        var deckToDrop = fullPlayer.playerDecklist[dugoutRef],
+        newDeckName = deckToDrop.deckName;
+
+        //drop deck associated with dugout
+        findFullCountryWithCountry(country).deck = {deckPlayer: newDeckPlayer, deckName: newDeckName}; 
+        //increase player dugout by 1
+        rollUpPlayerDugout(player);
+        //add second head            
+        if (adminSettings.useTwoHeadedGiant === true) {
+            addHeadToDeck(player, newDeckName, dugoutRef + 1);
+            rollUpPlayerDugout(player);
+        }
+        //return deck name
+        return newDeckName
+    }
 }
 
 function dropWildCard(card) {
@@ -106,8 +113,11 @@ function makeSupplyDrop() {
                     if (adminSettings.useAdditionalDeckDrops === true) {
                         //drop deck
                         var newDeckName = dropDeckIntoGame(gameVars.gameStatus.turn, country);
+
                         //add log text
-                        logText += ": " + findPlayerName(fullCountry.deck.deckPlayer) + " drops " + newDeckName + " into game";
+                        if (newDeckName !== undefined) {
+                            logText += ": " + findPlayerName(fullCountry.deck.deckPlayer) + " drops " + newDeckName + " into game";
+                        }
                     }
                 }
                 //border drop
